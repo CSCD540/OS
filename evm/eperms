@@ -1,0 +1,12 @@
+# Eagle Perms.  Set permissions on all files that need excecuting
+# To make this script excecutable run "chmod +x eperms".
+# Created 3/7/10 by Isaac Schlittenhart, last modified 3/10/10
+# by Rick Nungester.
+
+chmod +x ../easm
+chmod +x ../ecomp
+chmod +x ../evm
+chmod +x ../emake
+chmod +x bldtools
+chmod +x cleanup
+

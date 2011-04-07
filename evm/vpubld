@@ -1,0 +1,20 @@
+# Build all Eagle Virtual Machine end-user tools in the /bin
+# directory.  Created by Rick Nungester 2/11/10.  Last Modified by
+# Rick Nungester 3/6/10.
+
+set -x          # echo each command as executed
+
+# Create the Eagle Compiler in the parent directory.
+#bison -v -t -d ecomp.y    
+#flex -d ecomp.l
+#gcc -g lex.yy.c ecomp.tab.c -lfl -lm -o ../ecomp
+
+# Create the Eagle Assembler in the parent directory.
+bison -v -t -d easm.y    
+flex -d easm.l
+gcc -g lex.yy.c easm.tab.c -lfl -lm -o ../easm
+
+#Create the Eagle Virtual Machine in the parent directory.
+#gcc -o ../evm evm.c
+gcc -o ../evm vpu.c
+

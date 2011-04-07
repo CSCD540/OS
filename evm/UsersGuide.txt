@@ -1,0 +1,361 @@
+          The Eagle Concurrent Systems Development Kit
+
+                CSCD 467 (Concurrent Systems) /
+       CSCD 540 (Advanced Topics in Modern Operating Systems)
+                Winter Quarter 2010 Term Project
+
+                              by
+
+          Anna Kudrya, Isaac Schlittenhart, Kristy VanSkyock,
+                  Yuming Chang and Rick Nungester
+
+
+The Eagle Concurrent Systems Development Kit (ECSDK) consists of the
+Eagle Compiler, Eagle Assembler, Eagle Virtual Machine, and the tools
+needed to develop and use them.
+
+The Eagle Compiler (ecomp) converts high-level source code (for
+example, "if (note == 9)") into assembly code ("LOAD note, LOADI 9,
+EQ").
+
+The Eagle Assembler (easm) converts assembly code into machine code
+("262, 1, 263, 9, 278").
+
+The Eagle Virtual Machine (evm) is a program that simulates a
+computer.  It provides an interactive shell (e.g. "del", "ls",
+"save", "load") and the ability to run multiple processes
+concurrently.
+
+
+Execution and Development Environment
+=====================================
+
+Team members used various PCs to develop and experiment with the
+ECSDK.
+
+Rick Nungester used a Dell Latitude D600 Laptop configured for
+dual-boot into either Windows XP or Ubuntu 8.10.  Only the standard
+Ubuntu environment is necessary to execute ecomp, easm, and evm.  To
+develop them required adding Gnu gcc version Ubuntu 4.3.2-1ubuntu12,
+Gnu Bison version 2.3, and Gnu Flex version 2.5.35.
+
+Isaac Schlittenhart used Ubuntu 9.10 environment booted off a thumb
+drive with casper to allow persistence of settings and programs.
+
+Kristy VanSkyock used a Pentium Mac with OS X 10.4.11.
+
+Yuming Chang used a virtual machine with SUSE 11.1.
+
+Anna Korchmar used Ubuntu 9.10 on a virtual machine. 
+
+ 
+Files and Directory Structure
+=============================
+
+/edk (main user directory)
+   /dev (main developers directory)
+      bldtools (script to build ecomp, easm, and evm)
+      cleanup (script to remove all generated/temporary files)
+      easm.l (easm lex/flex language definition)
+      easm.y (easm yacc/bison grammar definition)
+      ecomp.l (ecomp lex/flex language definition)
+      ecomp.y (ecomp yacc/bison grammar definition)
+      evm.c (evm C source code)
+      ... other generated/temporary development files
+   /doc (end-user documentation)
+   /emakeout (output from the emake script)
+   /samples
+      *.e (Eagle source code sample files)
+   ecomp (Eagle Compiler)
+   easm (Eagle Assembler)
+   evm (Eagle Virtual Machine)
+   emake (script to convert .e -> .asm -> .o)
+   *.asm (generated or manually-written Eagle Assembly code)
+   *.o (generated Eagle machine code, to be executed by evm)
+
+
+High-Level Language Description
+===============================
+
+Syntax and semantics for the Eagle high-level language are  defined
+in files /edk/dev/ecomp.l and ecomp.y respectively.  Example usage
+is given in files /edk/samples/*.e.  Language keywords:
+
+process           start of process
+if else           conditional
+while             looping construct
+halt              end all processes
+<= >= < > == !=   comparisons
+AND OR NOT        boolean logic
+=                 assignment
++ - * /           integer arithmetic
+( )               expression grouping
+{ }               statement blocks
+[ ]               array indexing
+;                 end of statement
+,                 separator
+"                 strings
+//                comment
+lock unlock       start/end critical section
+open seek read    file operations
+write close       file operations
+
+
+Assembly-Language Description
+=============================
+
+Syntax and semantics for the Eagle assembly language are defined
+in files /edk/dev/easm.l and easm.y respectively.  Examples can
+be seen in user-created *.asm files.  Language keywords:
+
+ADD, AND, CLOSE, DATA, DIV, END, ENDP, EQ, GE, GT, HALT, IDATA,
+J, JFALSE, LA, LD, LE, LOAD, LOADI, LOCK, LT, MUL, NE, NOT, OPEN,
+OR, POP, POPD, PROC, READ, SEEK, ST, STOP, STOR, SUB, UNLOCK, WRITE
+
+
+Machine-Language Description
+============================
+
+The conversion from assembly language to machine language can be seen
+in file /edk/dev/easm.y.  For example, search for "JFALSE" to learn
+about how that statement is managed.
+
+Machine language files (*.o) are plain-ASCII text files, with one
+integer value per line.  Each line is maintained as a 4-byte
+2's complement integer in the internal evm file system and main
+memory.
+
+
+Session: Building the Tools
+===========================
+
+Doing the following commands requires installation of Gnu tools
+bison, flex, and gcc.
+
+bash-3.2$ pwd
+/home/nungester/cscd540/edk/dev
+bash-3.2$ ls -gGR ..
+... (look at all directories and files)
+bash-3.2$ ./bldtools
+... (create ecomp, easm, and evm executables)
+bash-3.2$ ls -gGR ..
+... (look at all directories and files)
+bash-3.2$ ./cleanup
+... (remove all temporary/intermediate files)
+bash-3.2$ ls -gGR ..
+... (look at all directories and files)
+
+
+Session: Make, Load & Run a Program
+===================================
+./
+bash-3.2$ pwd
+/home/nungester/cscd540/edk
+bash-3.2$ ./emake bubble
+**** ecomp stdout end ****
+: }
+END PARSING 3
+DONE
+
+**** ecomp stderr end ****
+")
+--(end of buffer or a NUL)
+--EOF (start condition 0)
+
+**** easm stdout end ****
+0168:  LOADI	 1
+0170:  STOR	 11  (p1done)
+0172:  END
+
+**** easm stderr end ****
+")
+--(end of buffer or a NUL)
+--EOF (start condition 0)
+bash-3.2$ ls -l bubble*
+bash-3.2$ ls -l bubble*
+-rw-r--r-- 1 nungester nungester  821 2010-03-09 12:13 bubble.asm
+-rw-rw-rw- 1 nungester nungester 2569 2010-03-05 15:21 bubble.e
+-rw-r--r-- 1 nungester nungester  656 2010-03-09 12:13 bubble.o
+bash-3.2$ ./edk
+***********************************************************
+*         WELCOME TO THE EAGLE VIRTUAL MACHINE            *
+*     To see what commands are available, type help       *
+*                                                         *
+*        The size of the disk is 16K integers.            *
+*      16*1024 machine code statements max, total         *
+***********************************************************
+evm$ save bubble.o
+The size of the file is 196, and The name of the file is bubble.o.
+The file needs 49 blocks
+16188 free of 16384
+evm$ load bubble.o
+Total number of processes: 2
+evm$ run
+HALT called by process 0
+
+Global memory: size 20
+1  2  3  4  5  6  7  0  0  0  7  1  0  0  0  0  0  0  0  0  
+Register data
+Process 0: 0  0  0  0  0  0  0  0  0  0  
+Process 1: 0  6  6  2  6  0  0  0  0  0  
+evm$ exit
+***********************************************************
+*       Thanks for using the Eagle Virtual Machine!       *
+*                         GOOD-BYE!                       *
+***********************************************************
+bash-3.2$ 
+
+
+Eagle Virtual Machine Shell Commands
+====================================
+
+evm$ help
+------------------------------------------------
+     The following commands are available:      
+   NOTE: Use the man command to find out more   
+    information about a command of interest.    
+------------------------------------------------
+cat [filename]
+debug [int value]. Default is off
+del [filename]
+exit
+help
+load [filename]
+rm [filename]
+ls
+man [command]
+memdump [processID]
+run
+save [filename]
+showBlocks [number of blocks] default:10
+showGlobalMem
+showLRU
+showpage
+showRegisterData
+------------------------------------------------
+
+
+Development Tips
+================
+
+* Because each line of machine code files (*.o) is an ASCII text
+  representation of an integer, the required evm-internal file
+  system size (in units of 32-bit integers) is equal to the
+  number of lines in the machine-code file:
+
+  bash-3.2$ pwd
+  /home/nungester/cscd540/edk
+  bash-3.2$ cat langtest.o | wc -l
+  563
+  bash-3.2$ ./edk
+  ...
+  evm$ save langtest.o
+  The size of the file is 563...
+
+* The team used Google Groups group "ewulist" (set up by Isaac) for
+  communication during the quarter.  Metrics as of 3/9/10 noon (the
+  day before our presentation): 81 discussion threads, 416 posts,
+  182 by Rick.
+
+* The team used Dropbox (www.dropbox.com, set up by Ming) for file
+  sharing during development.
+
+* Script /edk/dev/eperms is to work around a known Dropbox defect.
+  When Dropbox distributes Linux executables, the permissions are
+  not maintained properly and execute permissions go away.
+
+
+Future Work
+===========
+
+During development, the student team kept a prioritized list of
+remaining tasks.  These are things we didn't get to:
+
+* Known defect: If there is no process p0 and the first process
+  created is p1, the memory dump output after "halt" will refer to
+  p1 as "Process 0".  Workaround: Always have a process p0.
+
+* Selectable scheduler algorithms (random, round-robin, priority).
+  This owner should probably also own definition of Process Control
+  Blocks and their use in scheduling.
+
+* Make ecomp output comments into its created filename.asm showing
+  the user source code interleaved with the generated assembly code.
+  For example:
+
+  # process p0  # This is a comment in file milk.e.
+  # {
+  PROC   p0
+  #    if ((note==9) AND (flag[4]>milk)) { halt; }
+  LOAD note
+  LOADI 9
+  EQ
+  ...
+
+* Make easm output a separate listing file (like "milk.lst") showing
+  all comments in its input .asm file, plus its .asm file content,
+  and the resulting machine code.  This would contain the users
+  source code and comments, generated assembly code, and machine
+  code, all in one file.  For example:
+
+  ## process p0  # This is a comment in file milk.e.
+  ## {
+  #PROC   p0
+  0
+  29
+  ...
+  ##    if ((note==9) AND (flag[4]>milk)) { halt; }
+  #LOAD note
+  262
+  1
+  ...
+
+* Add a way to delete a file from a runnning program.
+
+* evm.c cleanup: No compile warnings; 78-char max line length;
+  functions in logical groups (shell commands, file system, paging
+  table...); good file header with Table of Contents (search strings
+  to quickly locate major function groups); shorter shell-command
+  "while" loop making calls to functions instead of code in while
+  loop; more comments of use to undergrads.
+
+* Disk (file system) and/or Memory (physical memory) real-time output
+  of a map showing free ("_") or inode/overhead ("*") or user file
+  contents (".") or ... of each block.  Uses terminal escape sequences
+  for cursor location.  Rick has experience here.  Allows seeing
+  fragmentation happen real-time.  Looks like this:
+
+   Disk Memory (each char = 1 block = xx bytes)
+   *****..._...._..**_**...._..._..**_**..._...._..**_**..._.......
+   **_**..._.._._..**_*_.._._..._..*__**._._...._..**_**..._.......
+   etc.
+
+* Split very-big evm.c (ex-machine.c) into multiple files.
+
+* Make tools ecomp, easm, and evm output version/usage information.
+  All 3 would start at version 1.01:
+  - ecomp, with no paramters, outputs:
+    Eagle Compiler version 1.01
+    Usage: ecomp <input source file> <output assembly file>
+  - easm, with no parameters, outputs:
+    Eagle Assembler version 1.01
+    Usage: easm <input assembly file> <output machine code file>
+  - evm -- Change the startup banner to:
+    ***********************************************************
+    *         Eagle Virtual Machine version 1.01              *
+    ...
+
+* Something to investigate: Sample program critsec.e shows a critical
+  section failing.  Read the file header.  It always seems to
+  execute in a way that indicates p1 and p2 are conflicting every
+  loop (glbcnt12 == 300) or they are never conflicting (glbcnt12 ==
+  600).  It seems more values between 300 and 600 should be seen,
+  indicating a more random pattern of conflict.
+
+Credits
+=======
+
+Dr. Kosuke Imamura did most of the development of the Eagle Compiler
+and Eagle Assembler.  Our student team did most of the development
+of the Eagle Virtual Machine.
+

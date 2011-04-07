@@ -1,0 +1,26 @@
+# Remove all generated/temporary files.  Created by Rick Nungester
+# 2/11/10, last modified by Rick Nungester 3/11/10.
+
+set -x          # echo each command as executed
+
+# Group together each directory being dealt with.
+
+rm -f ../*.asm  # Careful, always auto-generated? Assume so for now.
+rm -f ../*.o
+rm -f ../*~
+
+rm -f ../emakeout/*
+
+rm -f ../doc/*~
+
+rm -f ../samples/*~
+
+rm -f easm.output
+rm -f easm.tab.c
+rm -f easm.tab.h
+rm -f ecomp.output
+rm -f ecomp.tab.c
+rm -f ecomp.tab.h
+rm -f lex.yy.c
+rm -f *~
+
