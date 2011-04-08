@@ -1,3 +1,5 @@
+BThis is Jordan
+B
 This is the operating systems project for CSCD 540 at Eastern Washington University Spring 2011
 
 We are building an operating system on top of the JVM EVM (Eastern Virtual Machine); Both the VM and OS are a work in progress.
