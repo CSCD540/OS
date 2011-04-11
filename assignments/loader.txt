@@ -1,0 +1,3 @@
+Create a loader to load a program from the disk into the OS memory
+
+It should respect relocatable memory.

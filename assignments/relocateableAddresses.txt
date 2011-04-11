@@ -1,0 +1,50 @@
+Loader is the interface between the OS and application program
+Load app to main mem then boom OS is running it.
+
+Mem locations 0-9 are register locations
+
+Need to implement relocatable address (This should be a program to run on the .asm file, so it will be an intermediate file)
+Modify easm.y
+
+p0
+0:
+1
+.
+.
+9:
+10: load 2
+12: loadI 100
+14: add
+15: jmp 10
+.
+.
+.
+100:
+.
+.
+.
+109:
+110: load 2 //This should translate to 102 add base address of 100 to each
+112: loadI 100
+114: add
+115: jmp 10
+
+Address # 11 (contains "2"), 16 = "10"
+reloc[0] = 11
+reloc[1] = 16
+
+.asm file should look like this after implementing relocatable addresses (The first part says which addresses need to be relocated) [Would actually be in machine code]
+2
+11
+16
+----
+0:
+.
+.
+9:
+10: load 2
+
+
+in the LOAD term of the assembler needs to add and a couple other spots like (LOAD, POP, JMP, JMP term, STOR) all spots need 
+
+reloc_table[reloc_index]=mem; //Something like that
