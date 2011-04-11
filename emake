@@ -1,0 +1,5 @@
+#!/bin/sh
+#Build a program
+
+./ecomp $1.e $1.asm
+./easm $1.asm $1.o
