@@ -296,7 +296,7 @@ void initLRU()
 //Get the file from real disk
 int getFile(char *filename, int *result)
 {
-	
+    int size = 0;
 	return size;
 }//end the getFile function
 
@@ -521,6 +521,7 @@ checkdone:
 
 int sysOpen(char *name, int attribute)
 {
+    int index = 0;
 		return index;	
 }
 
