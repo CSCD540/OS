@@ -1,0 +1,85 @@
+Page table
+Not a big data structure, but needs to be designed carefully. 
+
+Especially at page boundaries!
+
+Make the pages small to exercise page table (something like 4 or 8 bytes per page)
+
+Inverted Page Table
+IVP
+
+Max of 4 pages per file.
+
+Suppose we're loading 
+8-bit address <- virtual address <- CPU
+00000000
+00000001
+00000010
+00000011
+00000100
+
+Processor address space (virtual memory)
+000000-00:	a		//Page 0
+000000-01:	b
+000000-10:	c
+000000-11:	d
+
+000001-00:	e		//Page 1
+000001-01:	f
+000001-10:	g
+000001-11:	h
+
+000010-00:			//Page 2
+000010-01:
+000010-10:
+000010-11:
+
+000011-00:			//Page 3
+000011-01:
+000011-10:
+000011-11:
+
+000100-00:	A		//Page 4
+000100-01:	B
+000100-10:	C
+000100-11:	D
+
+Need two bits to express page offset the rest is the page #, so 4 bits for the page # gives us 15 pages
+0001-00
+
+Page table (IVP)
+Physical page#: virtual page# (-1 is unused)
+0: -1 -> 0
+1: -1 -> 1 (LRU) -> 4
+2: -1 -> 2
+3: -1 -> 3
+4: -1
+.
+.
+.
+
+
+Physical page #: contents this corresponds to mem[0][]
+0:	a
+	b
+	c
+	d
+1:	e -> A
+	f -> B
+	g -> C
+	h -> D
+2:	
+
+
+LRU (least recently used) determine by a number of which page was accessed recently
+	
+Physical page # + page offset
+
+TLB (translations look aside buffer) keeps portion of the IVP in cache to speed up this process.
+
+VPU PC (program counter) wants to execute address 000100-01, 
+check IVP 
+it's in page 1, so the address of the instruction is 
+page 0 + 01
+
+If it doesn't find it in the IVP then unload the LRU page and load the page into that location.
