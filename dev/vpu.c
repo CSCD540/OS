@@ -6,7 +6,7 @@
 
 /*begin isaac execute vars*/
 #define MAXPRO 1   //max num of processes
-#define MAXMEM 64 //max word size of a process
+#define MAXMEM 64 //max word size of a process (2-bytes)
 #define STACKSIZE 100 //max size of the stack
 #define REGISTERSIZE 10 //size of each process registers
 #define MAXGMEM 20 //max size of global memory
@@ -19,7 +19,7 @@
 #define BLOCKSIZE 4 //size for per block
 #define BLOCKS DISKSIZE/BLOCKSIZE// total number of blocks
 #define DISKSIZE 16*1024//16kB
-#define PAGESIZE 16 //size of each page
+#define PAGESIZE 16 //size of each page in words 2-bytes
 #define NUMPAGES 2 //Number of pages in page table
 #define DBGCPU 1
 #define DBGCPU1 0
