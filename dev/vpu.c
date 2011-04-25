@@ -1,4 +1,3 @@
-
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
@@ -27,30 +26,30 @@
 
 #define keyhit(a) {if(DBGCPU1){printf("hit enter --(%d)", a); getchar();}}
 
-int  gmem[MAXGMEM];   //global var sit here
+int gmem[MAXGMEM];   //global var sit here
 int mem[MAXPRO][MAXMEM];//Main mem for each process
 
 int endprog[MAXPRO]; // last instruction of proc
-int  jsym[60];
+int jsym[60];
 int pid = 0;  //process id
 int p0running;
 /*end isaac execute vars*/
 
 //Ming's variables
-int size_of_disk=DISKSIZE;
-int DEBUG = 0;
-int total_blocks=BLOCKS;//Total blocks
-int file_index=0;//main index
-int search_index=0;// temp index for search
+int  size_of_disk=DISKSIZE;
+int  DEBUG = 0;
+int  total_blocks=BLOCKS;//Total blocks
+int  file_index=0;//main index
+int  search_index=0;// temp index for search
 char *cmd;//The command(save, load, ls...etc.)
 char *arg1;//The argument(file's name)
-int disk_index=0;//main index
-int machine_on = 1;
-int tempmem[MAXPRO][200];//for PTB - loading all of the process information here
-int fileMonitor[30];
-int HALTED=0;
-int gfd;// file discriptor
-int reg[MAXPRO][REGISTERSIZE];
+int  disk_index=0;//main index
+int  machine_on = 1;
+int  tempmem[MAXPRO][200];//for PTB - loading all of the process information here
+int  fileMonitor[30];
+int  HALTED=0;
+int  gfd;// file discriptor
+int  reg[MAXPRO][REGISTERSIZE];
 //end Ming's varibales
 
 //Methods declaration
@@ -58,9 +57,9 @@ int reg[MAXPRO][REGISTERSIZE];
 void print_register(int reg[][REGISTERSIZE]);
 void print_gmem();
 void print_stack(int stack[][STACKSIZE],int sp[]);
-int peek(int stack[][STACKSIZE], int proc_id, int sp[], int offset);
+int  peek(int stack[][STACKSIZE], int proc_id, int sp[], int offset);
 void push(int stack[][STACKSIZE], int proc_id, int sp[],int data, int calledfrom);
-int pop(int stack[][STACKSIZE], int proc_id, int sp[], int calledfrom);
+int  pop(int stack[][STACKSIZE], int proc_id, int sp[], int calledfrom);
 void executeit();
 void grabData(int index,int *grabdata);
 void initReg();
@@ -68,37 +67,32 @@ void showRegisterData();
 void showManPage(char *cmd);
 void resetMemory();
 void initGmem();
-
-int exe(int stack[][STACKSIZE],int sp[],int reg[][REGISTERSIZE], int next_instruct[],int next_inst[], int cur_proc, int *terminate);
+int  exe(int stack[][STACKSIZE],int sp[],int reg[][REGISTERSIZE], int next_instruct[],int next_inst[], int cur_proc, int *terminate);
 //end Methods declaration
 
 main(int argc, char *argv[])
 {
-        int fi =0;
-        int coni =0;
-        int size = 0;
-        FILE *f;
+  int fi =0;
+  int coni =0;
+  int size = 0;
+  FILE *f;
 
-printf("excecuting %s\n", argv[1]); 
+  printf("excecuting %s\n", argv[1]); 
 
-        f = fopen(argv[1], "r");
-        if (f == NULL)
-        {
-                return -1; // -1 means file opening fail
-        }
+  f = fopen(argv[1], "r");
+  if (f == NULL)
+  {
+    return -1; // -1 means file opening fail
+  }
 
-
-
-        while(fscanf(f, "%d\n", &fi) != EOF)
-        {
-
-                mem[0][coni]=fi;
-                printf("%d: %d\n", coni, mem[0][coni]);
-                size++;
-                coni++;
-        }
-
-        fclose(f);
+  while(fscanf(f, "%d\n", &fi) != EOF)
+  {
+    mem[0][coni]=fi;
+    printf("%d: %d\n", coni, mem[0][coni]);
+    size++;
+    coni++;
+  }
+  fclose(f);
 
   executeit();
 }
@@ -112,13 +106,13 @@ void executeit()
   int sp[MAXPRO];
   int next_instruct[MAXPRO];
   int proc_complete[MAXPRO];
-  //int reg[MAXPRO][REGISTERSIZE];
+  // int reg[MAXPRO][REGISTERSIZE];
   int locked=UNLOCKED;
   int terminate=0;
 
   memset(stack,0,MAXPRO*STACKSIZE*sizeof(int));
   memset(sp,-1,MAXPRO*sizeof(int));
- // memset(next_instruct,0,MAXPRO*sizeof(int));
+  // memset(next_instruct,0,MAXPRO*sizeof(int));
   memset(proc_complete,0,MAXPRO*sizeof(int));
   memset(reg,0,10*MAXPRO*sizeof(int));
   srand( time(NULL) );
@@ -130,140 +124,145 @@ void executeit()
   next_instruct[4]=10;
   next_instruct[5]=10;
 
-  /*for(i=0;i<pid;i++)
-   for(m=0;m<STACKSIZE;m++)
-      printf("STACK %d: %d\n",i,stack[i][m]);*/
+  /*
+  for(i=0;i<pid;i++)
+    for(m=0;m<STACKSIZE;m++)
+       printf("STACK %d: %d\n",i,stack[i][m]);
 
-/*while(1) //used for testing a single process
-{
-   cur_proc=2;
-   if(next_instruct[cur_proc]<endprog[cur_proc])
-   {
-       msg=exe(stack,sp,reg,next_instruct,next_instruct,cur_proc);
-       //increment next_instruction
+  while(1) //used for testing a single process
+  {
+    cur_proc=2;
+    if(next_instruct[cur_proc]<endprog[cur_proc])
+    {
+      msg=exe(stack,sp,reg,next_instruct,next_instruct,cur_proc);
+      // increment next_instruction
       next_instruct[cur_proc]++;
       printf("loop: %d\n",next_instruct[cur_proc]);
-   }
-   else break;
-}*/
+    }
+    else break;
+  }
+  */
 
- keyhit(54);
-   cur_proc=0;
-   while(1)
-   {
-cont:
+  keyhit(54);
+  cur_proc=0;
+  while(1)
+  {
+    cont:
 
- keyhit(55);
+    keyhit(55);
 
-	  if (HALTED==1)
-	  {
-		  HALTED=0;
-		  break;
-	  }
-      if(locked==UNLOCKED)
-       {// printf("pid=%d\n", pid); //keyhit(8999);
-           cur_proc = 0; // only one core 
+    if (HALTED==1)
+    {
+      HALTED=0;
+      break;
+    }
+    if(locked==UNLOCKED)
+    {
+      // printf("pid=%d\n", pid); //keyhit(8999);
+      cur_proc = 0; // only one core 
+    }
 
-       }
+    if(proc_complete[cur_proc] == 1)
+    {
+      if (DEBUG!=0)
+       printf("----------------------------cur_proc: %d\n",cur_proc);
+      goto checkdone;
+    }
 
-      if(proc_complete[cur_proc] == 1)
-       {
-		 if (DEBUG!=0)
-			printf("----------------------------cur_proc: %d\n",cur_proc);
-             goto checkdone;
-       }
+    if(next_instruct[cur_proc]< 256) // safe guard
+    {
+      msg=exe(stack,sp,reg,next_instruct,next_instruct,cur_proc, &terminate);
+      if(msg==ENDPROCESS || terminate == 1)
+      {// Ming
+        proc_complete[cur_proc]=1;
+        goto checkdone;// Ming
+      }// Ming
 
-      if(next_instruct[cur_proc]< 256) // safe guard
+      // printf("%d %d\n",cur_proc,next_instruct[cur_proc]+1);
+      // increment next_instruction
+      next_instruct[cur_proc]++;
+      if(msg==UNLOCKED)
       {
-         msg=exe(stack,sp,reg,next_instruct,next_instruct,cur_proc, &terminate);
-         if(msg==ENDPROCESS || terminate == 1)
-         {//Ming
-            proc_complete[cur_proc]=1;
-				goto checkdone;//Ming
-		 }//Ming
-			
-
-    //    printf("%d %d\n",cur_proc,next_instruct[cur_proc]+1);
-         //increment next_instruction
-         next_instruct[cur_proc]++;
-         if(msg==UNLOCKED)
-         {
-//printf("unlock\n");
-            locked=UNLOCKED;
-         }
-         else if(msg==LOCKED || locked==LOCKED)
-         {//printf("locked\n");
-            locked=LOCKED;
-         }
+        // printf("unlock\n");
+        locked=UNLOCKED;
+      }
+      else if(msg==LOCKED || locked==LOCKED)
+      {
+        // printf("locked\n");
+        locked=LOCKED;
+      }
          
 #if 0         
+      // run p0 in its entirety after a gmem write
+      // cur_proc=0;
+      // while(msg==p0WRITE || p0running)
+      while(1)
+      {
+        p0running=1; cur_proc=0;
+        // printf("p0 started   PC=%d\n", next_instruct[cur_proc]);
+        msg=exe(stack,sp,reg,next_instruct,next_instruct,p0);
+        // printf("p1, nextPC=%d\n" , next_instruct[1]);
 
-        //run p0 in its entirety after a gmem write
-         //cur_proc=0;
-        // while(msg==p0WRITE || p0running)
-         while(1)
-         {
-            p0running=1; cur_proc=0;
-//printf("p0 started   PC=%d\n", next_instruct[cur_proc]);
-            msg=exe(stack,sp,reg,next_instruct,next_instruct,p0);
-//   printf("p1, nextPC=%d\n" , next_instruct[1]);
-			
-			/*if(HALTED==1)
-			{
-				break;
-			}*/
-						
-            next_instruct[cur_proc]++;
-            if(p0running == 0)
-            {  msg=NORMAL;
-               next_instruct[p0]=10;
-               break;
-            }
-//printf("branch %d \n",(next_instruct[cur_proc]<endprog[cur_proc]));
-            if( next_instruct[p0]>=endprog[p0])
-            {  p0running=0;
-               sp[p0]=0;
-               next_instruct[p0]=10;
-               msg=NORMAL;
-               break;
-            }
-         }
-         continue;
+        /*
+        if(HALTED==1)
+        {
+          break;
+        }
+        */
+
+        next_instruct[cur_proc]++;
+        if(p0running == 0)
+        {
+          msg=NORMAL;
+          next_instruct[p0]=10;
+          break;
+        }
+        // printf("branch %d \n",(next_instruct[cur_proc]<endprog[cur_proc]));
+
+        if( next_instruct[p0]>=endprog[p0])
+        {
+          p0running=0;
+          sp[p0]=0;
+          next_instruct[p0]=10;
+          msg=NORMAL;
+          break;
+        }
+      }
+      continue;
 #endif
 
-      }
-      else
-      {
-           printf("Process %d complete, terminate=%d\n",cur_proc, terminate);
-           proc_complete[cur_proc]=1;
-      }
-      //check if all processes are done
-checkdone:
-  //    for(cur_proc=0;cur_proc<pid;cur_proc++)
-      if(terminate ==0)
-         goto cont;
-     break;
-   }
+    }
+    else
+    {
+      printf("Process %d complete, terminate=%d\n",cur_proc, terminate);
+      proc_complete[cur_proc]=1;
+    }
+    // check if all processes are done
+    checkdone:
+    // for(cur_proc=0;cur_proc<pid;cur_proc++)
+    if(terminate ==0)
+     goto cont;
+    break;
+  }
   // print_stack(stack,sp); stack should be all 0 and sp at -1
-   print_gmem();
-   print_register(reg);
+  print_gmem();
+  print_register(reg);
 }
 
 
 
 int exe(int stack[][STACKSIZE],int sp[],int reg[][REGISTERSIZE], int next_instruct[],int next_inst[], int cur_proc, int *terminate)
 {
-   int i,k, m; //delete these after all accesses renamed, except i
-   int tmp,tmp1, tmp2;
-   int real_inst;
-   char name[11];
+  int i,k, m; //delete these after all accesses renamed, except i
+  int tmp,tmp1, tmp2;
+  int real_inst;
+  char name[11];
 
- 
-   i=next_inst[cur_proc];
-   real_inst = i;
-printf("(pid=%d) PC = %d:  ", cur_proc, i);
-printf(" = %d\n", mem[cur_proc][i] );
-//gmem[6]=101;
+  i = next_inst[cur_proc];
+  real_inst = i;
+  printf("(pid=%d) PC = %d:  ", cur_proc, i);
+  printf(" = %d\n", mem[cur_proc][i] );
+// gmem[6]=101;
 
 /** the following 3 lines are for debugging user program too **/
 #if 0
@@ -549,15 +548,15 @@ if(DBGCPU)printf("jfalse %d %d \n", tmp,tmp2-1);
 				{
 					tmp=mem[cur_proc][i+1];
 				}
-                next_instruct[cur_proc]=tmp-1;//sub one for PC in executeit() 
- if(DBGCPU)    printf("%04d:  JMP\t %d\n", i, next_instruct[cur_proc]); 
-                 // next_inst[cur_proc]++;
-                break;
-default:
-     printf("illegal instruction mem[%d][%d]\n",cur_proc,i);
-     keyhit(127);
-     printf("(%04d:   %d)\n", i, mem[cur_proc][i]);  
-     break;
+        next_instruct[cur_proc]=tmp-1;//sub one for PC in executeit() 
+       if(DBGCPU)    printf("%04d:  JMP\t %d\n", i, next_instruct[cur_proc]); 
+                       // next_inst[cur_proc]++;
+       break;
+      default:
+       printf("illegal instruction mem[%d][%d]\n",cur_proc,i);
+       keyhit(127);
+       printf("(%04d:   %d)\n", i, mem[cur_proc][i]);  
+       break;
 
    }
 //printf("returning NORMAL\n"); // keyhit(9999);

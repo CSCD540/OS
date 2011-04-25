@@ -127,100 +127,68 @@ struct filesystem
 
 int main(void)
 {
- 
- initfilesys();//Just show the message.
- //initLastUsedPage();
+  initfilesys();//Just show the message.
+  //initLastUsedPage();
 
-/* Shell command 
- * Commands: save,del,ls,exit,run,help
- * switch case doesn't support string. 
- * */	
-while(machine_on)
-{
-  printf("evm$ ");
-  
- //gets(input);
- fgets(input,sizeof(input),stdin);
- 
- input[strlen(input)-1] = 0;
- 
- if(strlen(input)<1) continue;//When there is no input string, skiping everything.
-	
- 
- 
- //split the cmd and arg(file name)
- cmd = strtok(input, " ");
- arg1= strtok('\0', " ");
- 
-  
- if(strcmp(cmd,"ls")==0) 
- {
+  /* Shell command 
+  * Commands: save,del,ls,exit,run,help
+  * switch case doesn't support string. 
+  * */	
+  while(machine_on)
+  {
+    printf("evm$ ");
 
- }
- else if(strcmp(cmd,"save")==0)
-	{
-			
-		
-	}
- else if(strcmp(cmd,"rm")==0)
-	{
-		
-	}
- else if(strcmp(cmd,"load")==0)
- {
- }
- else if(strcmp(cmd,"run")==0)
- 	{
-		/*Run the file*/
-	}
- else if(strcmp(cmd,"exit")==0)
-	{
-		 showExit();
+    //gets(input);
+    fgets(input,sizeof(input),stdin);
 
-	}
- else if(strcmp(cmd,"showpage")==0)
-	{
-	}
+    input[strlen(input)-1] = 0;
 
- else if(strcmp(cmd, "help")==0)
- {
- }
- else if(strcmp(cmd,"memdump")==0)
- {
-		
- }
+    if(strlen(input)<1) continue;//When there is no input string, skiping everything.
 
- else if(strcmp(cmd,"showLRU")==0)
- {
+    //split the cmd and arg(file name)
+    cmd = strtok(input, " ");
+    arg1= strtok('\0', " ");
 
- }
- else if(strcmp(cmd,"showBlocks")==0)
- {
-	
- }
- else if(strcmp(cmd,"debug")==0)
- {
-	
- }
-else if(strcmp(cmd,"cat")==0)
- {
-	
- }
- else if(strcmp(cmd,"man")==0)
- {
+    if(strcmp(cmd,"ls")==0) 
+    {}
+    else if(strcmp(cmd,"save")==0)
+    {}
+    else if(strcmp(cmd,"rm")==0)
+    {}
+    else if(strcmp(cmd,"load")==0)
+    {}
+    else if(strcmp(cmd,"run")==0)
+    {
+      /*Run the file*/
+    }
+    else if(strcmp(cmd,"exit")==0)
+    {
+      showExit();
+    }
+    else if(strcmp(cmd,"showpage")==0)
+    {}
+    else if(strcmp(cmd, "help")==0)
+    {}
+    else if(strcmp(cmd,"memdump")==0)
+    {}
+    else if(strcmp(cmd,"showLRU")==0)
+    {}
+    else if(strcmp(cmd,"showBlocks")==0)
+    {}
+    else if(strcmp(cmd,"debug")==0)
+    {}
+    else if(strcmp(cmd,"cat")==0)
+    {}
+    else if(strcmp(cmd,"man")==0)
+    {}
+    else if(strcmp(cmd, "showGlobalMem")==0)
+    {}
+    else if(strcmp(cmd, "showRegisterData")==0)
+    {}
+    else printf("Bad command\n");
+  }// end while(machine_on)
 
- }
- else if(strcmp(cmd, "showGlobalMem")==0)
- {
- }
- else if(strcmp(cmd, "showRegisterData")==0)
- {
- }
- else printf("Bad command\n");
-}
-
-	return 0;
-
+  return 0;
 }// end of main
 
 void showManPage(char *cmd)

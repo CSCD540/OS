@@ -72,18 +72,16 @@ void list_reverse(LLIST **p)
 		
 	while(*p != NULL)
 	{
-	
 		list_add(&n, (*p)->data);
-		//list_print(n);
-	
+		// list_print(n);
 		*p = (*p)->next;
 	}
-	//n->next = NULL;
-	//list_print(n);
-	//n->next = *p; /* the previous element (*p) now becomes the "next" element */
+	// n->next = NULL;
+	// list_print(n);
+	// n->next = *p; /* the previous element (*p) now becomes the "next" element */
 	*p = n;       /* add new empty element to the front (head) of the list */
 	
-	//list_print(*p);
+	// list_print(*p);
 }
  
 void list_remove(LLIST **p) /* remove head */
@@ -126,7 +124,7 @@ void list_print(LLIST *n)
 		printf("%d Node\n",j+1);
 		for(i=0; i< 4; i++)
 		{
-			//printf("print %p %p %d\n", n, n->next, n->data[i]);
+			// printf("print %p %p %d\n", n, n->next, n->data[i]);
 			printf("print %p %d\n", n, n->data[i]);
 		}
 		n = n->next;
@@ -147,16 +145,16 @@ void ToArray(LLIST *n, int *array)
 	{
 		int i;
 		
-		//printf("%d Node\n",j+1);
+		// printf("%d Node\n",j+1);
 		int k = j * 4;
 		
 		for(i=0; i< 4; i++)
 		{
 			
-			//printf("print %p %p %d\n", n, n->next, n->data[i]);
-			//printf("print %p %d\n", n, n->data[i]);
+			// printf("print %p %p %d\n", n, n->next, n->data[i]);
+			// printf("print %p %d\n", n, n->data[i]);
 			array[k+i] = n->data[i];
-			//printf("%d\n",array[k+i]);
+			// printf("%d\n",array[k+i]);
 		}
 		n = n->next;
 		j++;

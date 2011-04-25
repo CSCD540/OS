@@ -53,7 +53,7 @@ char glovars[GMAX][11];
 //char locvars[GMAX][11];
 char initialized[INITMAX];
 int  initializedindex = 0; 
-char  countinitialized = 0; 
+char countinitialized = 0; 
 char subvars[SMAX][11];
 unsigned int nglob;
 
@@ -65,12 +65,12 @@ char *gid[11];
 char assID[11];
 char prevID[11];
 char optype[3];
-int assIDon = 1;
-int i,j,k;
+int  assIDon = 1;
+int  i,j,k;
 
-int  sindex = 0;
-int  pindex = 0;
-int  memloc = 0;
+int sindex = 0;
+int pindex = 0;
+int memloc = 0;
 int psub =1;
 int loadcount =0;
 int smemloc = 0;
@@ -78,91 +78,103 @@ int smemloc = 0;
 int symloc=0;
 
 int showparse( int beg)
-{ int i;
-        for (i=beg; i<sindex; i++)
-        {  printf("############## parse[%d].idop= %s, (type)%d\n",
-                                i, parse[i].idop, parse[i].type);
-        }
-        printf("end show\n");
+{ 
+  int i;
+  for (i=beg; i<sindex; i++)
+  {
+    printf("############## parse[%d].idop= %s, (type)%d\n", i, parse[i].idop, parse[i].type);
+  }
+  printf("end show\n");
 }
 
 int termcopy(int beg)
-{ int i, j;
-         printf("termcopy: storage loc calc here\n");
-         //fprintf(outfile,"storage loc calc here\n");
-         j = 0;        
-         strcpy(parsecopy[j].idop, parse[beg].idop);
-         parsecopy[j].type = parse[beg].type;
+{
+  int i, j;
+  printf("termcopy: storage loc calc here\n");
+  //fprintf(outfile,"storage loc calc here\n");
+  j = 0;        
+  strcpy(parsecopy[j].idop, parse[beg].idop);
+  parsecopy[j].type = parse[beg].type;
  
-printf("%s  ->   %s\n", parse[beg].idop, parsecopy[beg].idop);
+  printf("%s  ->   %s\n", parse[beg].idop, parsecopy[beg].idop);
 
-         if(parse[beg+1].idop[0] == '[')
-         { i= beg+1; j++;
-           do { /* append parse[i].idop to tgt */
-             strcpy(parsecopy[j].idop, parse[i].idop);
-printf("%s  ->   %s\n", parse[i].idop, parsecopy[j].idop);
-             parsecopy[j].type = parse[beg].type;
-             j++;
-           } while (parse[i++].idop[0] != ']');
-         }
-         copysindex = j;
+  if(parse[beg+1].idop[0] == '[')
+  {
+    i= beg+1; j++;
+    do { /* append parse[i].idop to tgt */
+      strcpy(parsecopy[j].idop, parse[i].idop);
+      printf("%s  ->   %s\n", parse[i].idop, parsecopy[j].idop);
+      parsecopy[j].type = parse[beg].type;
+      j++;
+    } while (parse[i++].idop[0] != ']');
+  }
+  copysindex = j;
 }
 
 int printinitialized()
-{ int i;
+{
+  int i;
 
-   fprintf(outfile, ".IDATA\n");
-   for(i=0; initialized[i]; i++)
-   { if(initialized[i] == -1)
-     { fprintf(outfile, "\n");
-       //printf("\n");
-     }
-     else
-     { fprintf(outfile, "%c", initialized[i]);
-       // printf("%c", initialized[i]);
-     }
-   } 
+  fprintf(outfile, ".IDATA\n");
+  for(i=0; initialized[i]; i++)
+  {
+    if(initialized[i] == -1)
+    {
+      fprintf(outfile, "\n");
+      // printf("\n");
+    }
+    else
+    {
+      fprintf(outfile, "%c", initialized[i]);
+      // printf("%c", initialized[i]);
+    }
+  } 
 }
 
 int showterm( int beg)
-{ int i;
-//fprintf(outfile, "sindex=%d\n", sindex);
-        for (i=beg; i<sindex; i++)
-        {  fprintf(outfile, "  %s",  parse[i].idop);
-           printf("    %s",  parse[i].idop);
-           if( ((i+1)<sindex) && (parse[i+1].idop[0] == '['))
-           { i= i+1;
-             do { /* append parse[i].idop to tgt */
-               fprintf(outfile, "%s",  parse[i].idop);
-               printf("%s",  parse[i].idop);
-             } while (parse[i++].idop[0] != ']');
-             i--;
-           }
-        }
-        fprintf(outfile, "\n");
+{
+  int i;
+  //fprintf(outfile, "sindex=%d\n", sindex);
+  for (i=beg; i<sindex; i++)
+  {
+    fprintf(outfile, "  %s",  parse[i].idop);
+    printf("    %s",  parse[i].idop);
+    if( ((i+1) < sindex) && (parse[i+1].idop[0] == '['))
+    {
+      i= i+1;
+      do { /* append parse[i].idop to tgt */
+        fprintf(outfile, "%s",  parse[i].idop);
+        printf("%s",  parse[i].idop);
+      } while (parse[i++].idop[0] != ']');
+      i--;
+    }
+  }
+  fprintf(outfile, "\n");
 }
 
 int declr_alloc(int loc)
-{ int i;
-printf("declr_alloc called from %d\n", loc);
-//showparse(0);
-//showterm(0);
-//keyhit(445);
-//printf("END of showparse showterm\n");
+{
+  int i;
+  printf("declr_alloc called from %d\n", loc);
+  //showparse(0);
+  //showterm(0);
+  //keyhit(445);
+  //printf("END of showparse showterm\n");
 
   if( parse[0].type != ID )
-  {  printf("declare Identifier err: %s\n", parse[0].idop ); 
-  
+  {
+    printf("declare Identifier err: %s\n", parse[0].idop );
   } 
   printf("declr_alloc():   loc:%d\n",  memloc);
 
   if( parse[1].type != (char)LBRCT )
   {   
-      return;
+    return;
   }
   else
-  {    printf("declr_alloc():  %s", parse[2].idop);
-      return;
+  {
+    printf("declr_alloc():  %s", parse[2].idop);
+    return;
   }
 }
 
@@ -213,7 +225,6 @@ printf("declr_alloc called from %d\n", loc);
 %token UNLOCK
 %token DBLQT
 %token CHARSTR
-
 %token ARRAY 
 
 %left  LPREC 
