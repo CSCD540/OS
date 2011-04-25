@@ -6,7 +6,7 @@
 
 /*begin isaac execute vars*/
 #define MAXPRO 1   //max num of processes
-#define MAXMEM 64 //max word size of a process
+#define MAXMEM 64 //max size of a process in word/sizeof(int) bytes
 #define STACKSIZE 100 //max size of the stack
 #define REGISTERSIZE 10 //size of each process registers
 #define MAXGMEM 20 //max size of global memory
@@ -19,29 +19,29 @@
 #define BLOCKSIZE 4 //size for per block
 #define BLOCKS DISKSIZE/BLOCKSIZE// total number of blocks
 #define DISKSIZE 16*1024//16kB
-#define PAGESIZE 16 //size of each page
-#define NUMPAGES 2 //Number of pages in page table
+#define PAGESIZE 16 //size of each page in words 2-bytes
+#define NUMPAGES MAXMEM / PAGESIZE //Number of pages in page table
 #define DBGCPU 1
 #define DBGCPU1 0
 
 #define keyhit(a) {if(DBGCPU1){printf("hit enter --(%d)", a); getchar();}}
 
 // Variables
-int gmem[MAXGMEM]; // global var sit here
-int mem[MAXPRO][MAXMEM]; // Main mem for each process
-int endprog[MAXPRO]; // last instruction of proc
-int jsym[60];
-int pid = 0;  //process id
-int p0running;
-int  size_of_disk=DISKSIZE;
+int  gmem[MAXGMEM]; // global var sit here
+int  mem[MAXPRO][MAXMEM]; // Main mem for each process
+int  endprog[MAXPRO]; // last instruction of proc
+int  jsym[60];
+int  pid = 0;  //process id
+int  p0running;
+int  sizeOfDisk=DISKSIZE;
 int  DEBUG = 0;
-int  total_blocks=BLOCKS; // Total blocks
-int  file_index=0; // main index
-int  search_index=0; // temp index for search
+int  totalBlocks=BLOCKS; // Total blocks
+int  fileIndex=0; // main index
+int  searchIndex=0; // temp index for search
 char *cmd; // The command(save, load, ls...etc.)
 char *arg1; // The argument(file's name)
-int  disk_index=0; // main index
-int  machine_on = 1;
+int  diskIndex=0; // main index
+int  machineOn = 1;
 int  tempmem[MAXPRO][200]; // for PTB - loading all of the process information here
 int  fileMonitor[30];
 int  HALTED=0;
@@ -56,28 +56,28 @@ char input[30]; //Console input
 // Methods declaration
 int  exe(int stack[][STACKSIZE],int sp[],int reg[][REGISTERSIZE], int next_instruct[],int next_inst[], int cur_proc, int *terminate);
 void executeit();
-void grabData(int index,int *grabdata);
-void initGmem();
-void initReg();
+void grab_data(int index,int *grabdata);
+void init_gmem();
+void init_reg();
 void print_register(int reg[][REGISTERSIZE]);
 void print_gmem();
 void print_stack(int stack[][STACKSIZE],int sp[]);
 int  peek(int stack[][STACKSIZE], int proc_id, int sp[], int offset);
 void push(int stack[][STACKSIZE], int proc_id, int sp[],int data, int calledfrom);
 int  pop(int stack[][STACKSIZE], int proc_id, int sp[], int calledfrom);
-void showExit();
-void showRegisterData();
-void showManPage(char *cmd);
-void resetMemory();
+void show_exit();
+void show_register_data();
+void show_man_page(char *cmd);
+void reset_memory();
 //end Methods declaration
 
 // Jordan's method declarations
 void concatenate(char *filename);
-void listDirectoryContents();
-void loadProgram(char *filename);
-void removeFile(char *filename);
-void saveFile(char *filename);
-void showHelp();
+void list_directory_contents();
+int  load_program(char *filename);
+void remove_file(char *filename);
+void save_file(char *filename);
+void show_help();
 // end Jordan's method declarations
 
 
@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
   * Commands: save,del,ls,exit,run,help
   * switch case doesn't support string. 
   * */	
-  while(machine_on)
+  while(machineOn)
   {
     printf("evm$ ");
 
@@ -105,7 +105,7 @@ int main(int argc, char *argv[])
     }
     else if(strcmp(cmd, "ls")==0) 
     {
-      listDirectoryContents();
+      list_directory_contents();
     }
     else if(strcmp(cmd, "cat")==0)
     {
@@ -116,15 +116,15 @@ int main(int argc, char *argv[])
     }
     else if(strcmp(cmd, "exit")==0)
     {
-      showExit();
+      show_exit();
     }
     else if(strcmp(cmd, "help")==0)
     {
-      showHelp();
+      show_help();
     }
     else if(strcmp(cmd, "load")==0)
     {
-      loadProgram(arg1);
+      load_program(arg1);
     }
     else if(strcmp(cmd, "man")==0)
     {
@@ -134,7 +134,7 @@ int main(int argc, char *argv[])
     }
     else if(strcmp(cmd, "rm")==0)
     {
-      removeFile(arg1);
+      remove_file(arg1);
     }
     else if(strcmp(cmd, "run")==0)
     {
@@ -142,7 +142,7 @@ int main(int argc, char *argv[])
     }
     else if(strcmp(cmd, "save")==0)
     {
-      saveFile(arg1);
+      save_file(arg1);
     }
     else if(strcmp(cmd, "showBlocks")==0)
     {
@@ -163,33 +163,9 @@ int main(int argc, char *argv[])
 		{
       printf("Bad command\n");
     }
-  }// end while(machine_on)
+  }// end while(machineOn)
 
   return 0;
-
-  /*  int fi =0;*/
-  /*  int coni =0;*/
-  /*  int size = 0;*/
-  /*  FILE *f;*/
-
-  /*  printf("excecuting %s\n", argv[1]);*/
-
-  /*  f = fopen(argv[1], "r");*/
-  /*  if (f == NULL)*/
-  /*  {*/
-  /*    return -1; // -1 means file opening fail*/
-  /*  }*/
-
-  /*  while(fscanf(f, "%d\n", &fi) != EOF)*/
-  /*  {*/
-  /*    mem[0][coni]=fi;*/
-  /*    printf("%d: %d\n", coni, mem[0][coni]);*/
-  /*    size++;*/
-  /*    coni++;*/
-  /*  }*/
-  /*  fclose(f);*/
-
-  /*  executeit();*/
 }
 
 
@@ -205,25 +181,49 @@ void concatenate(char *filename)
 /* 
  * List the contents of the current directory
  */
-void listDirectoryContents()
+void list_directory_contents()
 {
 	printf("Print out the contents of PWD.\n");
 }
 
 
-/* 
- * Invoke the program loader & load into memory
+/* int load_file(char *file)  
+ * Description: This function grabs the program from the disk and loads it into mem[0] starting from [0]
+ * Input: filename with path if needed
+ * Output: Returns -1 if it fails to open the file or the status of fclose() 
+ *  -1: if the file wasn't loaded
+ *   0: if everything was alright
  */
-void loadProgram(char *filename)
+int load_program(char *filename)
 {
-	printf("Load program \"%s\".\n", filename);
-}
+    int fi =0;
+    int coni =0;
+    int size = 0;
+    FILE *f;
+    int status = 0;
+    
+    f = fopen(filename, "r");
+    if (f == NULL)
+    {
+      return -1; // -1 means file opening fail
+    }
+
+    while(fscanf(f, "%d\n", &fi) != EOF)
+    {
+      mem[0][coni]=fi;
+      printf("%d: %d\n", coni, mem[0][coni]);
+      size++;
+      coni++;
+    }
+    status = fclose(f);
+    return status;
+} //End load_file
 
 
 /* 
  * Delete a file from the disk
  */
-void removeFile(char *filename)
+void remove_file(char *filename)
 {
   printf("Delete file \"%s\" from the filesystem.\n", filename);
 }
@@ -232,29 +232,29 @@ void removeFile(char *filename)
 /* 
  * Save a file to the disk
  */
-void saveFile(char *filename)
+void save_file(char *filename)
 {
   printf("Save the file \"%s\" to the filesystem.\n", filename);
 }
 
 
 /*
- * Show the exit message and set machine_on to 0 (turn it off)
+ * Show the exit message and set machineOn to 0 (turn it off)
  */
-void showExit()
+void show_exit()
 {
 		printf("***********************************************************\n");
 		printf("*       Thanks for using the Eagle Virtual Machine!       *\n");
 		printf("*                         GOOD-BYE!                       *\n");
 		printf("***********************************************************\n");
-		machine_on = 0;
+		machineOn = 0;
 }
 
 
 /*
  * Show the help screen for the shell
  */
-void showHelp()
+void show_help()
 {
   printf("Print out the help screen for the shell\n");
 }
@@ -426,13 +426,13 @@ int exe(int stack[][STACKSIZE],int sp[],int reg[][REGISTERSIZE], int next_instru
   real_inst = i;
   printf("(pid=%d) PC = %d:  ", cur_proc, i);
   printf(" = %d\n", mem[cur_proc][i] );
-// gmem[6]=101;
+  // gmem[6]=101;
 
 /** the following 3 lines are for debugging user program too **/
 #if 0
    print_gmem();
    print_register(reg);
-   resetMemory();
+   reset_memory();
    keyhit(343);
 #endif
 
@@ -466,9 +466,9 @@ int exe(int stack[][STACKSIZE],int sp[],int reg[][REGISTERSIZE], int next_instru
           break;
 
       case POPD :
-						tmp = mem[cur_proc][i+1];
+			tmp = mem[cur_proc][i+1];
             tmp1 = pop(stack,cur_proc,sp, 10) ;
-						if( DBGCPU ) printf("POPD: popd %d into %d\n", tmp1, tmp);
+			if( DBGCPU ) printf("POPD: popd %d into %d\n", tmp1, tmp);
             if(tmp<230)
             { gmem[tmp]=tmp1; }
             else
@@ -491,89 +491,89 @@ int exe(int stack[][STACKSIZE],int sp[],int reg[][REGISTERSIZE], int next_instru
           break;
 
       case LA : 
-          if(DBGCPU) printf("LA1 %d\n",tmp);
-	        if(i==PAGESIZE-1 || i ==PAGESIZE*2-1)//This is the Boundary between every page.
-	        {
-            // load address of start of array
-		        tmp = mem[cur_proc][i];
-	        }
-	        else
-	          tmp = mem[cur_proc][i+1];
-          push(stack,cur_proc,sp,tmp, 17);
-	        //printf("%04d LA %d %d\n",i,tmp);
-          next_inst[cur_proc]++;
-        break;
+            if(DBGCPU) printf("LA1 %d\n",tmp);
+	          if(i==PAGESIZE-1 || i ==PAGESIZE*2-1)//This is the Boundary between every page.
+	          {
+              // load address of start of array
+		          tmp = mem[cur_proc][i];
+	          }
+	          else
+	            tmp = mem[cur_proc][i+1];
+            push(stack,cur_proc,sp,tmp, 17);
+	          //printf("%04d LA %d %d\n",i,tmp);
+            next_inst[cur_proc]++;
+          break;
 
       case LOAD :
-          if(DBGCPU)printf("LOAD\n");
-	        if(i==PAGESIZE-1 || i ==PAGESIZE*2-1)//This is the Boundary between every page.
-	          tmp = mem[cur_proc][i];
-	        else
-	          tmp = mem[cur_proc][i+1];
-          //printf("load 1 %d\n",tmp);
-          //printf("load 1 mem[%d][%d]\n",cur_proc, i+1);
-          //printf("stack  0= %d\n", peek(stack,cur_proc,sp, 0)) ;
-          //printf("stack -1= %d\n", peek(stack,cur_proc,sp, -1)) ;
-          if(tmp<230)
-            tmp1 = gmem[tmp];
-          else
-          {
-            tmp = tmp-230;
-            tmp1 = reg[cur_proc][tmp];
-          }
-          push(stack,cur_proc,sp,tmp1, 19);
-          //printf("%04d load tmp %d %d %d\n",i+1,tmp,tmp1,cur_proc);
-          //printf("stack  0= %d\n", peek(stack,cur_proc,sp, 0)) ;
-          //printf("stack -1= %d\n", peek(stack,cur_proc,sp, -1)) ;
-          next_inst[cur_proc]++;
-        break;
+            if(DBGCPU)printf("LOAD\n");
+	          if(i==PAGESIZE-1 || i ==PAGESIZE*2-1)//This is the Boundary between every page.
+	            tmp = mem[cur_proc][i];
+	          else
+	            tmp = mem[cur_proc][i+1];
+            //printf("load 1 %d\n",tmp);
+            //printf("load 1 mem[%d][%d]\n",cur_proc, i+1);
+            //printf("stack  0= %d\n", peek(stack,cur_proc,sp, 0)) ;
+            //printf("stack -1= %d\n", peek(stack,cur_proc,sp, -1)) ;
+            if(tmp<230)
+              tmp1 = gmem[tmp];
+            else
+            {
+              tmp = tmp-230;
+              tmp1 = reg[cur_proc][tmp];
+            }
+            push(stack,cur_proc,sp,tmp1, 19);
+            //printf("%04d load tmp %d %d %d\n",i+1,tmp,tmp1,cur_proc);
+            //printf("stack  0= %d\n", peek(stack,cur_proc,sp, 0)) ;
+            //printf("stack -1= %d\n", peek(stack,cur_proc,sp, -1)) ;
+            next_inst[cur_proc]++;
+          break;
 
       case LOADI : 
-			    if(i==PAGESIZE-1 || i ==PAGESIZE*2-1)//This is the Boundary between every page.
-			    {
-				    push(stack,cur_proc,sp,mem[cur_proc][i], 21);
-				    //printf("i == 31 ,LOADI Push:%d\n",mem[cur_proc][i]);
-			    }
-			    else
-			    {
-				    push(stack,cur_proc,sp,mem[cur_proc][i+1], 21);
-				    //printf("i < 31 ,LOADI Push:%d\n",mem[cur_proc][i+1]);
-			    } 
-			    //printf("%04d loadi %d\n",i,stack[cur_proc][sp[cur_proc]] );
-          next_inst[cur_proc]++;
-         break;
+            if(i==PAGESIZE-1 || i ==PAGESIZE*2-1)//This is the Boundary between every page.
+            {
+            push(stack,cur_proc,sp,mem[cur_proc][i], 21);
+            //printf("i == 31 ,LOADI Push:%d\n",mem[cur_proc][i]);
+            }
+            else
+            {
+            push(stack,cur_proc,sp,mem[cur_proc][i+1], 21);
+            //printf("i < 31 ,LOADI Push:%d\n",mem[cur_proc][i+1]);
+            } 
+            //printf("%04d loadi %d\n",i,stack[cur_proc][sp[cur_proc]] );
+            next_inst[cur_proc]++;
+          break;
 
       case ADD :
-          tmp1 = pop(stack,cur_proc,sp, 16);
-          tmp2 = pop(stack,cur_proc,sp, 18);
-          tmp1 += tmp2;
-          push(stack,cur_proc,sp,tmp1, 23);
-          if(DBGCPU) printf("%04d:  ADD %d\n",i, tmp1);
-        break;
+            tmp1 = pop(stack,cur_proc,sp, 16);
+            tmp2 = pop(stack,cur_proc,sp, 18);
+            tmp1 += tmp2;
+            push(stack,cur_proc,sp,tmp1, 23);
+            if(DBGCPU) printf("%04d:  ADD %d\n",i, tmp1);
+          break;
 
       case SUB :
-          tmp1 = pop(stack,cur_proc,sp, 20);
-          tmp2 = pop(stack,cur_proc,sp, 22);
-          tmp1 = tmp2-tmp1;
-          push(stack,cur_proc,sp,tmp1, 25);
-          // printf("%04d:  SUB\n", i); 
-        break;
+            tmp1 = pop(stack,cur_proc,sp, 20);
+            tmp2 = pop(stack,cur_proc,sp, 22);
+            tmp1 = tmp2-tmp1;
+            push(stack,cur_proc,sp,tmp1, 25);
+            // printf("%04d:  SUB\n", i); 
+          break;
 
       case MUL :
-          tmp1 = pop(stack,cur_proc,sp, 24);
-          tmp2 = pop(stack,cur_proc,sp, 26);
-          tmp1 *= tmp2;
-          push(stack,cur_proc,sp,tmp1, 27);
-          //  printf("%04d:  MUL\n", i); 
-        break;
+            tmp1 = pop(stack,cur_proc,sp, 24);
+            tmp2 = pop(stack,cur_proc,sp, 26);
+            tmp1 *= tmp2;
+            push(stack,cur_proc,sp,tmp1, 27);
+            //  printf("%04d:  MUL\n", i); 
+          break;
 
       case DIV :
-          tmp1 = pop(stack,cur_proc,sp, 28);
-          tmp2 = pop(stack,cur_proc,sp, 30);
-          tmp1 = tmp2/tmp1;
-          push(stack,cur_proc,sp,tmp1, 29);
-          //  printf("%04d:  DIV\n", i); 
-        break;
+            tmp1 = pop(stack,cur_proc,sp, 28);
+            tmp2 = pop(stack,cur_proc,sp, 30);
+            tmp1 = tmp2/tmp1;
+            push(stack,cur_proc,sp,tmp1, 29);
+            //  printf("%04d:  DIV\n", i); 
+          break;
 
       case END : 
           if (DEBUG!=0) printf("Process %d completed normally\n", cur_proc);
@@ -582,16 +582,16 @@ int exe(int stack[][STACKSIZE],int sp[],int reg[][REGISTERSIZE], int next_instru
           return ENDPROCESS;
 
       case ENDP :
-          //printf("ENDP\n");
-        break;
+            //printf("ENDP\n");
+          break;
 
       case AND :
-          tmp1 = pop(stack,cur_proc,sp, 32);
-          tmp2 = pop(stack,cur_proc,sp, 34);
-          tmp1 = tmp1 && tmp2;
-          push(stack,cur_proc,sp,tmp1, 31);
-          if(DBGCPU) printf("%04d:  AND\n", i); 
-        break ;
+            tmp1 = pop(stack,cur_proc,sp, 32);
+            tmp2 = pop(stack,cur_proc,sp, 34);
+            tmp1 = tmp1 && tmp2;
+            push(stack,cur_proc,sp,tmp1, 31);
+            if(DBGCPU) printf("%04d:  AND\n", i); 
+          break ;
 
       case OR:
             tmp1 = pop(stack,cur_proc,sp, 36);
@@ -609,136 +609,135 @@ int exe(int stack[][STACKSIZE],int sp[],int reg[][REGISTERSIZE], int next_instru
           break;
 
       case LE_OP :
-              tmp1 = pop(stack,cur_proc,sp, 42);
-              tmp2 = pop(stack,cur_proc,sp, 44);
-              tmp = tmp1 >= tmp2;
-              push(stack,cur_proc,sp,tmp, 37);
-              if(DBGCPU) printf("%04d:  LE_OP %d\n", i, tmp); 
-            break;
+            tmp1 = pop(stack,cur_proc,sp, 42);
+            tmp2 = pop(stack,cur_proc,sp, 44);
+            tmp = tmp1 >= tmp2;
+            push(stack,cur_proc,sp,tmp, 37);
+            if(DBGCPU) printf("%04d:  LE_OP %d\n", i, tmp); 
+          break;
 
       case GE_OP :
-              tmp1 = pop(stack,cur_proc,sp, 46);
-              tmp2 = pop(stack,cur_proc,sp, 48);
-              tmp = tmp1 <= tmp2;
-              push(stack,cur_proc,sp,tmp, 39);
-              // printf("%04d:  GE_OP%d\n", i,tmp); 
-            break;
+            tmp1 = pop(stack,cur_proc,sp, 46);
+            tmp2 = pop(stack,cur_proc,sp, 48);
+            tmp = tmp1 <= tmp2;
+            push(stack,cur_proc,sp,tmp, 39);
+            // printf("%04d:  GE_OP%d\n", i,tmp); 
+          break;
 
       case LT_OP :
-              tmp1 = pop(stack,cur_proc,sp, 50);
-              tmp2 = pop(stack,cur_proc,sp, 52);
-              tmp = tmp2 < tmp1;
-              push(stack,cur_proc,sp,tmp, 41);
-              if(DBGCPU) printf("%04d:  LT_OP %d %d %d\n", i,tmp,tmp1,tmp2);
-            break;
+            tmp1 = pop(stack,cur_proc,sp, 50);
+            tmp2 = pop(stack,cur_proc,sp, 52);
+            tmp = tmp2 < tmp1;
+            push(stack,cur_proc,sp,tmp, 41);
+            if(DBGCPU) printf("%04d:  LT_OP %d %d %d\n", i,tmp,tmp1,tmp2);
+          break;
 
       case GT_OP :
-              tmp1 = pop(stack,cur_proc,sp, 54);
-              tmp2 = pop(stack,cur_proc,sp, 56);
-              tmp = tmp2 > tmp1;
-              push(stack,cur_proc,sp,tmp, 43);
-              if(DBGCPU) printf("%04d:  GT_OP %d SP %d %d\n", i,tmp, sp[cur_proc],GT_OP); 
-            break;
+            tmp1 = pop(stack,cur_proc,sp, 54);
+            tmp2 = pop(stack,cur_proc,sp, 56);
+            tmp = tmp2 > tmp1;
+            push(stack,cur_proc,sp,tmp, 43);
+            if(DBGCPU) printf("%04d:  GT_OP %d SP %d %d\n", i,tmp, sp[cur_proc],GT_OP); 
+          break;
 
       case EQ_OP :
-              tmp1 = pop(stack,cur_proc,sp, 58);
-              //printf("step 2 %d\n",sp[cur_proc]);
-              tmp2 = pop(stack,cur_proc,sp, 60);
-              if(DBGCPU) printf("EQ? %d %d\n", tmp1, tmp2);
-              tmp = tmp1 == tmp2;
-              push(stack,cur_proc,sp,tmp, 45);
-              if(DBGCPU) printf("%04d:  EQ_OP %d\n", i, tmp); 
-            break;
+            tmp1 = pop(stack,cur_proc,sp, 58);
+            //printf("step 2 %d\n",sp[cur_proc]);
+            tmp2 = pop(stack,cur_proc,sp, 60);
+            if(DBGCPU) printf("EQ? %d %d\n", tmp1, tmp2);
+            tmp = tmp1 == tmp2;
+            push(stack,cur_proc,sp,tmp, 45);
+            if(DBGCPU) printf("%04d:  EQ_OP %d\n", i, tmp); 
+          break;
 
       case NE_OP :
-              tmp1 = pop(stack,cur_proc,sp, 62);
-              tmp2 = pop(stack,cur_proc,sp, 64);
-              tmp = tmp1 != tmp2;
-              push(stack,cur_proc,sp,tmp, 47);
-              if(DBGCPU) printf("%04d:  NE_OP\n", i); 
-            break;
+            tmp1 = pop(stack,cur_proc,sp, 62);
+            tmp2 = pop(stack,cur_proc,sp, 64);
+            tmp = tmp1 != tmp2;
+            push(stack,cur_proc,sp,tmp, 47);
+            if(DBGCPU) printf("%04d:  NE_OP\n", i); 
+          break;
 
       case STOP :
-              printf("STOP called by proccess %d, hit any key to continue\n", cur_proc);
-              scanf("%d",&tmp2);
-            break;
+            printf("STOP called by proccess %d, hit any key to continue\n", cur_proc);
+            scanf("%d",&tmp2);
+          break;
 
       case STOR :
-              tmp = pop(stack,cur_proc,sp, 68);
-              if (i==PAGESIZE-1 || i ==PAGESIZE*2-1)//This is the Boundary between every page.
-                tmp1 = mem[cur_proc][i];
-              else
-                tmp1 = mem[cur_proc][i+1];
-              if(tmp1<230)
-              {
-                gmem[tmp1]=tmp;
-                if (DEBUG !=0) printf("Process %d wrote to global mem in index %d, %d\n",cur_proc,tmp1,gmem[tmp1]);
-                //printf("returning p0WRITE\n"); keyhit(99);
-                next_inst[cur_proc]++;
-                return p0WRITE;
-              } 
-              else
-              {
-                reg[cur_proc][tmp1-230]=tmp;
-                next_inst[cur_proc]++;
-              }
-            break;
+            tmp = pop(stack,cur_proc,sp, 68);
+            if (i==PAGESIZE-1 || i ==PAGESIZE*2-1)//This is the Boundary between every page.
+              tmp1 = mem[cur_proc][i];
+            else
+              tmp1 = mem[cur_proc][i+1];
+            if(tmp1<230)
+            {
+              gmem[tmp1]=tmp;
+              if (DEBUG !=0) printf("Process %d wrote to global mem in index %d, %d\n",cur_proc,tmp1,gmem[tmp1]);
+              //printf("returning p0WRITE\n"); keyhit(99);
+              next_inst[cur_proc]++;
+              return p0WRITE;
+            } 
+            else
+            {
+              reg[cur_proc][tmp1-230]=tmp;
+              next_inst[cur_proc]++;
+            }
+          break;
 
       case ST :
-              tmp = pop(stack,cur_proc,sp, 70);//does ST ever need to store in a register?
-              //printf("%d\n",tmp);
-              tmp1 = pop(stack,cur_proc,sp, 72);
-              //printf("%d\n",tmp1);
-              gmem[tmp]=tmp1;
-              if (DEBUG !=0) printf("process %d wrote to global mem in index %d, %d\n",cur_proc,tmp,gmem[tmp]);
-              return p0WRITE;
+            tmp = pop(stack,cur_proc,sp, 70);//does ST ever need to store in a register?
+            //printf("%d\n",tmp);
+            tmp1 = pop(stack,cur_proc,sp, 72);
+            //printf("%d\n",tmp1);
+            gmem[tmp]=tmp1;
+            if (DEBUG !=0) printf("process %d wrote to global mem in index %d, %d\n",cur_proc,tmp,gmem[tmp]);
+            return p0WRITE;
 
       case LOCK :
-				      if (DEBUG!=0) printf("LOCK called by process %d\n",cur_proc); 
-              return LOCKED;
+			      if (DEBUG!=0) printf("LOCK called by process %d\n",cur_proc); 
+            return LOCKED;
 
       case UNLOCK : 
-    					if (DEBUG!=0) printf("UNLOCK called\n");
-              return UNLOCKED;
+  					if (DEBUG!=0) printf("UNLOCK called\n");
+            return UNLOCKED;
 
       case HALT :
-              printf("HALT called by process %d\n\n",cur_proc);
-              //print_gmem();
-              //print_register(reg);
-              HALTED=1;
-              *terminate = 1;
-              //exit(0);
-            break;
+            printf("HALT called by process %d\n\n",cur_proc);
+            //print_gmem();
+            //print_register(reg);
+            HALTED=1;
+            *terminate = 1;
+            //exit(0);
+          break;
                   
       case JFALSE :
-              tmp=pop(stack, cur_proc,sp, 74);
-              if(i==PAGESIZE-1 || i ==PAGESIZE*2-1)//This is the Boundary between every page.
-                tmp2=mem[cur_proc][i];	
-              else
-                tmp2=mem[cur_proc][i+1];
-              if(DBGCPU) printf("jfalse %d %d \n", tmp,tmp2-1);
-              if(tmp==0)
-                next_instruct[cur_proc]=tmp2-1;//sub one for PC in executeit()
-              else
-                next_inst[cur_proc]++;
-            break;
+            tmp=pop(stack, cur_proc,sp, 74);
+            if(i==PAGESIZE-1 || i ==PAGESIZE*2-1)//This is the Boundary between every page.
+              tmp2=mem[cur_proc][i];	
+            else
+              tmp2=mem[cur_proc][i+1];
+            if(DBGCPU) printf("jfalse %d %d \n", tmp,tmp2-1);
+            if(tmp==0)
+              next_instruct[cur_proc]=tmp2-1;//sub one for PC in executeit()
+            else
+              next_inst[cur_proc]++;
+          break;
 
       case JMP: 
-              if(i==PAGESIZE-1 || i == PAGESIZE*2-1)//This is the Boundary between every page.
-                tmp=mem[cur_proc][i];
-              else
-                tmp=mem[cur_proc][i+1];
-              next_instruct[cur_proc]=tmp-1;//sub one for PC in executeit() 
-              if(DBGCPU) printf("%04d:  JMP\t %d\n", i, next_instruct[cur_proc]); 
-              // next_inst[cur_proc]++;
-            break;
+            if(i==PAGESIZE-1 || i == PAGESIZE*2-1)//This is the Boundary between every page.
+              tmp=mem[cur_proc][i];
+            else
+              tmp=mem[cur_proc][i+1];
+            next_instruct[cur_proc]=tmp-1;//sub one for PC in executeit() 
+            if(DBGCPU) printf("%04d:  JMP\t %d\n", i, next_instruct[cur_proc]); 
+            // next_inst[cur_proc]++;
+          break;
 
       default:
-              printf("illegal instruction mem[%d][%d]\n",cur_proc,i);
-              keyhit(127);
-              printf("(%04d:   %d)\n", i, mem[cur_proc][i]);  
-            break;
-
+            printf("illegal instruction mem[%d][%d]\n",cur_proc,i);
+            keyhit(127);
+            printf("(%04d:   %d)\n", i, mem[cur_proc][i]);  
+          break;
    }
    //printf("returning NORMAL\n"); // keyhit(9999);
    return NORMAL;
@@ -809,7 +808,7 @@ void print_gmem()
 }
 
 
-void initGmem()
+void init_gmem()
 {
   int i;
   //printf("Global memory: size %d\n",MAXGMEM);
@@ -843,7 +842,7 @@ void print_register(int reg[][REGISTERSIZE])
 /*End Isaac Execute*/
 
 
-void resetMemory()
+void reset_memory()
 {
 	int i,j;
 

@@ -1,5 +1,7 @@
 #!/bin/sh
 #Build a program
+#Ex: ./emake milk1 
+#To make milk1.e
 
 ./ecomp $1.e $1.asm
-./easm $1.asm $1.o
+./easm $1.asm $1.out
