@@ -1,4 +1,4 @@
-Style guildlines
+Style guidelines
 
 Open braces on the following line
 Ex: 
@@ -10,6 +10,13 @@ for(....)
 Functions:
 Function names should be underscored this_function()
 Start with a comment block
+/* int load_file(char *file)  - function signature 
+ * Description:
+ * Input: filename with path if needed
+ * Output: Returns 
+ *  -1: if the file wasn't loaded
+ *   0: if everything was alright
+ */
 If it's more than a page long end with a comment
 
 

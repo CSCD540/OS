@@ -73,11 +73,6 @@ int  exe(int stack[][STACKSIZE],int sp[],int reg[][REGISTERSIZE], int next_instr
 
 main(int argc, char *argv[])
 {
-  int fi =0;
-  int coni =0;
-  int size = 0;
-  FILE *f;
-
   printf("excecuting %s\n", argv[1]); 
 
   load_file(argv[1]);
@@ -553,16 +548,21 @@ if(DBGCPU)printf("jfalse %d %d \n", tmp,tmp2-1);
 
 }
 
-/* int load_file(char *file)
- * Description:
+/* int load_file(char *file)  
+ * Description: This function grabs the program from the disk and loads it into mem[0] starting from [0]
  * Input: filename with path if needed
- * Output: Returns 
+ * Output: Returns -1 if it fails to open the file or the status of fclose() 
  *  -1: if the file wasn't loaded
  *   0: if everything was alright
  */
 int load_file(char *file)
 {
+    int fi =0;
+    int coni =0;
+    int size = 0;
+    FILE *f;
     int status = 0;
+    
     f = fopen(file, "r");
     if (f == NULL)
     {
