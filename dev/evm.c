@@ -25,11 +25,11 @@
 
 #define keyhit(a) {printf("hit enter --(%d)", a); getchar();}
 
-int  gmem[MAXGMEM];   //global var sit here
+int gmem[MAXGMEM];   //global var sit here
 int mem[MAXPRO][MAXMEM];//Main mem for each process
 
 int endprog[MAXPRO]; // last instruction of proc
-int  jsym[60];
+int jsym[60];
 int pid = 0;  //process id
 int p0running;
 /*end isaac execute vars*/
@@ -64,16 +64,16 @@ void deleteFile(int index);//Free the disk when the file is deleted
 void print_register(int reg[][REGISTERSIZE]);
 void print_gmem();
 void print_stack(int stack[][STACKSIZE],int sp[]);
-int peek(int stack[][STACKSIZE], int proc_id, int sp[], int offset);
+int  peek(int stack[][STACKSIZE], int proc_id, int sp[], int offset);
 void push(int stack[][STACKSIZE], int proc_id, int sp[],int data, int calledfrom);
-int pop(int stack[][STACKSIZE], int proc_id, int sp[], int calledfrom);
+int  pop(int stack[][STACKSIZE], int proc_id, int sp[], int calledfrom);
 void initPTB(void);//Initial PTB(Page Table)
 void loadFile(void);//Load the file
-int getFile(char *filename, int *result);//Get the file from real disk
-int checkPages(int procNum,int pc);
+int  getFile(char *filename, int *result);//Get the file from real disk
+int  checkPages(int procNum,int pc);
 void showPage(void);
 void loadPage(int procNum, int pageNumber, int pc);
-int findLRU(int procNum);
+int  findLRU(int procNum);
 void updateLRU(int procNum, int pageNum);
 void updatePageTable(int procNum, int memPageNum, int virPageNum);
 void getMemoryDump(int process_number);//MemoryDump
@@ -82,19 +82,19 @@ void initLastUsedPage();
 void showHelp();//show help information
 void showExit();//show Exit message
 void initBlocks();// initial the blocks
-int checkBlocks(int number_blocks);//Checking the available blocks
+int  checkBlocks(int number_blocks);//Checking the available blocks
 void getFreeBlocks(int fileblocks, int *freeBlocks);//get the free blocks to write the data
 //int saveFile();//saving the file
 void showBlockTable(int count);//show the status of the BlockTable
 void initFiletags();
 void showFileContent(int index);
 void executeit();
-int sysOpen(char *name, int attribute);
-int sysRead(int fd);
+int  sysOpen(char *name, int attribute);
+int  sysRead(int fd);
 void sysClose(int fd);
-int sysWrite(int fd, int data);
+int  sysWrite(int fd, int data);
 void sysSeek(int fd, int position);
-int searchFile(char *name);
+int  searchFile(char *name);
 void grabData(int index,int *grabdata);
 void initReg();
 void showRegisterData();
@@ -127,8 +127,7 @@ struct filesystem
 
 int main(void)
 {
-  initfilesys();//Just show the message.
-  //initLastUsedPage();
+  initfilesys(); //Just show the message.
 
   /* Shell command 
   * Commands: save,del,ls,exit,run,help
