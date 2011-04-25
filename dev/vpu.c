@@ -216,7 +216,7 @@ void listDirectoryContents()
  */
 void loadProgram(char *filename)
 {
-	printf("Load program %s.\n", filename);
+	printf("Load program \"%s\".\n", filename);
 }
 
 
