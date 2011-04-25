@@ -20,7 +20,7 @@
 #define BLOCKS DISKSIZE/BLOCKSIZE// total number of blocks
 #define DISKSIZE 16*1024//16kB
 #define PAGESIZE 16 //size of each page in words 2-bytes
-#define NUMPAGES 2 //Number of pages in page table
+#define NUMPAGES MAXMEM / PAGESIZE //Number of pages in page table
 #define DBGCPU 1
 #define DBGCPU1 0
 
