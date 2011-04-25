@@ -1,0 +1,17 @@
+Style guildlines
+
+Open braces on the following line
+Ex: 
+for(....)
+{
+
+}
+
+Functions:
+Function names should be underscored this_function()
+Start with a comment block
+If it's more than a page long end with a comment
+
+
+Variable names:
+camelCase 

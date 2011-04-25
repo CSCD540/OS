@@ -6,7 +6,7 @@
 
 /*begin isaac execute vars*/
 #define MAXPRO 1   //max num of processes
-#define MAXMEM 64 //max word size of a process (2-bytes)
+#define MAXMEM 64 //max size of a process in word/sizeof(int) bytes
 #define STACKSIZE 100 //max size of the stack
 #define REGISTERSIZE 10 //size of each process registers
 #define MAXGMEM 20 //max size of global memory
@@ -63,6 +63,7 @@ int  pop(int stack[][STACKSIZE], int proc_id, int sp[], int calledfrom);
 void executeit();
 void grabData(int index,int *grabdata);
 void initReg();
+int load_file(char* file);
 void showRegisterData();
 void showManPage(char *cmd);
 void resetMemory();
@@ -79,20 +80,7 @@ main(int argc, char *argv[])
 
   printf("excecuting %s\n", argv[1]); 
 
-  f = fopen(argv[1], "r");
-  if (f == NULL)
-  {
-    return -1; // -1 means file opening fail
-  }
-
-  while(fscanf(f, "%d\n", &fi) != EOF)
-  {
-    mem[0][coni]=fi;
-    printf("%d: %d\n", coni, mem[0][coni]);
-    size++;
-    coni++;
-  }
-  fclose(f);
+  load_file(argv[1]);
 
   executeit();
 }
@@ -564,6 +552,33 @@ if(DBGCPU)printf("jfalse %d %d \n", tmp,tmp2-1);
    
 
 }
+
+/* int load_file(char *file)
+ * Description:
+ * Input: filename with path if needed
+ * Output: Returns 
+ *  -1: if the file wasn't loaded
+ *   0: if everything was alright
+ */
+int load_file(char *file)
+{
+    int status = 0;
+    f = fopen(file, "r");
+    if (f == NULL)
+    {
+      return -1; // -1 means file opening fail
+    }
+
+    while(fscanf(f, "%d\n", &fi) != EOF)
+    {
+      mem[0][coni]=fi;
+      printf("%d: %d\n", coni, mem[0][coni]);
+      size++;
+      coni++;
+    }
+    status = fclose(f);
+    return status;
+} //End load_file
 
 int peek(int stack[][STACKSIZE], int proc_id, int sp[], int offset)
 {
