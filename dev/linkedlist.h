@@ -11,11 +11,11 @@ typedef struct node {
 
 //Methods 
 LLIST *list_add(LLIST **p, int *i);
-void list_remove(LLIST **p);
+void  list_remove(LLIST **p);
 LLIST **list_search(LLIST **n, int *i);
-void list_print(LLIST *n);
-void list_reverse(LLIST **p);
-void ToArray(LLIST *n, int *array);
+void  list_print(LLIST *n);
+void  list_reverse(LLIST **p);
+void  ToArray(LLIST *n, int *array);
 LLIST *head;
 
 
