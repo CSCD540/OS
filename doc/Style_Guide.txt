@@ -11,9 +11,9 @@ Functions:
 Function names should be underscored this_function()
 Start with a comment block
 /* int load_file(char *file)  - function signature 
- * Description:
+ * Description: This function grabs the program from the disk and loads it into mem[0] starting from [0]
  * Input: filename with path if needed
- * Output: Returns 
+ * Output: Returns -1 if it fails to open the file or the status of fclose() 
  *  -1: if the file wasn't loaded
  *   0: if everything was alright
  */
