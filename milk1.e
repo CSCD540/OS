@@ -9,5 +9,3 @@ process p0 {
    }
    r0 = open("file", 0);
 }
-
-
