@@ -6,8 +6,9 @@
  
 typedef struct node {
 	int data[4];
-	struct node *next; /* pointer to next element in list */
+	struct node *cd ; /* pointer to next element in list */
 } LLIST;
+
 
 //Methods 
 LLIST *list_add(LLIST **p, int *i);
@@ -19,48 +20,47 @@ void  ToArray(LLIST *n, int *array);
 LLIST *head;
 
 
-
-
  
 LLIST *list_add(LLIST **p, int *i)
 {
-	LLIST *cur;
-	int x;
-	if (p == NULL)
-		return NULL;
- 
-	LLIST *tmp = malloc(sizeof(LLIST));
-	if (tmp == NULL)
-		return NULL;
-	
-	for(x = 0 ; x <4 ; x++)
-		tmp->data[x] = i[x];
-	
-	tmp->next = NULL;
-	
-	
-	cur = *p;
-	
-	if (cur == NULL) {
-      *p = tmp;
-   } else {
-      while (cur->next != NULL)
-        cur = cur->next;
-      cur->next = tmp;
-   }
-	
-	//n->next = *p; /* the previous element (*p) now becomes the "next" element */
-	
-	
-    //*p = n;       /* add new empty element to the front (head) of the list */
-   
-	
-	//for(x = 0 ; x <4 ; x++)
-	//	n->data[x] = i[x];
-		//head->data[x] = i[x];
-		
- 
-	return *p;
+  LLIST *cur;
+  int x;
+  if (p == NULL)
+  return NULL;
+
+  LLIST *tmp = malloc(sizeof(LLIST));
+  if (tmp == NULL)
+    return NULL;
+
+  for(x = 0 ; x <4 ; x++)
+    tmp->data[x] = i[x];
+
+  tmp->next = NULL;
+
+  cur = *p;
+
+  if (cur == NULL)
+  {
+    *p = tmp;
+  }
+  else
+  {
+    while (cur->next != NULL)
+      cur = cur->next;
+    cur->next = tmp;
+  }
+
+  //n->next = *p; /* the previous element (*p) now becomes the "next" element */
+
+
+  //*p = n;       /* add new empty element to the front (head) of the list */
+
+
+  //for(x = 0 ; x <4 ; x++)
+  //	n->data[x] = i[x];
+  //head->data[x] = i[x];
+
+  return *p;
 }
 
 
@@ -68,22 +68,23 @@ LLIST *list_add(LLIST **p, int *i)
 
 void list_reverse(LLIST **p)
 { 
-	LLIST *n = malloc(sizeof(LLIST));
-		
-	while(*p != NULL)
-	{
-		list_add(&n, (*p)->data);
-		// list_print(n);
-		*p = (*p)->next;
-	}
-	// n->next = NULL;
-	// list_print(n);
-	// n->next = *p; /* the previous element (*p) now becomes the "next" element */
-	*p = n;       /* add new empty element to the front (head) of the list */
-	
-	// list_print(*p);
+  LLIST *n = malloc(sizeof(LLIST));
+
+  while(*p != NULL)
+  {
+    list_add(&n, (*p)->data);
+    // list_print(n);
+    *p = (*p)->next;
+  }
+  // n->next = NULL;
+  // list_print(n);
+  // n->next = *p; /* the previous element (*p) now becomes the "next" element */
+  *p = n;       /* add new empty element to the front (head) of the list */
+  // list_print(*p);
 }
- 
+
+
+
 void list_remove(LLIST **p) /* remove head */
 {
 	if (p != NULL && *p != NULL)
@@ -109,7 +110,8 @@ LLIST **list_search(LLIST **n, int *i)
 	}
 	return NULL;
 }
- 
+
+
 void list_print(LLIST *n)
 {
 	int j = 0;
@@ -132,36 +134,31 @@ void list_print(LLIST *n)
 	}
 }
 
+
 void ToArray(LLIST *n, int *array)
 {
-	
-    
-	int j = 0;
-	if (n == NULL)
-	{
-		printf("list is empty\n");
-	}
-	while (n != NULL)
-	{
-		int i;
-		
-		// printf("%d Node\n",j+1);
-		int k = j * 4;
-		
-		for(i=0; i< 4; i++)
-		{
-			
-			// printf("print %p %p %d\n", n, n->next, n->data[i]);
-			// printf("print %p %d\n", n, n->data[i]);
-			array[k+i] = n->data[i];
-			// printf("%d\n",array[k+i]);
-		}
-		n = n->next;
-		j++;
-	}
-	
-	
-	
+  int j = 0;
+  if (n == NULL)
+  {
+    printf("list is empty\n");
+  }
+  while (n != NULL)
+  {
+    int i;
+
+    // printf("%d Node\n",j+1);
+    int k = j * 4;
+
+    for(i=0; i< 4; i++)
+    {
+      // printf("print %p %p %d\n", n, n->next, n->data[i]);
+      // printf("print %p %d\n", n, n->data[i]);
+      array[k+i] = n->data[i];
+      // printf("%d\n",array[k+i]);
+    }
+    n = n->next;
+    j++;
+  }
 }
 
 
