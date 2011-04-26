@@ -8,8 +8,9 @@
 
 
 
-/* struct block
- * Description: This struct defines a block in the filesystem.
+/* 
+ * struct block
+ * Description: This struct defines a block in the disk.
  * Input: none
  * Output: none
  */
@@ -19,17 +20,17 @@ typedef struct {
 
 
 /* 
- * void init_filesystem(block filesystem[])
- * Description: Initialize the passed in filesystem. Assumes that the filesystem was created using the constants defined.
- * Input: block filesystem[] : an array of blocks. Assumes that the array is of size NUMBLOCKS.
- * Output: All entries in block filesystem[] will be initialized to -1.
+ * void init_disk(block disk[])
+ * Description: Initialize the passed in disk. Assumes that the disk was created using the constants defined.
+ * Input: block disk[] : an array of blocks. Assumes that the array is of size NUMBLOCKS.
+ * Output: All entries in block disk[] will be initialized to -1.
  */
-void init_filesystem(block filesystem[])
+void init_disk(block disk[])
 {
   int i, j;
   for(i = 0; i < NUMBLOCKS; i++)
     for(j = 0; j < BLOCKSIZE; j++)
-      filesystem[i].instructions[j] = -1;
+      disk[i].instructions[j] = -1;
 }
 
 

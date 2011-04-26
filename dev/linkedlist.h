@@ -1,26 +1,26 @@
 #include <stdio.h>    /* for printf */
 #include <stdlib.h>   /* for malloc */
 
-//Reference: http://en.wikipedia.org/wiki/Linked_list
-//		   : http://answers.google.com/answers/threadview/id/312972.html
- 
+// Reference: http://en.wikipedia.org/wiki/Linked_list
+//		      : http://answers.google.com/answers/threadview/id/312972.html
+
 typedef struct node {
 	int data[4];
-	struct node *cd ; /* pointer to next element in list */
+	struct node *next; /* pointer to next element in list */
 } LLIST;
 
 
 //Methods 
+LLIST *head;
 LLIST *list_add(LLIST **p, int *i);
-void  list_remove(LLIST **p);
 LLIST **list_search(LLIST **n, int *i);
 void  list_print(LLIST *n);
+void  list_remove(LLIST **p);
 void  list_reverse(LLIST **p);
-void  ToArray(LLIST *n, int *array);
-LLIST *head;
+void  to_array(LLIST *n, int *array);
 
 
- 
+
 LLIST *list_add(LLIST **p, int *i)
 {
   LLIST *cur;
@@ -50,19 +50,14 @@ LLIST *list_add(LLIST **p, int *i)
     cur->next = tmp;
   }
 
-  //n->next = *p; /* the previous element (*p) now becomes the "next" element */
-
-
-  //*p = n;       /* add new empty element to the front (head) of the list */
-
-
-  //for(x = 0 ; x <4 ; x++)
+  // n->next = *p; /* the previous element (*p) now becomes the "next" element */
+  // *p = n;       /* add new empty element to the front (head) of the list */
+  // for(x = 0 ; x <4 ; x++)
   //	n->data[x] = i[x];
-  //head->data[x] = i[x];
+  // head->data[x] = i[x];
 
   return *p;
 }
-
 
 
 
@@ -94,7 +89,9 @@ void list_remove(LLIST **p) /* remove head */
 		free(n);
 	}
 }
- 
+
+
+
 LLIST **list_search(LLIST **n, int *i)
 {
 	if (n == NULL)
@@ -110,6 +107,7 @@ LLIST **list_search(LLIST **n, int *i)
 	}
 	return NULL;
 }
+
 
 
 void list_print(LLIST *n)
@@ -135,7 +133,8 @@ void list_print(LLIST *n)
 }
 
 
-void ToArray(LLIST *n, int *array)
+
+void to_array(LLIST *n, int *array)
 {
   int j = 0;
   if (n == NULL)
