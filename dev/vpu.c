@@ -1,8 +1,8 @@
+// #include <ctype.h>
+#include <stdio.h>
 #include <stdlib.h>
-#include <ctype.h>
 #include <string.h>
 #include "easm.tab.h"
-#include "linkedlist.h"
 
 /*begin isaac execute vars*/
 #define MAXPRO        1   // max num of processes
