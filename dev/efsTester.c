@@ -1,12 +1,13 @@
 #include <stdio.h>
 #include "efs.h"
 
-block disk[NUMBLOCKS];
+struct block disk[NUMBLOCKS];
 
 int main(int argc, char *argv[])
 {
   init_disk(disk);
-  
+
+    
   int i;
   for(i = 0; i < NUMBLOCKS; i++)
   {
@@ -16,6 +17,8 @@ int main(int argc, char *argv[])
       printf(" %d", disk[i].instructions[j]);
     printf("\n");
   }
+  
+  print_block_list(freeBlockList);
 
   return 0;
 }

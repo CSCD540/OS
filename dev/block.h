@@ -6,7 +6,8 @@
  * Input: none
  * Output: none
  */
-typedef struct {
+struct block {
+  int blockNum;
   int instructions[BLOCKSIZE];
-} block;
+};
 
