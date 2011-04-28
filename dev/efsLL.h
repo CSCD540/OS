@@ -14,9 +14,12 @@
 
 /* 
  * struct blockNode
- * Description: This struct defines a blockNode in the list.
- * Input: none
- * Output: none
+ * Description:
+ *    This struct defines a blockNode in the list.
+ * Input:
+ *    none
+ * Output:
+ *    none
  */
 struct blockNode {
   struct block *block; // Pointer to a block on the disk
@@ -26,9 +29,12 @@ struct blockNode {
 
 /* 
  * struct fileNode
- * Description: This struct defines a fileNode in the list.
- * Input: none
- * Output: none
+ * Description:
+ *    This struct defines a fileNode in the list.
+ * Input:
+ *    none
+ * Output:
+ *    none
  */
 struct fileNode {
   char *filename; // This file's name
@@ -40,7 +46,8 @@ struct fileNode {
 
 /* 
  * int add_file(fileNode *files, char *filename)
- * Description: Add a new file to the disk
+ * Description:
+ *    Add a new file to the disk
  * Input:
  *    fileNode *fileList : Pointer to the current list of files
  *    char *filename : Name of the file to be added
@@ -68,7 +75,8 @@ int add_file(struct fileNode *fileList, char *filename)
 
 /* 
  * void add_block(blockNode **block)
- * Description: Add a new block to the list
+ * Description:
+ *    Add a new block to the list
  * Input:
  *    blockNode *blockNode : Pointer to the first node in the blockList.
  *    block *block : Pointer to a block on the disk.
@@ -78,12 +86,13 @@ void add_block(struct blockNode **blockNode, struct block *block)
 {
   struct blockNode *temp;
   // List is empty. Add first.
-  if(*blockNode == NULL)
+  if((*blockNode)->block == NULL)
   {
     temp = (struct blockNode *)malloc(sizeof(struct blockNode));
     temp->block = block;
     temp->next = NULL;
     *blockNode = temp;
+    // printf("blockNode %p\n", *blockNode);
   }
   // List is NOT empty. Add last.
   else
@@ -103,6 +112,15 @@ void add_block(struct blockNode **blockNode, struct block *block)
 }
 
 
+/* 
+ * void print_block_list(struct blockNode *head)
+ * Description:
+ *    Print out all the data in all the blocks in this blockList
+ * Input:
+ *    struct blockNode *head : Pointer to the first node in this blockList
+ * Output:
+ *    Screen output of the data in the blockList
+ */
 void print_block_list(struct blockNode *head)
 {
   if(head == NULL)
@@ -110,7 +128,11 @@ void print_block_list(struct blockNode *head)
   else
     while(head != NULL)
     {
-      printf("%d\n", head->block->blockNum);
+      printf("Block #%d:", head->block->blockNum);
+      int i;
+      for(i = 0; i < BLOCKSIZE; i++)
+        printf(" %d", head->block->instructions[i]);
+      printf("\n");
       head = head->next;
     }
 }

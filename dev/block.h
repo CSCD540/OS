@@ -2,9 +2,12 @@
 
 /* 
  * struct block
- * Description: This struct defines a block in the disk.
- * Input: none
- * Output: none
+ * Description:
+ *    This struct defines a block in the disk.
+ * Input:
+ *    none
+ * Output:
+ *    none
  */
 struct block {
   int blockNum;
