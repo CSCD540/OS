@@ -8,9 +8,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define SUCCESS = 0;
-#define OUT_OF_DISK_SPACE = 1;
-
 
 /* 
  * struct blockNode
@@ -22,8 +19,8 @@
  *    none
  */
 struct blockNode {
-  struct block *block; // Pointer to a block on the disk
-  struct blockNode *next; // Pointer to the next blockNode in the list.
+  struct block     *block; // Pointer to a block on the disk
+  struct blockNode *next;  // Pointer to the next blockNode in the list.
 };
 
 
@@ -37,35 +34,32 @@ struct blockNode {
  *    none
  */
 struct fileNode {
-  char *filename; // This file's name
-  int numBlocks; // The number of block this file occupies
-  struct blockNode *firstBlock; // Pointer to the location where the file's first block begins, or the first node in it's blockList
-  struct fileNode  *nextFile; // Pointer to the next file in the file list
+  char   *filename; // This file's name
+  int    numBlocks; // The number of block this file occupies
+  struct blockNode  *firstBlock; // Pointer to the location where the file's first block begins, or the first node in it's blockList
+  struct fileNode   *nextFile;   // Pointer to the next file in the file list
 };
 
 
 /* 
- * int add_file(fileNode *files, char *filename)
+ * int add_file(fileNode **fileList, char *filename)
  * Description:
  *    Add a new file to the disk
  * Input:
- *    fileNode *fileList : Pointer to the current list of files
+ *    fileNode **fileList : Pointer to the current list of files
  *    char *filename : Name of the file to be added
  * Output:
- *    OUT_OF_DISK_SPACE : if there is not enough room on the disk to add the file
- *    SUCCESS : if the file was successfully added to the disk.
  *    New file will be stored on the disk. fileList, blockList and freeBlockList will be updated.
  */
-int add_file(struct fileNode *fileList, char *filename)
+int add_file(struct fileNode **fileList, char *filename)
 {
-  // TODO: Need to read through the file and count the number of instructions.
-  
-  
-  
-  
+  struct fileNode *temp;
   // First file in the list
-  if(fileList == NULL)
-  { fileList = malloc(sizeof(struct fileNode)); }
+  if((*fileList)->firstBlock == NULL)
+  {
+    temp = (struct fileNode *) malloc(sizeof(struct fileNode));
+    temp->filename = filename;
+  }
   
   // TODO: Add the node to the end of the list
   
@@ -74,31 +68,31 @@ int add_file(struct fileNode *fileList, char *filename)
 
 
 /* 
- * void add_block(blockNode **block)
+ * void add_block(struct blockNode **blockList, struct block *block)
  * Description:
  *    Add a new block to the list
  * Input:
- *    blockNode *blockNode : Pointer to the first node in the blockList.
+ *    blockNode *blockList : Pointer to the first node in the blockList.
  *    block *block : Pointer to a block on the disk.
  * Output:
  */
-void add_block(struct blockNode **blockNode, struct block *block)
+void add_block(struct blockNode **blockList, struct block *block)
 {
   struct blockNode *temp;
   // List is empty. Add first.
-  if((*blockNode)->block == NULL)
+  if((*blockList)->block == NULL)
   {
     temp = (struct blockNode *)malloc(sizeof(struct blockNode));
     temp->block = block;
     temp->next = NULL;
-    *blockNode = temp;
-    // printf("blockNode %p\n", *blockNode);
+    *blockList = temp;
+    // printf("blockNode %p\n", *blockList);
   }
   // List is NOT empty. Add last.
   else
   {
     struct blockNode *next;
-    temp = *blockNode;
+    temp = *blockList;
     
     // Advance to the last node in the list
     while(temp->next != NULL)
