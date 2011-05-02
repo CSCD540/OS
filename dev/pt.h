@@ -3,7 +3,8 @@
  * 
  * Author Brian Zier
  * 
- * 
+ * Colored printf info: http://cc.byexamples.com/2007/01/20/print-color-string-without-ncurses/
+ * And some more: http://tldp.org/LDP/LGNET/65/padala.html
  */
 
 #include <stdio.h>
@@ -79,7 +80,7 @@ int lookup(int pid, int vpn)
 
 int page_fault(int pid, int vpn)
 {
-  printf("\r\n%c[%d;%d;%dmPAGE FAULT%c[%dm\r\n", 27, 1, 37, 41, 27, 0);
+  printf("\r\n%c[%d;%d;%dmPAGE FAULT%c[%dm\r\n", 27, 5, 37, 41, 27, 0);
   
   // find lru
   //int lru = least_recently_used();
@@ -143,7 +144,7 @@ init_pg_tbl()
  */
 int print_page_table()
 {
-  printf("Page Table (%c[%d;%dmLRU in red%c[%dm):\r\n", 27, 0, 31, 27, 0);
+  printf("Page Table (%c[%dmLRU in red%c[%dm):\r\n", 27, 31, 27, 0);
   printf("            pid  vpn  lru\r\n");
   printf("            ---  ---  ---\r\n");
   int i;
