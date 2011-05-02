@@ -7,7 +7,7 @@
  */
 
 #include <stdio.h>
-#include "efs.h"
+// #include "efs.h"
 
 #define MAXPRO        1   // max num of processes
 #define MAXMEM        64  // max size of a process in word/sizeof(int) bytes
