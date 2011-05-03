@@ -238,7 +238,7 @@ void remove_file(char *filename)
  */
 void save_file(char *filename)
 {
-  printf("Save the file \"%s\" to the filesystem.\n", filename);
+  printf("Save a file to the virtual disk\n");
 }
 
 
