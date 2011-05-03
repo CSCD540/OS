@@ -3,8 +3,10 @@
  * 
  * Author Brian Zier
  * 
- * Colored printf info: http://cc.byexamples.com/2007/01/20/print-color-string-without-ncurses/
- * And some more: http://tldp.org/LDP/LGNET/65/padala.html
+ * Colored printf info:
+ *   http://cc.byexamples.com/2007/01/20/print-color-string-without-ncurses/
+ * And some more:
+ *   http://tldp.org/LDP/LGNET/65/padala.html
  */
 
 #include <stdio.h>
@@ -15,12 +17,29 @@
 #define PAGESIZE      16            // size of each page in words 2-bytes
 #define NUMPAGES MAXMEM / PAGESIZE  // Number of pages in page table
 
-int pageTable[NUMPAGES][3];   // The page table array which contains the process id, virtual page number, and LRU info
+// The process table array which is indexed on the process id, and
+//  contains the priority (?), and the file descriptor/filename
+int processTable[MAXPRO][2];
+// The page table array which contains the process id,
+//  virtual page number, dirty bit, and LRU info
+int pageTable[NUMPAGES][4];
 int lru;
-int processTable[MAXPRO][2];  // The process table array which is indexed on the process id, the priority, and the file descriptor
 
-
-int lookup(int pid, int vpn)
+/* int lookup(int pid, int vpn, int rw) // Externally accessible method
+ *
+ * Description: This function takes a virtual page number for a particular
+ *                process and looks it up in the page table returning the
+ *                physical page number for where that page is loaded in memory.
+ *                If the page is not loaded into memory, a page fault occurs and
+ *                the page will be loaded, swapping out the least recently used
+ *                page in memory.
+ * Input:
+ *        pid - The process id of the virtual page you are looking up
+ *        vpn - The virtual page number
+ *        rw  - Memory read/write designation (0 - read; 1 - write)
+ * Output: Returns the physical page number of the virtual page in memory
+ */
+int lookup(int pid, int vpn, int rw)
 {
   int found = 0;
   
@@ -77,8 +96,19 @@ int lookup(int pid, int vpn)
   return physPage;
 }
 
-
-int page_fault(int pid, int vpn)
+/* int page_fault(int pid, int vpn, int rw) // Internal method
+ * Description: This function takes the virtual page number for a particular
+ *                process and loads it from the disk to memory returning the
+ *                physical page number of where it was loaded. The page which
+ *                was previously loaded in memory, if dirty, is written back to
+ *                the disk.
+ * Input:
+ *        pid - The process id of the virtual page you are looking up
+ *        vpn - The virtual page number
+ *        rw  - Memory read/write designation (0 - read; 1 - write)
+ * Output: Returns the physical page number of the virtual page in memory
+ */
+int page_fault(int pid, int vpn, int rw)
 {
   printf("\r\n%c[%d;%d;%dmPAGE FAULT%c[%dm\r\n", 27, 5, 37, 41, 27, 0);
   
@@ -90,7 +120,8 @@ int page_fault(int pid, int vpn)
   if(pageTable[lru][0] != -1)
   {
     printf("Pretending to write existing page from memory to disk...\r\n");
-    printf("Writing physical page %d to disk. PID: %d, VPN: %d\r\n", lru, pageTable[lru][0], pageTable[lru][1]);
+    printf("Writing physical page %d to disk. PID: %d, VPN: %d\r\n",
+                                  lru, pageTable[lru][0], pageTable[lru][1]);
   }
   else
     printf("Empty page, no need to write out\r\n");
@@ -129,20 +160,25 @@ int least_recently_used()
  *
  */
 
+/* init_pg_tbl() // Internal method
+ * Description: This function initializes the page table to be empty (i.e. -1's)
+ * Input: None
+ * Output: None
+ */
 init_pg_tbl()
 {
   int i,j;
   for(i = 0; i < NUMPAGES; i++)
-    for(j = 0; j < 3; j++)
+    for(j = 0; j < 4; j++)
       pageTable[i][j] = -1;
 }
 
-/* Signature: page_table(int vpn)
- * Desc: Takes a virtual page number and '''handles paging''' to return a physical page number
- * Inputs: Virtual page number (int)
- * Output: Physical page number (int)
+/* print_page_table(int vpn)
+ * Description: Prints the current page table
+ * Inputs: None
+ * Output: None
  */
-int print_page_table()
+print_page_table()
 {
   printf("Page Table (%c[%dmLRU in red%c[%dm):\r\n", 27, 31, 27, 0);
   printf("            pid  vpn  lru\r\n");
