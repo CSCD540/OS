@@ -41,6 +41,38 @@ struct fileNode {
 };
 
 
+int delete_block_node(struct blockNode **blockList, struct block *block)
+{
+  // Check for empty list
+  if((*blockList)->block==NULL)
+    return -1;
+  
+  struct blockNode *temp, *last;
+  temp = *blockList;
+  while(temp != NULL)
+  {
+    if(temp->block == block)
+    {
+      // Initialize the block
+      int i;
+      for(i = 0; i < BLOCKSIZE; i++)
+        block->instructions[i] = -1;
+      
+      // First node in the list?
+      if(temp == *blockList)
+        *blockList = temp->nextBlock;
+      else
+        last->nextBlock = temp->nextBlock;
+      free(temp);
+      return 0;
+    }
+    last = temp;
+    temp = temp->nextBlock;
+  }
+  return 1;
+}
+
+
 /* 
  * void add_block_node(struct blockNode **blockList, struct block *block)
  * Description:
@@ -161,7 +193,7 @@ void print_file_list(struct fileNode *head)
   else
     while(head != NULL)
     {
-      printf("File: %s\n", head->filename);
+      printf("%s\n", head->filename);
       head = head->nextFile;
     }
 }
