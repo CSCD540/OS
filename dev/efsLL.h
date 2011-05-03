@@ -36,7 +36,7 @@ struct blockNode {
 struct fileNode {
   char   *filename; // This file's name
   int    numBlocks; // The number of block this file occupies
-  struct blockNode  *firstBlock; // Pointer to the location where the file's first block begins, or the first node in it's blockList
+  struct blockNode  *blockList; // Pointer to the location where the file's first block begins, or the first node in it's blockList
   struct fileNode   *nextFile;   // Pointer to the next file in the file list
 };
 
@@ -180,6 +180,37 @@ struct block * get_block(struct blockNode **blockList, int blockIndex)
 
 
 /* 
+ * int get_block_count(struct blockNode *blockList)
+ * Description:
+ *    Count the number of nodes in the list
+ * Input:
+ *    struct blockNode *blockList : Pointer to the first node in this blockList
+ * Output:
+ *    0 : The list is empty
+ *    i : The number of nodes in this list
+ */
+int get_block_count(struct blockNode *blockList)
+{
+  int i;
+  if(blockList == NULL)
+  { 
+    printf("\n\nList is empty!\n\n");
+    return 0;
+  }
+  else
+  {
+    i = 0;
+    while(blockList != NULL)
+    {
+      i++;
+      blockList = blockList->nextBlock;
+    }
+  }
+  return i;
+}
+
+
+/* 
  * void print_block_list(struct blockNode *head)
  * Description:
  *    Print out all the data in all the blocks in this blockList
@@ -188,19 +219,19 @@ struct block * get_block(struct blockNode **blockList, int blockIndex)
  * Output:
  *    Screen output of the data in the blockList
  */
-void print_block_list(struct blockNode *head)
+void print_block_list(struct blockNode *blockList)
 {
-  if(head == NULL)
+  if(blockList == NULL)
   { printf("\n\nList is empty!\n\n"); }
   else
-    while(head != NULL)
+    while(blockList != NULL)
     {
-      printf("Block #%d:", head->block->blockNum);
+      printf("Block #%d:", blockList->block->blockNum);
       int i;
       for(i = 0; i < BLOCKSIZE; i++)
-        printf(" %d", head->block->instructions[i]);
+        printf(" %d", blockList->block->instructions[i]);
       printf("\n");
-      head = head->nextBlock;
+      blockList = blockList->nextBlock;
     }
 }
 
