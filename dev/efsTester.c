@@ -13,12 +13,8 @@ int main(int argc, char *argv[])
   
   printf("\nFilelist after adding \"milk1.out\":\n");
   print_file_list(fileList);
-  
-  status = delete_block_node(&freeBlockList, freeBlockList->block);
   printf("\nfreeBlockList after deleting nodes used for file:\n");
   print_block_list(freeBlockList);
-  
-  
   printf("\nDisk after adding file:\n");
   print_disk(disk);
 
@@ -37,12 +33,17 @@ int save_file(char *filename)
   if(fd == NULL)
     return -1;
   
-  struct blockNode *blockNode;
-  blockNode = add_file(filename);
-    
+  struct fileNode *newFile;
+  newFile = add_file(filename);
+  struct block *curblock = get_free_block();
+  
+  
+      
   int numBlocks = 1; // Start at one block because this is the first block.
   int instNum = 0; // Basically the line number in the file
   int instruction = 0; // What the line says
+  
+  
   while(fscanf(fd, "%d\n", &instruction) != EOF)
   {
     // TODO: save 4 instructions to current block
@@ -57,4 +58,5 @@ int save_file(char *filename)
   }
   return fclose(fd);
 }
+
 

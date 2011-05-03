@@ -236,31 +236,9 @@ void remove_file(char *filename)
 /* 
  * Save a file to the disk
  */
-int save_file(char *filename)
+void save_file(char *filename)
 {
-  FILE *fd;
-  fd = fopen(filename, "r");
-  if(fd == NULL)
-    return -1;
-  
-  add_file(fileName);
-    
-  int numBlocks = 1; // Start at one block because this is the first block.
-  int instNum = 0; // Basically the line number in the file
-  int instruction = 0; // What the line says
-  while(fscanf(fd, "%d\n", &instruction) != EOF)
-  {
-    // TODO: save 4 instructions to current block
-    printf("Inst# %3d: %d\n", instNum, instruction);
-    instNum++;
-    // Check if the current block is full
-    if(instNum % BLOCKSIZE == 0)
-    {
-      // TODO: Get the next free block, free and remove the first node in the free block list
-      numBlocks++;
-    }
-  }
-  return fclose(fd);
+  printf("Save a file to the virtual disk\n");
 }
 
 

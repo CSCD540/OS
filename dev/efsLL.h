@@ -41,38 +41,6 @@ struct fileNode {
 };
 
 
-int delete_block_node(struct blockNode **blockList, struct block *block)
-{
-  // Check for empty list
-  if((*blockList)->block==NULL)
-    return -1;
-  
-  struct blockNode *temp, *last;
-  temp = *blockList;
-  while(temp != NULL)
-  {
-    if(temp->block == block)
-    {
-      // Initialize the block
-      int i;
-      for(i = 0; i < BLOCKSIZE; i++)
-        block->instructions[i] = -1;
-      
-      // First node in the list?
-      if(temp == *blockList)
-        *blockList = temp->nextBlock;
-      else
-        last->nextBlock = temp->nextBlock;
-      free(temp);
-      return 0;
-    }
-    last = temp;
-    temp = temp->nextBlock;
-  }
-  return 1;
-}
-
-
 /* 
  * void add_block_node(struct blockNode **blockList, struct block *block)
  * Description:
@@ -113,7 +81,7 @@ void add_block_node(struct blockNode **blockList, struct block *block)
 
 
 /* 
- * void add_file_node(fileNode **fileList, char *filename)
+ * struct fileNode * add_file_node(fileNode **fileList, char *filename)
  * Description:
  *    Add a new file to the disk
  * Input:
@@ -122,7 +90,7 @@ void add_block_node(struct blockNode **blockList, struct block *block)
  * Output:
  *    New file will be stored on the disk. fileList, blockList and freeBlockList will be updated.
  */
-struct blockNode * add_file_node(struct fileNode **fileList, char *filename)
+struct fileNode * add_file_node(struct fileNode **fileList, char *filename)
 {
   struct fileNode *temp;
   // First file in the list
@@ -147,7 +115,67 @@ struct blockNode * add_file_node(struct fileNode **fileList, char *filename)
     next->nextFile = NULL;
     temp->nextFile = next;    
   }
-  return temp->firstBlock;
+  return temp;
+}
+
+
+/* 
+ * int delete_block_node(struct blockNode **blockList, struct block *block)
+ * Description:
+ *    Delete the specified block from the list
+ * Input:
+ *    struct blockNode **blockList : pointer to the head node of the blockList
+ *    struct block *block : the block to be deleted
+ * Output:
+ *    -1 : blockList is empty
+ *     0 : block was found and the node was successfully removed from the list
+ *     1 : block was not found. No changes made to the list
+ */
+int delete_block_node(struct blockNode **blockList, struct block *block)
+{
+  // Check for empty list
+  if((*blockList)->block==NULL)
+    return -1;
+  
+  struct blockNode *temp, *last;
+  temp = *blockList;
+  while(temp != NULL)
+  {
+    if(temp->block == block)
+    {
+      // Initialize the block
+      int i;
+      for(i = 0; i < BLOCKSIZE; i++)
+        block->instructions[i] = -1;
+      
+      // First node in the list?
+      if(temp == *blockList)
+        *blockList = temp->nextBlock;
+      else
+        last->nextBlock = temp->nextBlock;
+      free(temp);
+      return 0;
+    }
+    last = temp;
+    temp = temp->nextBlock;
+  }
+  return 1;
+}
+
+
+struct block * get_block(struct blockNode **blockList, int blockIndex)
+{
+  struct blockNode *temp;
+  temp = *blockList;
+  // Check for empty list
+  if((*blockList)->block==NULL || temp == NULL)
+    return NULL;
+  
+  int i;
+  for(i = 0; i < blockIndex && temp != NULL; i++)
+    temp = temp->nextBlock;
+  
+  return temp->block;
 }
 
 

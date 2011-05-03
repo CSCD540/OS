@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include "efsLL.h"
 
-#define DISKSIZE    16*1                  // Total size of the disk
+#define DISKSIZE    16*8                  // Total size of the disk
 #define NUMBLOCKS   DISKSIZE / BLOCKSIZE  // Total number of blocks on the disk
 
 struct fileNode *fileList = NULL;
@@ -13,18 +13,35 @@ struct blockNode *freeBlockList = NULL;
  * Description:
  *    add a new file with the specified filename to the fileList
  * Input:
- *    char *filename - the name of the file to add
+ *    char *filename : the name of the file to add
  * Output:
- *    a pointer to the first block of the file, which will be null.
- *    user must point the block to a free block in the free list
- *    ...don't forget to remove that block from the free list!
+ *    a pointer to the first node in the blockList
  */
-struct blockNode * add_file(char *filename)
+struct fileNode * add_file(char *filename)
 {
   // Add a new file to the fileList and get a pointer to the first block.  
-  struct blockNode * blockNode;
-  blockNode = add_file_node(&fileList, filename);
-  return blockNode;
+  struct fileNode * newFileNode;
+  newFileNode = add_file_node(&fileList, filename);
+  return newFileNode;
+}
+
+
+/* 
+ * struct block * get_free_block()
+ * Description:
+ *    Get the first free block from the freeBlockList, then remove it from the freeBlockList
+ * Input:
+ *    none
+ * Output:
+ *    a pointer to the first free block on the disk
+ */
+struct block * get_free_block()
+{
+  struct block * block;
+  int blockIndex = 0;
+  block = get_block(&freeBlockList, blockIndex);
+  delete_block_node(&freeBlockList, block);
+  return block;
 }
 
 
