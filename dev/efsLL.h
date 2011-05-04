@@ -169,7 +169,7 @@ struct block * get_block(struct blockNode **blockList, int blockIndex)
   struct blockNode *temp;
   temp = *blockList;
   // Check for empty list
-  if(temp == NULL || temp->block == NULL)
+  if(temp == NULL)
     return NULL;
   
   int i;

@@ -13,6 +13,11 @@ int main(int argc, char *argv[])
 {
   init_disk(disk);
   
+  printf("\nfreeBlockList after initialization:\n");
+  print_block_list(freeBlockList);
+  printf("\nDisk after initialization:\n");
+  print_disk(disk);
+  
   int status = save_file("milk1.out");
   
   if(status == 0)
@@ -128,7 +133,6 @@ int write(struct fileNode **fileListNode, int data[], int count, int writeMode)
 
   for(j = 0; j < count; j++)
   {
-  printf("%d\n", i);
     if(i == 0)
     {
       curBlock = malloc(sizeof(struct block));
