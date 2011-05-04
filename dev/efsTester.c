@@ -19,10 +19,10 @@ int main(int argc, char *argv[])
   {
     printf("\nFilelist after adding \"milk1.out\":\n");
     print_file_list(fileList);
-    // printf("\nfreeBlockList after deleting nodes used for file:\n");
-    // print_block_list(freeBlockList);
-    // printf("\nDisk after adding file:\n");
-    // print_disk(disk);
+    printf("\nfreeBlockList after deleting nodes used for file:\n");
+    print_block_list(freeBlockList);
+    printf("\nDisk after adding file:\n");
+    print_disk(disk);
   }
   else
     printf("\nFile not saved successfully. Status returned %d\n", status);
@@ -105,6 +105,7 @@ int write(struct fileNode **fileListNode, int data[], int count, int writeMode)
 
   // Appending to end of file?
   int i; // First empty index in instructions array
+  i = 0;
   if(writeMode == APPEND)
   {
     // Forward the list to the last node
@@ -114,12 +115,8 @@ int write(struct fileNode **fileListNode, int data[], int count, int writeMode)
     curBlock = blockNode->block;
     // Does this block already have data in it?
     if(curBlock != NULL)
-    {
       // Find the first free instruction index
-      for(i = 0; curBlock->instructions[i] != -1 || i < BLOCKSIZE; i++);
-      if(i == BLOCKSIZE)
-        curBlock = get_free_block(); // Get the first available block on the disk
-    }
+      for(i; curBlock->instructions[i] != -1 || i < BLOCKSIZE; i++);
     // Get the next free block on the disk
     else
       curBlock = get_free_block(); // Get the first available block on the disk
@@ -127,6 +124,25 @@ int write(struct fileNode **fileListNode, int data[], int count, int writeMode)
   else // Overwrite
     curBlock = blockNode->block;
   
-  
+  int j;
+
+  for(j = 0; j < count; j++)
+  {
+  printf("%d\n", i);
+    if(i == 0)
+    {
+      curBlock = malloc(sizeof(struct block));
+      curBlock = get_free_block();
+    }
+    curBlock->instructions[i] = data[j];
+    i++;
+    if(i == BLOCKSIZE)
+    {
+      blockNode = add_block_node(&blockNode, curBlock);
+      blockNode->block = curBlock;
+      i = 0;
+    }
+  }
+  return 0;
 }
 

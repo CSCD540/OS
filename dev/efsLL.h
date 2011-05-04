@@ -50,7 +50,7 @@ struct fileNode {
  *    block *block : Pointer to a block on the disk.
  * Output:
  */
-void add_block_node(struct blockNode **blockList, struct block *block)
+struct blockNode * add_block_node(struct blockNode **blockList, struct block *block)
 {
   struct blockNode *temp;
   // List is empty. Add first.
@@ -77,6 +77,7 @@ void add_block_node(struct blockNode **blockList, struct block *block)
     next->nextBlock = NULL;
     temp->nextBlock = next;
   }
+  return temp;
 }
 
 
@@ -133,12 +134,12 @@ struct fileNode * add_file_node(struct fileNode **fileList, char *filename)
  */
 int delete_block_node(struct blockNode **blockList, struct block *block)
 {
-  // Check for empty list
-  if((*blockList)->block==NULL)
-    return -1;
-  
   struct blockNode *temp, *last;
   temp = *blockList;
+  // Check for empty list
+  if(temp == NULL)
+    return -1;
+    
   while(temp != NULL)
   {
     if(temp->block == block)
@@ -168,7 +169,7 @@ struct block * get_block(struct blockNode **blockList, int blockIndex)
   struct blockNode *temp;
   temp = *blockList;
   // Check for empty list
-  if((*blockList)->block==NULL || temp == NULL)
+  if(temp == NULL || temp->block == NULL)
     return NULL;
   
   int i;
