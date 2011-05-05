@@ -7,6 +7,7 @@
 #include "block.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 /* Definitions */
 #define LIST_EMPTY 0
@@ -64,6 +65,7 @@ struct blockNode * add_block_node(struct blockNode **blockList, struct block *bl
   if((*blockList)->block == NULL)
   {
     temp = malloc(sizeof(struct blockNode));
+    temp->block = malloc(sizeof(struct block *));
     temp->block = block;
     temp->nextBlock = NULL;
     *blockList = temp;
@@ -80,6 +82,7 @@ struct blockNode * add_block_node(struct blockNode **blockList, struct block *bl
     { temp = temp->nextBlock; }
     
     next = malloc(sizeof(struct blockNode));
+    next->block = malloc(sizeof(struct block *));
     next->block = block;
     next->nextBlock = NULL;
     temp->nextBlock = next;
@@ -107,6 +110,7 @@ struct fileNode * add_file_node(struct fileNode **fileList, char *filename, int 
     temp = malloc(sizeof(struct fileNode));
     temp->numBlocks = numBlocks;
     temp->filename = filename;
+    temp->blockList = malloc(sizeof(struct blockList *));
     temp->nextFile = NULL;
     *fileList = temp;
     // printf("fileNode %p\n", *fileList);
@@ -122,6 +126,7 @@ struct fileNode * add_file_node(struct fileNode **fileList, char *filename, int 
     next = malloc(sizeof(struct fileNode));
     next->numBlocks = numBlocks;
     next->filename = filename;
+    next->blockList = malloc(sizeof(struct blockList *));
     next->nextFile = NULL;
     temp->nextFile = next;    
   }
@@ -176,6 +181,32 @@ int delete_block_node(struct blockNode **blockList, struct block *block)
 } // end delete_block_node()
 
 
+struct fileNode * find_file(struct fileNode **fileList, char *filename)
+{
+  struct fileNode * file = *fileList;
+  if(file == NULL)
+  {    
+    print_error(LIST_EMPTY);
+    return NULL;
+  }
+  
+  while(file != NULL)
+  {
+    if(strcmp(file->filename, filename) == 0)
+    {
+      printf("%p\n", file->blockList);
+      return file;
+    }
+    else
+    {
+      file = file->nextFile;
+      printf("File not found\n");
+    }
+  }
+  return NULL;
+}
+
+
 /* 
  * struct block * get_block(struct blockNode **blockList, int blockIndex)
  * Description:
@@ -191,6 +222,7 @@ struct block * get_block(struct blockNode **blockList, int blockIndex)
 {
   struct blockNode *temp;
   temp = *blockList;
+  
   // Check for empty list
   if(temp == NULL)
   {

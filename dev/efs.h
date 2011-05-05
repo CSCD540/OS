@@ -28,7 +28,9 @@ struct fileNode * add_file(char *filename, int numBlocks)
 
 struct fileNode * get_file(char *filename)
 {
-  
+  struct fileNode * file;
+  file = find_file(&fileList, filename);
+  return file;
 }
 
 
@@ -96,6 +98,7 @@ void print_block_list(struct blockNode *blockList)
   else
     while(blockList != NULL)
     {
+      printf("%p\n", blockList->block);
       printf("Block #%d:", blockList->block->blockNum);
       int i;
       for(i = 0; i < BLOCKSIZE; i++)
