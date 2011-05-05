@@ -11,27 +11,35 @@ struct block disk[NUMBLOCKS];
 
 int main(int argc, char *argv[])
 {
-  init_disk(disk);
-  
-  printf("\nfreeBlockList after initialization:\n");
+  printf("\nfreeBlockList before initialization:\n");
   print_block_list(freeBlockList);
-  printf("\nDisk after initialization:\n");
-  print_disk(disk);
+
+  init_disk(disk);
+
+/*  printf("\nfreeBlockList after initialization:\n");*/
+/*  print_block_list(freeBlockList);*/
+/*  printf("\nDisk after initialization:\n");*/
+/*  print_disk(disk);*/
   
-  int status = save_file("milk1.out");
+  int status;
   
-  if(status == 0)
+  int i;
+  for(i = 0; i < 3; i++)
   {
-    printf("\nFilelist after adding \"milk1.out\":\n");
-    print_file_list(fileList);
-    printf("\nfreeBlockList after deleting nodes used for file:\n");
-    print_block_list(freeBlockList);
-    printf("\nDisk after adding file:\n");
-    print_disk(disk);
+    status = save_file("milk1.out");
+    
+    if(status == 0)
+    {
+      printf("\nFilelist after adding \"milk1.out\":\n");
+      print_file_list(fileList);
+      printf("\nDisk after adding file:\n");
+      print_disk(disk);
+      printf("\nfreeBlockList after deleting nodes used for file:\n");
+      print_block_list(freeBlockList);
+    }
+    else
+      printf("\nFile not saved successfully. Status returned %d\n", status);
   }
-  else
-    printf("\nFile not saved successfully. Status returned %d\n", status);
-  
   printf("\n");
   return 0;
 }
@@ -89,11 +97,11 @@ int save_file(char *filename)
   fclose(fd);
 
   struct fileNode *newFile; // Declare a fileNode pointer
-  newFile = add_file(filename); // Add a new file to the list and get the pointer to that fileNode
+  newFile = add_file(filename, numBlocks); // Add a new file to the list and get the pointer to that fileNode
   write(&newFile, instructions, numInstructs, OVERWRITE);
   
   return 0;
-}
+}// end save_file()
 
 
 int write(struct fileNode **fileListNode, int data[], int count, int writeMode)
@@ -148,5 +156,5 @@ int write(struct fileNode **fileListNode, int data[], int count, int writeMode)
     }
   }
   return 0;
-}
+} // end write()
 

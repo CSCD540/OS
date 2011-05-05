@@ -1,13 +1,20 @@
 /*
  * Author: Jordan Bondo
  * 
- * A lot of the linked list stuff came from http://www.daniweb.com/software-development/c/threads/216353
+ * A lot of this stuff came from http://www.daniweb.com/software-development/c/threads/216353
  */
 
 #include "block.h"
 #include <stdio.h>
 #include <stdlib.h>
 
+/* Definitions */
+#define LIST_EMPTY 0
+/* End Definitions */
+
+/* Forward Declarations */
+void print_error(int errno);
+/* End Forward Declarations */
 
 /* 
  * struct blockNode
@@ -78,7 +85,7 @@ struct blockNode * add_block_node(struct blockNode **blockList, struct block *bl
     temp->nextBlock = next;
   }
   return temp;
-}
+} // end add_block_node()
 
 
 /* 
@@ -91,13 +98,14 @@ struct blockNode * add_block_node(struct blockNode **blockList, struct block *bl
  * Output:
  *    New file will be stored on the disk. fileList, blockList and freeBlockList will be updated.
  */
-struct fileNode * add_file_node(struct fileNode **fileList, char *filename)
+struct fileNode * add_file_node(struct fileNode **fileList, char *filename, int numBlocks)
 {
   struct fileNode *temp;
   // First file in the list
   if((*fileList)->filename == NULL)
   {
     temp = malloc(sizeof(struct fileNode));
+    temp->numBlocks = numBlocks;
     temp->filename = filename;
     temp->nextFile = NULL;
     *fileList = temp;
@@ -112,12 +120,13 @@ struct fileNode * add_file_node(struct fileNode **fileList, char *filename)
     { temp = temp->nextFile; }
     
     next = malloc(sizeof(struct fileNode));
+    next->numBlocks = numBlocks;
     next->filename = filename;
     next->nextFile = NULL;
     temp->nextFile = next;    
   }
   return temp;
-}
+} // end add_file_node()
 
 
 /* 
@@ -138,7 +147,10 @@ int delete_block_node(struct blockNode **blockList, struct block *block)
   temp = *blockList;
   // Check for empty list
   if(temp == NULL)
+  {
+    print_error(LIST_EMPTY);
     return -1;
+  }
     
   while(temp != NULL)
   {
@@ -161,16 +173,30 @@ int delete_block_node(struct blockNode **blockList, struct block *block)
     temp = temp->nextBlock;
   }
   return 1;
-}
+} // end delete_block_node()
 
 
+/* 
+ * struct block * get_block(struct blockNode **blockList, int blockIndex)
+ * Description:
+ *    Get a block in the blockList at the specified index
+ * Input:
+ *    struct blockNode **blockList : Pointer to the first node in this blockList
+ *    int blockIndex : The index number of the desired block
+ * Output:
+ *    NULL : The list is empty
+ *    temp->block : The block at the location specified by blockIndex.
+ */
 struct block * get_block(struct blockNode **blockList, int blockIndex)
 {
   struct blockNode *temp;
   temp = *blockList;
   // Check for empty list
   if(temp == NULL)
+  {
+    print_error(LIST_EMPTY);
     return NULL;
+  }
   
   int i;
   for(i = 0; i < blockIndex && temp != NULL; i++)
@@ -195,7 +221,7 @@ int get_block_count(struct blockNode *blockList)
   int i;
   if(blockList == NULL)
   { 
-    printf("\n\nList is empty!\n\n");
+    print_error(LIST_EMPTY);
     return 0;
   }
   else
@@ -223,7 +249,7 @@ int get_block_count(struct blockNode *blockList)
 void print_block_list(struct blockNode *blockList)
 {
   if(blockList == NULL)
-  { printf("\n\nList is empty!\n\n"); }
+    print_error(LIST_EMPTY);
   else
     while(blockList != NULL)
     {
@@ -234,6 +260,30 @@ void print_block_list(struct blockNode *blockList)
       printf("\n");
       blockList = blockList->nextBlock;
     }
+}
+
+
+/* 
+ * void print_error(int errno)
+ * Description:
+ *    Print out the error message associated with the errno
+ * Input:
+ *    int errno : The error number
+ * Output:
+ *    Screen output of what error occurred.
+ */
+void print_error(int errno)
+{
+  printf("\nERROR: ");
+  switch(errno)
+  {
+    case LIST_EMPTY:
+      printf("List is empty!\n");
+      break;
+      
+    default:
+      printf("An unspecified has error occurred.\n");
+  }
 }
 
 
@@ -249,12 +299,15 @@ void print_block_list(struct blockNode *blockList)
 void print_file_list(struct fileNode *head)
 {
   if(head == NULL)
-  { printf("\n\nList is empty!\n\n"); }
+    print_error(LIST_EMPTY);
   else
+  {
+    printf("Filename      Blocks\n");
     while(head != NULL)
     {
-      printf("%s\n", head->filename);
+      printf("%s%11d\n", head->filename, head->numBlocks);
       head = head->nextFile;
     }
+  }
 }
 

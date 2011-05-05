@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include "efsLL.h"
 
-#define DISKSIZE    16*8                  // Total size of the disk
+#define DISKSIZE    BLOCKSIZE * 50        // Total size of the disk
 #define NUMBLOCKS   DISKSIZE / BLOCKSIZE  // Total number of blocks on the disk
 
 struct fileNode *fileList = NULL;
@@ -17,12 +17,18 @@ struct blockNode *freeBlockList = NULL;
  * Output:
  *    a pointer to the first node in the blockList
  */
-struct fileNode * add_file(char *filename)
+struct fileNode * add_file(char *filename, int numBlocks)
 {
   // Add a new file to the fileList and get a pointer to the first block.  
   struct fileNode * newFileNode;
-  newFileNode = add_file_node(&fileList, filename);
+  newFileNode = add_file_node(&fileList, filename, numBlocks);
   return newFileNode;
+}
+
+
+struct fileNode * get_file(char *filename)
+{
+  
 }
 
 
@@ -58,6 +64,7 @@ void init_disk(struct block disk[])
 {
   // Allocate memory for the head node in freeBlockList
   freeBlockList = malloc(sizeof(struct blockNode));
+  
   // Initialize all blocks in the disk and add all blocks to freeBlockList
   int i, j;
   for(i = 0; i < NUMBLOCKS; i++)
