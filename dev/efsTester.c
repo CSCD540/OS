@@ -13,18 +13,15 @@ int main(int argc, char *argv[])
 {
   printf("\nfreeBlockList before initialization:\n");
   print_block_list(freeBlockList);
-
+  printf("\nfile before initialization:\n");
+  print_file_list(fileList);
+  
   init_disk(disk);
-
-/*  printf("\nfreeBlockList after initialization:\n");*/
-/*  print_block_list(freeBlockList);*/
-/*  printf("\nDisk after initialization:\n");*/
-/*  print_disk(disk);*/
   
   int status;
   
   int i;
-  for(i = 0; i < 3; i++)
+  for(i = 0; i < 2; i++)
   {
     status = save_file("milk1.out");
     

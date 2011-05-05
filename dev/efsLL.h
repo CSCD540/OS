@@ -238,32 +238,6 @@ int get_block_count(struct blockNode *blockList)
 
 
 /* 
- * void print_block_list(struct blockNode *head)
- * Description:
- *    Print out all the data in all the blocks in this blockList
- * Input:
- *    struct blockNode *head : Pointer to the first node in this blockList
- * Output:
- *    Screen output of the data in the blockList
- */
-void print_block_list(struct blockNode *blockList)
-{
-  if(blockList == NULL)
-    print_error(LIST_EMPTY);
-  else
-    while(blockList != NULL)
-    {
-      printf("Block #%d:", blockList->block->blockNum);
-      int i;
-      for(i = 0; i < BLOCKSIZE; i++)
-        printf(" %d", blockList->block->instructions[i]);
-      printf("\n");
-      blockList = blockList->nextBlock;
-    }
-}
-
-
-/* 
  * void print_error(int errno)
  * Description:
  *    Print out the error message associated with the errno
@@ -283,31 +257,6 @@ void print_error(int errno)
       
     default:
       printf("An unspecified has error occurred.\n");
-  }
-}
-
-
-/* 
- * void print_file_list(struct fileNode *head)
- * Description:
- *    Print out all the file currently stored on the disk
- * Input:
- *    struct fileNode *head : Pointer to the first node in the fileList
- * Output:
- *    Screen output of the files in the fileList
- */
-void print_file_list(struct fileNode *head)
-{
-  if(head == NULL)
-    print_error(LIST_EMPTY);
-  else
-  {
-    printf("Filename      Blocks\n");
-    while(head != NULL)
-    {
-      printf("%s%11d\n", head->filename, head->numBlocks);
-      head = head->nextFile;
-    }
   }
 }
 
