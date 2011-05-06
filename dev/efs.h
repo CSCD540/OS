@@ -98,11 +98,13 @@ void print_block_list(struct blockNode *blockList)
   else
     while(blockList != NULL)
     {
-      printf("%p\n", blockList->block);
-      printf("Block #%d:", blockList->block->blockNum);
+      printf("blockList: %p\n", blockList);
+      printf("blockList->block: %p\n", blockList->block);
+      //printf("Block #%d:", blockList->block->blockNum);
       int i;
       for(i = 0; i < BLOCKSIZE; i++)
-        printf(" %d", blockList->block->instructions[i]);
+        ;
+      //  printf(" %d", blockList->block->instructions[i]);
       printf("\n");
       blockList = blockList->nextBlock;
     }

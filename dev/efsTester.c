@@ -16,6 +16,7 @@ int main(int argc, char *argv[])
   printf("\nfile before initialization:\n");
   print_file_list(fileList);
   
+  printf("\nInitializing Disk...\n");
   init_disk(disk);
   
   int status;
@@ -23,19 +24,21 @@ int main(int argc, char *argv[])
 /*  int i;*/
 /*  for(i = 0; i < 4; i++)*/
 /*  {*/
+    printf("\nSaving file...\n");
     status = save_file("milk1.out");
     struct fileNode * file = get_file("milk1.out");
-    printf("File %s found\n", file->filename);
     
     if(status == 0 && file != NULL)
     {
+      printf("File %s found\n", file->filename);
+      printf("\nFilelist after adding \"milk1.out\":\n");
+      print_file_list(fileList);
+      printf("\nDisk after adding file:\n");
+      print_disk(disk);
+      printf("\nfreeBlockList after deleting nodes used for file:\n");
+      print_block_list(freeBlockList);
+      printf("\n%s blockList:\n", file->filename);
       print_block_list(file->blockList);
-/*      printf("\nFilelist after adding \"milk1.out\":\n");*/
-/*      print_file_list(fileList);*/
-/*      printf("\nDisk after adding file:\n");*/
-/*      print_disk(disk);*/
-/*      printf("\nfreeBlockList after deleting nodes used for file:\n");*/
-/*      print_block_list(freeBlockList);*/
     }
     else
       printf("\nFile not saved successfully. Status returned %d. \n", status);
@@ -121,14 +124,14 @@ int save_file(char *filename)
 int write(struct fileNode **fileListNode, int data[], int count, int writeMode)
 {
   struct blockNode *blockNode = (*fileListNode)->blockList;
-  struct block *curBlock; // Declare a block pointer.
+  printf("write:blockList: %p\n", blockNode);
+  struct block *curBlock = malloc(sizeof(struct block *)); // Declare a block pointer.
 
   if(blockNode == NULL)
   {
+    printf("blockNode == NULL\n");
     blockNode = malloc(sizeof(struct blockNode));
-    add_block_node(&blockNode, curBlock);
   }
-  // printf("%p\n", blockNode);
 
   // Appending to end of file?
   int i; // First empty index in instructions array
@@ -153,20 +156,19 @@ int write(struct fileNode **fileListNode, int data[], int count, int writeMode)
     curBlock = blockNode->block;
   
   int j;
-
   for(j = 0; j < count; j++)
   {
     if(i == 0)
     {
-      curBlock = malloc(sizeof(struct block *));
       curBlock = get_free_block();
     }
     curBlock->instructions[i] = data[j];
     i++;
     if(i == BLOCKSIZE)
     {
+      //printf("write:curblock: %p\n", curBlock);
       blockNode = add_block_node(&blockNode, curBlock);
-      blockNode->block = curBlock;
+      //printf("write - block %p\n", curBlock);
       i = 0;
     }
   }
