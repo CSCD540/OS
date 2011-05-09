@@ -60,14 +60,14 @@ struct fileNode {
  */
 struct blockNode * add_block_node(struct blockNode **blockList, struct block *block)
 {
-      printf("add_block_node:in-block: %p\n", block);
+  printf("add_block_node:in-block: %p\n", block);
   struct blockNode *temp;
   // List is empty. Add first.
   if((*blockList)->block == NULL)
   {
     temp = malloc(sizeof(struct blockNode));
-    // temp->block = malloc(sizeof(struct block *));
-    &temp->block = &block;
+    temp->block = malloc(sizeof(struct block *));
+    temp->block = block;
     printf("add_block->new list %p\n", temp->block);
     temp->nextBlock = NULL;
     *blockList = temp;
@@ -84,7 +84,7 @@ struct blockNode * add_block_node(struct blockNode **blockList, struct block *bl
     { temp = temp->nextBlock; }
     
     next = malloc(sizeof(struct blockNode));
-    // next->block = malloc(sizeof(struct block *));
+    next->block = malloc(sizeof(struct block *));
     next->block = block;
     printf("add_block->old list %p\n", next->block);
     next->nextBlock = NULL;

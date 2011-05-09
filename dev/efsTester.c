@@ -99,8 +99,9 @@ int save_file(char *filename)
     instructions[i] = instruction;
   fclose(fd);
 
-  struct fileNode *newFile; // Declare a fileNode pointer
+  struct fileNode *newFile = malloc(sizeof(struct fileNode *)); // Declare a fileNode pointer
   newFile = add_file(filename, numBlocks); // Add a new file to the list and get the pointer to that fileNode
+  newFile->blockList = malloc(sizeof(struct blockNode *));
   write(&newFile, instructions, numInstructs, OVERWRITE);
   
   return 0;
@@ -127,10 +128,10 @@ int write(struct fileNode **fileListNode, int data[], int count, int writeMode)
   printf("write:blockList: %p\n", blockNode);
   struct block *curBlock = malloc(sizeof(struct block *)); // Declare a block pointer.
 
-  if(blockNode == NULL)
+  if(blockNode->block == NULL)
   {
-    printf("blockNode == NULL\n");
-    blockNode = malloc(sizeof(struct blockNode));
+    printf("blockNode->block == NULL\n");
+    blockNode->block = malloc(sizeof(struct block *));
   }
 
   // Appending to end of file?
