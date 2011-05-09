@@ -181,18 +181,18 @@ init_pg_tbl()
 print_page_table()
 {
   printf("Page Table (%c[%dmLRU in red%c[%dm):\r\n", 27, 31, 27, 0);
-  printf("            pid  vpn  lru\r\n");
-  printf("            ---  ---  ---\r\n");
+  printf("            pid  vpn  lru  drt\r\n");
+  printf("            ---  ---  ---  ---\r\n");
   int i;
   for(i = 0; i < NUMPAGES; i++)
     if(i == lru)
     {
       printf("%c[%d;%dm", 27, 0, 31);
-      printf("PysPage %2d: %3d  %3d  %3d\r\n", i, pageTable[i][0],  pageTable[i][1], pageTable[i][2]);
+      printf("PysPage %2d: %3d  %3d  %3d  %3d\r\n", i, pageTable[i][0],  pageTable[i][1], pageTable[i][2], pageTable[i][3]);
       printf("%c[%dm", 27, 0);
     }
     else
-      printf("PysPage %2d: %3d  %3d  %3d\r\n", i, pageTable[i][0],  pageTable[i][1], pageTable[i][2]);
+      printf("PysPage %2d: %3d  %3d  %3d  %3d\r\n", i, pageTable[i][0],  pageTable[i][1], pageTable[i][2], pageTable[i][3]);
 }
 /* end of page_table method */
 

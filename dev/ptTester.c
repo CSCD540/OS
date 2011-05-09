@@ -29,7 +29,7 @@ void accessPage(int pid, int vpn)
 {
   printf("\r\nLooking up virtual page number %d for process %d\r\n", vpn, pid);
   
-  int physPgNm = lookup(pid, vpn);
+  int physPgNm = lookup(pid, vpn, 0);
   
   printf("\r\nPhysical page number is: %d\r\n", physPgNm);
   
