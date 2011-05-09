@@ -17,6 +17,7 @@
 void print_error(int errno);
 /* End Forward Declarations */
 
+
 /* 
  * struct blockNode
  * Description:
@@ -131,7 +132,8 @@ struct fileNode * add_file_node(struct fileNode **fileList, char *filename, int 
     next->filename = filename;
     next->blockList = malloc(sizeof(struct blockList *));
     next->nextFile = NULL;
-    temp->nextFile = next;    
+    temp->nextFile = next;
+    temp = temp->nextFile;
   }
   return temp;
 } // end add_file_node()
@@ -174,7 +176,6 @@ int delete_block_node(struct blockNode **blockList, struct block *block)
         *blockList = temp->nextBlock;
       else
         last->nextBlock = temp->nextBlock;
-      free(temp);
       return 0;
     }
     last = temp;
@@ -197,7 +198,7 @@ struct fileNode * find_file(struct fileNode **fileList, char *filename)
   {
     if(strcmp(file->filename, filename) == 0)
     {
-      printf("%p\n", file->blockList->block);
+      printf("%p\n", file->blockList);
       return file;
     }
     else
@@ -221,7 +222,7 @@ struct fileNode * find_file(struct fileNode **fileList, char *filename)
  *    NULL : The list is empty
  *    temp->block : The block at the location specified by blockIndex.
  */
-struct block * get_block(struct blockNode **blockList, int blockIndex)
+struct blockNode * get_block_node(struct blockNode **blockList, int blockIndex)
 {
   struct blockNode *temp;
   temp = *blockList;
@@ -237,7 +238,7 @@ struct block * get_block(struct blockNode **blockList, int blockIndex)
   for(i = 0; i < blockIndex && temp != NULL; i++)
     temp = temp->nextBlock;
   
-  return temp->block;
+  return temp;
 }
 
 

@@ -35,21 +35,22 @@ struct fileNode * get_file(char *filename)
 
 
 /* 
- * struct block * get_free_block()
+ * struct block * get_free_block_node()
  * Description:
- *    Get the first free block from the freeBlockList, then remove it from the freeBlockList
+ *    Get the first free blockNode from the freeBlockList, then remove it from the freeBlockList
  * Input:
  *    none
  * Output:
- *    a pointer to the first free block on the disk
+ *    The first available free blockNode
  */
-struct block * get_free_block()
+struct blockNode * get_free_block_node()
 {
-  struct block * block;
-  int blockIndex = 0;
-  block = get_block(&freeBlockList, blockIndex);
-  delete_block_node(&freeBlockList, block);
-  return block;
+  struct blockNode * freeNode;
+  int blockIndex = 0; // Just want the first free node in the freeBlockList
+
+  freeNode = get_block_node(&freeBlockList, blockIndex);
+  delete_block_node(&freeBlockList, freeNode->block);
+  return freeNode;
 }
 
 

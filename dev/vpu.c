@@ -165,7 +165,7 @@ int main(int argc, char *argv[])
     }
     else
 		{
-      printf("Bad command\n");
+      printf("Command Not Found\n");
     }
   } // end while(machineOn)
 
