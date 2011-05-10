@@ -55,7 +55,7 @@ void init_main_mem()
 
 void print_mem()
 {
-  printf("\r\n------------------\r\n|   MAIN MEMORY  |\r\n|----------------|\r\n");
+  printf("\r\n------------------\r\n|%c[%d;%dm   MAIN MEMORY  %c[%dm|\r\n|----------------|\r\n", 27, 1, 42, 27, 0);
   
   int i,j;
   for(i = 0; i < MAXPRO; i++)
