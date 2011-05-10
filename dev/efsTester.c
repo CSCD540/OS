@@ -106,6 +106,7 @@ int save_file(char *filename)
 
   struct fileNode *newFile = malloc(sizeof(struct fileNode *)); // Declare a fileNode pointer
   newFile = add_file(filename, numBlocks); // Add a new file to the list and get the pointer to that fileNode
+  printf("newFile %p\n", newFile);
   // newFile->blockList = get_free_block_node();
   write(&newFile, instructions, numInstructs, OVERWRITE);
   
@@ -131,7 +132,8 @@ int write(struct fileNode **fileListNode, int data[], int count, int writeMode)
 {
   struct blockNode *blockNode = (*fileListNode)->blockList;
   struct block *curBlock = malloc(sizeof(struct block *)); // Declare a block pointer.
-
+  printf("start write : fileListNode->blockList %p\n", (*fileListNode)->blockList->block);
+  printf("blockNode %p\n", blockNode);
   // Appending to end of file?
   int i; // First empty index in instructions array
   i = 0;
@@ -163,6 +165,8 @@ int write(struct fileNode **fileListNode, int data[], int count, int writeMode)
       blockNode->nextBlock = get_free_block_node();
       blockNode = blockNode->nextBlock;
       curBlock = blockNode->block;
+      printf("new blockNode %p\n", blockNode);
+      printf("new block %p\n", curBlock);
     }
     printf("writing %d to block %d\n", data[j], curBlock->blockNum);
     curBlock->instructions[i] = data[j];
@@ -171,6 +175,7 @@ int write(struct fileNode **fileListNode, int data[], int count, int writeMode)
     if(i == BLOCKSIZE)
       i = 0;
   }
+  printf("end write : fileListNode->blockList %p\n", (*fileListNode)->blockList->block);
   return 0;
 } // end write()
 

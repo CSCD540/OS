@@ -21,7 +21,9 @@ struct fileNode * add_file(char *filename, int numBlocks)
 {
   // Add a new file to the fileList and get a pointer to the first block.  
   struct fileNode * newFileNode = malloc(sizeof(struct fileNode *));
+  printf("add file %p\n", newFileNode);
   newFileNode = add_file_node(&fileList, filename, numBlocks);
+  printf("add file %p\n", newFileNode);
   return newFileNode;
 }
 
@@ -30,6 +32,7 @@ struct fileNode * get_file(char *filename)
 {
   struct fileNode * file;
   file = find_file(&fileList, filename);
+  printf("Find file %p\n", file->blockList->block);
   return file;
 }
 
@@ -99,13 +102,14 @@ void print_block_list(struct blockNode *blockList)
   else
     while(blockList != NULL)
     {
-      printf("Block #%d:", blockList->block->blockNum);
+
       printf("blockList: %p\n", blockList);
-      printf("blockList->block: %p", blockList->block);
+      printf("blockList->block: %p\n", blockList->block);
+      printf("Block #%d:", blockList->block->blockNum);
       int i;
       for(i = 0; i < BLOCKSIZE; i++)
-        ;
       //  printf(" %d", blockList->block->instructions[i]);
+        ;
       printf("\n");
       blockList = blockList->nextBlock;
     }

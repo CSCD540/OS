@@ -135,6 +135,7 @@ struct fileNode * add_file_node(struct fileNode **fileList, char *filename, int 
     temp->nextFile = next;
     temp = temp->nextFile;
   }
+  printf("add file node %p\n", temp);
   return temp;
 } // end add_file_node()
 
@@ -198,7 +199,7 @@ struct fileNode * find_file(struct fileNode **fileList, char *filename)
   {
     if(strcmp(file->filename, filename) == 0)
     {
-      printf("%p\n", file->blockList);
+      printf("%p\n", file->blockList->block);
       return file;
     }
     else
