@@ -17,6 +17,8 @@
 #define PAGESIZE      16            // size of each page in words 2-bytes
 #define NUMPAGES MAXMEM / PAGESIZE  // Number of pages in page table
 
+int  mem[MAXPRO][MAXMEM];   // Main mem for each process
+
 // The process table array which is indexed on the process id, and
 //  contains the priority (?), and the file descriptor/filename
 int processTable[MAXPRO][2];
@@ -38,6 +40,7 @@ int lru;
  *        vpn - The virtual page number
  *        rw  - Memory read/write designation (0 - read; 1 - write)
  * Output: Returns the physical page number of the virtual page in memory
+ *          or -1 if the virtual page number is beyond the end of the file
  */
 int lookup(int pid, int vpn, int rw)
 {
@@ -67,7 +70,7 @@ int lookup(int pid, int vpn, int rw)
     physPage = i;
   }
   else // If we did not find it, we page fault
-    physPage = page_fault(pid, vpn);
+    physPage = page_fault(pid, vpn, rw);
   
   
   // Increase every page's recently used counter
@@ -107,6 +110,7 @@ int lookup(int pid, int vpn, int rw)
  *        vpn - The virtual page number
  *        rw  - Memory read/write designation (0 - read; 1 - write)
  * Output: Returns the physical page number of the virtual page in memory
+ *          or -1 if the virtual page number is beyond the end of the file
  */
 int page_fault(int pid, int vpn, int rw)
 {
@@ -116,24 +120,53 @@ int page_fault(int pid, int vpn, int rw)
   //int lru = least_recently_used();
   printf("LRU: %d\r\n", lru);
   
-  // write lru page to disk
-  if(pageTable[lru][0] != -1)
+  // if the lru page has been used and is dirty, write it back to the disk
+  if(pageTable[lru][0] == -1)
+    printf("Empty page, no need to write out\r\n");
+  else if(pageTable[lru][3] == 0)
+    printf("Clean page, no need to write out\r\n");
+  else
   {
+    printf("Dirty page!\r\n");
     printf("Pretending to write existing page from memory to disk...\r\n");
     printf("Writing physical page %d to disk. PID: %d, VPN: %d\r\n",
                                   lru, pageTable[lru][0], pageTable[lru][1]);
   }
-  else
-    printf("Empty page, no need to write out\r\n");
   
   // read new page in
-  printf("\r\nPretending to read new page from disk into memory...\r\n");
-  pageTable[lru][0] = pid;
-  pageTable[lru][1] = vpn;
-  pageTable[lru][2] = 0;
+  printf("\r\nReading new page from disk into memory...\r\n");
+  FILE * fd = fopen("testingPT.out", "r");
+  int tmp = 0, i = 0, EOFreached = 0;
+  for(; i < PAGESIZE * vpn; i++)
+    if(fscanf(fd, "%d\n", &tmp) == EOF)
+    {
+      EOFreached = 1;
+      break;
+    }
   
-  // return physical page num
-  return lru;
+  if(!EOFreached)
+  {
+    for(i = 0; i < PAGESIZE; i++)
+    {
+      int res = fscanf(fd, "%d\n", &tmp);
+      if(res != EOF)
+        mem[0][PAGESIZE * lru + i] = tmp;
+      else
+        mem[0][PAGESIZE * lru + i] = -1;
+    }
+    //  printf("First int in file: %d\r\n", tmp);
+    fclose(fd);
+
+    pageTable[lru][0] = pid;
+    pageTable[lru][1] = vpn;
+    pageTable[lru][2] = 0;
+    pageTable[lru][3] = rw;
+    
+    // return physical page num
+    return lru;
+  }
+  
+  return -1; // Page was beyond scope of file
 }
 
 /*
@@ -180,19 +213,23 @@ init_pg_tbl()
  */
 print_page_table()
 {
-  printf("Page Table (%c[%dmLRU in red%c[%dm):\r\n", 27, 31, 27, 0);
-  printf("            pid  vpn  lru  drt\r\n");
-  printf("            ---  ---  ---  ---\r\n");
+  printf("\r\nPage Table (%c[%dmLRU in red%c[%dm):\r\n", 27, 31, 27, 0);
+  printf("            -------------------------\r\n");
+  printf("            | pid | vpn | lru | drt |\r\n");
+  printf("------------------|-----|-----|-----|\r\n");
   int i;
   for(i = 0; i < NUMPAGES; i++)
+  {
     if(i == lru)
     {
       printf("%c[%d;%dm", 27, 0, 31);
-      printf("PysPage %2d: %3d  %3d  %3d  %3d\r\n", i, pageTable[i][0],  pageTable[i][1], pageTable[i][2], pageTable[i][3]);
+      printf("|PysPage %2d | %3d | %3d | %3d | %3d |\r\n", i, pageTable[i][0],  pageTable[i][1], pageTable[i][2], pageTable[i][3]);
       printf("%c[%dm", 27, 0);
     }
     else
-      printf("PysPage %2d: %3d  %3d  %3d  %3d\r\n", i, pageTable[i][0],  pageTable[i][1], pageTable[i][2], pageTable[i][3]);
+      printf("|PysPage %2d | %3d | %3d | %3d | %3d |\r\n", i, pageTable[i][0],  pageTable[i][1], pageTable[i][2], pageTable[i][3]);
+    printf("|-----------------------------------|\r\n");
+  }
 }
 /* end of page_table method */
 
