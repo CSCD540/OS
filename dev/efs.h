@@ -21,9 +21,9 @@ struct fileNode * add_file(char *filename, int numBlocks)
 {
   // Add a new file to the fileList and get a pointer to the first block.  
   struct fileNode * newFileNode = malloc(sizeof(struct fileNode *));
-  printf("add file %p\n", newFileNode);
+  printf("pre add file  %p\n", newFileNode);
   newFileNode = add_file_node(&fileList, filename, numBlocks);
-  printf("add file %p\n", newFileNode);
+  printf("post add file %p\n", newFileNode);
   return newFileNode;
 }
 
@@ -32,7 +32,7 @@ struct fileNode * get_file(char *filename)
 {
   struct fileNode * file;
   file = find_file(&fileList, filename);
-  printf("Find file %p\n", file->blockList->block);
+  // printf("get_file %p\n", file->blockList->block);
   return file;
 }
 
@@ -103,13 +103,13 @@ void print_block_list(struct blockNode *blockList)
     while(blockList != NULL)
     {
 
-      printf("blockList: %p\n", blockList);
-      printf("blockList->block: %p\n", blockList->block);
-      printf("Block #%d:", blockList->block->blockNum);
+//      printf("blockList: %p\n", blockList);
+//      printf("blockList->block: %p\n", blockList->block);
+      printf("Block #%2d ", blockList->block->blockNum);
       int i;
       for(i = 0; i < BLOCKSIZE; i++)
-      //  printf(" %d", blockList->block->instructions[i]);
-        ;
+        printf(" %d", blockList->block->instructions[i]);
+      //  ;
       printf("\n");
       blockList = blockList->nextBlock;
     }
@@ -130,7 +130,7 @@ void print_disk(struct block disk[])
   int i, j;
   for(i = 0; i < NUMBLOCKS; i++)
   {
-    printf("Block #%d", i);
+    printf("Block #%2d ", i);
     for(j = 0; j < BLOCKSIZE; j++)
       printf(" %d", disk[i].instructions[j]);
     printf("\n");

@@ -61,7 +61,7 @@ struct fileNode {
  */
 struct blockNode * add_block_node(struct blockNode **blockList, struct block *block)
 {
-  printf("add_block_node:in-block: %p\n", block);
+  // printf("add_block_node:in-block: %p\n", block);
   struct blockNode *temp;
   // List is empty. Add first.
   if((*blockList)->block == NULL)
@@ -199,7 +199,7 @@ struct fileNode * find_file(struct fileNode **fileList, char *filename)
   {
     if(strcmp(file->filename, filename) == 0)
     {
-      printf("%p\n", file->blockList->block);
+      printf("\nfind_file %p\n", file->blockList->block);
       return file;
     }
     else
