@@ -2,56 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "globals.h"
 #include "easm.tab.h"
-
-/*begin isaac execute vars*/
-#define MAXPRO        1   // max num of processes
-#define MAXMEM        64  // max size of a process in word/sizeof(int) bytes
-#define STACKSIZE     100 // max size of the stack
-#define REGISTERSIZE  10  // size of each process registers
-#define MAXGMEM       20  // max size of global memory
-#define NORMAL        0   // denotes a normal return from exe()
-#define LOCKED        1   // stops process switching until unlock
-#define UNLOCKED      2   // remove lock
-#define ENDPROCESS    3
-
-#define p0WRITE       4                     // tells p0 to run-p0 should only run after a write to gmem
-#define DISKSIZE      16*1024               // 16kB
-#define BLOCKSIZE     4                     // size for per block
-#define BLOCKS        DISKSIZE / BLOCKSIZE  // total number of blocks
-#define PAGESIZE      BLOCKSIZE * 4         // size of each page in words 2-bytes
-#define NUMPAGES      MAXMEM / PAGESIZE     // Number of pages in page table
-#define DBGCPU        1
-#define DBGCPU1       0
-
-#define keyhit(a) {if(DBGCPU1){printf("hit enter --(%d)", a); getchar();}}
-
-// Variables
-int  gmem[MAXGMEM];         // global var sit here
-int  mem[MAXPRO][MAXMEM];   // Main mem for each process
-int  endprog[MAXPRO];       // last instruction of proc
-int  jsym[60];
-int  pid = 0;               // process id
-int  p0running;
-int  sizeOfDisk = DISKSIZE;
-int  DEBUG = 0;
-int  totalBlocks = BLOCKS;  // Total blocks
-int  fileIndex=0;           // main index
-int  searchIndex=0;         // temp index for search
-char *cmd;                  // The command(save, load, ls...etc.)
-char *arg1;                 // The argument(file's name)
-int  diskIndex=0;           // main index
-int  machineOn = 1;
-int  tempmem[MAXPRO][200];  // for PTB - loading all of the process information here
-int  fileMonitor[30];
-int  HALTED=0;
-int  gfd;                   // file discriptor
-int  reg[MAXPRO][REGISTERSIZE];
-// end Variables
-
-// Jordan's Variables
-char input[30]; //Console input
-// end Jordan's Variables
+#include "pt.h"
 
 // Methods declaration
 int  exe(int stack[][STACKSIZE],int sp[],int reg[][REGISTERSIZE], int next_instruct[],int next_inst[], int cur_proc, int *terminate);
@@ -60,6 +13,7 @@ void grab_data(int index,int *grabdata);
 void init_gmem();
 void init_reg();
 void print_register(int reg[][REGISTERSIZE]);
+void print_mem();
 void print_gmem();
 void print_stack(int stack[][STACKSIZE],int sp[]);
 int  peek(int stack[][STACKSIZE], int proc_id, int sp[], int offset);
@@ -80,13 +34,16 @@ void save_file(char *filename);
 void show_help();
 // end Jordan's method declarations
 
-
 int main(int argc, char *argv[])
 {
   /* 
    * Shell command 
    * Commands: save,del,ls,exit,run,help
    */	
+  //Load a program from the disk
+  if(argc > 1)
+    load_program(argv[1]);
+   
   while(machineOn)
   {
     printf("evm$ ");
@@ -122,7 +79,13 @@ int main(int argc, char *argv[])
     {
       show_help();
     }
-    else if(strcmp(cmd, "load")==0)
+    //This should load from outside the VM
+    else if(strcmp(cmd, "hdload")==0) 
+    {
+      load_program(arg1);
+    }
+    //This should load from VM filesystem
+    else if(strcmp(cmd, "load")==0) 
     {
       load_program(arg1);
     }
@@ -131,6 +94,7 @@ int main(int argc, char *argv[])
     }
     else if(strcmp(cmd, "memdump")==0)
     {
+        print_mem();
     }
     else if(strcmp(cmd, "pwd")==0)
     {
@@ -153,6 +117,7 @@ int main(int argc, char *argv[])
     }
     else if(strcmp(cmd, "showGlobalMem")==0)
     {
+      print_gmem();
     }
     else if(strcmp(cmd, "showLRU")==0)
     {
@@ -200,12 +165,13 @@ void list_directory_contents()
  */
 int load_program(char *filename)
 {
-  int fi =0;
-  int coni =0;
+  int fi = 0;
+  int coni = 0;
   int size = 0;
   FILE *f;
   int status = 0;
-
+  
+  printf("Loading from HD: %s\n", filename);
   f = fopen(filename, "r");
   if (f == NULL)
   {
@@ -223,7 +189,6 @@ int load_program(char *filename)
   return status;
 } // End load_file
 
-
 /* 
  * Delete a file from the disk
  */
@@ -231,7 +196,6 @@ void remove_file(char *filename)
 {
   printf("Delete file \"%s\" from the filesystem.\n", filename);
 }
-
 
 /* 
  * Save a file to the disk
@@ -254,7 +218,6 @@ void show_exit()
 		machineOn = 0;
 }
 
-
 /*
  * Show the help screen for the shell
  */
@@ -263,10 +226,6 @@ void show_help()
   printf("Print out the help screen for the shell\n");
 }
 
-
-/*
- * Begin Isaac execute
- */
 void executeit()
 {
   int cur_proc, p0=0, msg=-1,m;
@@ -415,7 +374,6 @@ void executeit()
   print_gmem();
   print_register(reg);
 }
-
 
 int exe(int stack[][STACKSIZE], int sp[], int reg[][REGISTERSIZE], int next_instruct[], int next_inst[], int cur_proc, int *terminate)
 {
@@ -746,7 +704,6 @@ int exe(int stack[][STACKSIZE], int sp[], int reg[][REGISTERSIZE], int next_inst
    return NORMAL;
 }
 
-
 int peek(int stack[][STACKSIZE], int proc_id, int sp[], int offset)
 {
   int val = stack[proc_id][sp[proc_id] + offset];
@@ -754,7 +711,6 @@ int peek(int stack[][STACKSIZE], int proc_id, int sp[], int offset)
     printf("peek : %d\n", val);
   return val;
 }
-
 
 int pop(int stack[][STACKSIZE], int proc_id, int sp[], int calledfrom)
 {
@@ -769,7 +725,6 @@ int pop(int stack[][STACKSIZE], int proc_id, int sp[], int calledfrom)
   return val;
 }
 
-
 void push(int stack[][STACKSIZE], int proc_id, int sp[], int data, int calledfrom)
 {
   sp[proc_id]++;
@@ -782,7 +737,6 @@ void push(int stack[][STACKSIZE], int proc_id, int sp[], int data, int calledfro
   }
   stack[proc_id][sp[proc_id]] = data;
 }
-
 
 // debug routines
 void print_stack(int stack[][STACKSIZE], int sp[])
@@ -797,6 +751,27 @@ void print_stack(int stack[][STACKSIZE], int sp[])
   }
 }
 
+/* void print_mem()
+ * Description: This function does a memory dump of mem[][]
+ * Input: none
+ * Output: Displays the contents of mem on the screen
+ */
+void print_mem()
+{
+    //int  mem[MAXPRO][MAXMEM];
+    int i,j;
+    for(i = 0; i < MAXPRO; ++i)
+    {
+        printf("Process %d: Addresses 0 - %d\n", i, MAXMEM);
+        for(j = 0; j < MAXMEM; ++j)
+        {
+            printf("%d\t", i, j, mem[i][j]);
+            if( j == (MAXMEM - 1) || (j + 1) % 8 == 0)
+                printf(" | %d\n", j);
+        }
+        printf("\n");
+    }
+}
 
 void print_gmem()
 {
@@ -804,25 +779,20 @@ void print_gmem()
   printf("Global memory: size %d\n", MAXGMEM);
   for(i = 0; i < MAXGMEM; i++)
   {
-    printf("%d  ", gmem[i]);
-    //gmem[i]=0;
+    printf("%d\t", gmem[i]);
+    if( i == (MAXGMEM - 1) || (i + 1) % 8 == 0)
+        printf(" | %d\n", i);
   }
   printf("\n");
 }
 
-
 void init_gmem()
 {
   int i;
-  // printf("Global memory: size %d\n",MAXGMEM);
+  
   for(i = 0; i < MAXGMEM; i++)
-  {
-    // printf("%d  ", gmem[i]);
     gmem[i] = 0;
-  }
-  // printf("\n");
 }
-
 
 void print_register(int reg[][REGISTERSIZE])
 {
@@ -842,8 +812,6 @@ void print_register(int reg[][REGISTERSIZE])
   }
   printf("--------------------------------------------------\n");
 }
-/*End Isaac Execute*/
-
 
 void reset_memory()
 {
