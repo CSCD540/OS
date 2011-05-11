@@ -10,12 +10,13 @@
  */
 
 #include <stdio.h>
+#include "globals.h"
 // #include "efs.h"
 
-#define MAXPRO        1   // max num of processes
-#define MAXMEM        64  // max size of a process in word/sizeof(int) bytes
-#define PAGESIZE      16            // size of each page in words 2-bytes
-#define NUMPAGES MAXMEM / PAGESIZE  // Number of pages in page table
+//#define MAXPRO        1   // max num of processes
+//#define MAXMEM        64  // max size of a process in word/sizeof(int) bytes
+//#define PAGESIZE      16            // size of each page in words 2-bytes
+//#define NUMPAGES MAXMEM / PAGESIZE  // Number of pages in page table
 
 int  mem[MAXPRO][MAXMEM];   // Main mem for each process
 
