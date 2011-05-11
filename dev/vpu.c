@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include "globals.h"
+#include "helpers.h"
+#include "shell.h"
 #include "easm.tab.h"
 #include "pt.h"
 
@@ -12,27 +14,12 @@ void executeit();
 void grab_data(int index,int *grabdata);
 void init_gmem();
 void init_reg();
-void print_register(int reg[][REGISTERSIZE]);
-void print_mem();
-void print_gmem();
-void print_stack(int stack[][STACKSIZE],int sp[]);
 int  peek(int stack[][STACKSIZE], int proc_id, int sp[], int offset);
 void push(int stack[][STACKSIZE], int proc_id, int sp[],int data, int calledfrom);
 int  pop(int stack[][STACKSIZE], int proc_id, int sp[], int calledfrom);
 void reset_memory();
-void show_exit();
-void show_register_data();
-void show_man_page(char *cmd);
 //end Methods declaration
 
-// Jordan's method declarations
-void concatenate(char *filename);
-void list_directory_contents();
-int  load_program(char *filename);
-void remove_file(char *filename);
-void save_file(char *filename);
-void show_help();
-// end Jordan's method declarations
 
 int main(int argc, char *argv[])
 {
@@ -135,95 +122,6 @@ int main(int argc, char *argv[])
   } // end while(machineOn)
 
   return 0;
-}
-
-
-/*
- * Concatenate the contents of the file specified
- */
-void concatenate(char *filename)
-{
-  printf("Concatenate the file %s\n", filename);
-}
-
-
-/* 
- * List the contents of the current directory
- */
-void list_directory_contents()
-{
-	printf("Print out the contents of PWD.\n");
-}
-
-
-/* int load_file(char *file)  
- * Description: This function grabs the program from the disk and loads it into mem[0] starting from [0]
- * Input: filename with path if needed
- * Output: Returns -1 if it fails to open the file or the status of fclose() 
- *  -1: if the file wasn't loaded
- *   0: if everything was alright
- */
-int load_program(char *filename)
-{
-  int fi = 0;
-  int coni = 0;
-  int size = 0;
-  FILE *f;
-  int status = 0;
-  
-  printf("Loading from HD: %s\n", filename);
-  f = fopen(filename, "r");
-  if (f == NULL)
-  {
-    return -1; // -1 means file opening fail
-  }
-
-  while(fscanf(f, "%d\n", &fi) != EOF)
-  {
-    mem[0][coni]=fi;
-    printf("%d: %d\n", coni, mem[0][coni]);
-    size++;
-    coni++;
-  }
-  status = fclose(f);
-  return status;
-} // End load_file
-
-/* 
- * Delete a file from the disk
- */
-void remove_file(char *filename)
-{
-  printf("Delete file \"%s\" from the filesystem.\n", filename);
-}
-
-/* 
- * Save a file to the disk
- */
-void save_file(char *filename)
-{
-  printf("Save a file to the virtual disk\n");
-}
-
-
-/*
- * Show the exit message and set machineOn to 0 (turn it off)
- */
-void show_exit()
-{
-		printf("***********************************************************\n");
-		printf("*       Thanks for using the Eagle Virtual Machine!       *\n");
-		printf("*                         GOOD-BYE!                       *\n");
-		printf("***********************************************************\n");
-		machineOn = 0;
-}
-
-/*
- * Show the help screen for the shell
- */
-void show_help()
-{
-  printf("Print out the help screen for the shell\n");
 }
 
 void executeit()
@@ -738,91 +636,4 @@ void push(int stack[][STACKSIZE], int proc_id, int sp[], int data, int calledfro
   stack[proc_id][sp[proc_id]] = data;
 }
 
-// debug routines
-void print_stack(int stack[][STACKSIZE], int sp[])
-{
-  int i, j;
-  for(i = 0; i < pid; i++)
-  {
-    printf("Stack contents for process %d\n", i);
-    for(j = 0; j < STACKSIZE; j++)
-      printf("%d\n", stack[i][j]);
-    printf("SP at %d\n\n", sp[i]);
-  }
-}
-
-/* void print_mem()
- * Description: This function does a memory dump of mem[][]
- * Input: none
- * Output: Displays the contents of mem on the screen
- */
-void print_mem()
-{
-    //int  mem[MAXPRO][MAXMEM];
-    int i,j;
-    for(i = 0; i < MAXPRO; ++i)
-    {
-        printf("Process %d: Addresses 0 - %d\n", i, MAXMEM);
-        for(j = 0; j < MAXMEM; ++j)
-        {
-            printf("%d\t", i, j, mem[i][j]);
-            if( j == (MAXMEM - 1) || (j + 1) % 8 == 0)
-                printf(" | %d\n", j);
-        }
-        printf("\n");
-    }
-}
-
-void print_gmem()
-{
-  int i;
-  printf("Global memory: size %d\n", MAXGMEM);
-  for(i = 0; i < MAXGMEM; i++)
-  {
-    printf("%d\t", gmem[i]);
-    if( i == (MAXGMEM - 1) || (i + 1) % 8 == 0)
-        printf(" | %d\n", i);
-  }
-  printf("\n");
-}
-
-void init_gmem()
-{
-  int i;
-  
-  for(i = 0; i < MAXGMEM; i++)
-    gmem[i] = 0;
-}
-
-void print_register(int reg[][REGISTERSIZE])
-{
-  int i, j;
-  printf("--------------------------------------------------\n");
-  printf("-                Register data                   -\n");
-  printf("--------------------------------------------------\n");
-  for(i = 0; i < pid; i++)
-  {
-    printf("- Process %d: ",i);
-    for(j = 0; j < REGISTERSIZE; j++)
-    {
-      printf("%d  ", reg[i][j]);
-      // reg[i][j]=0;
-    }
-    printf("      -\n");
-  }
-  printf("--------------------------------------------------\n");
-}
-
-void reset_memory()
-{
-	int i, j;
-
-	for(i = 0; i < pid; i++)
-	{
-		for(j = 0; j < REGISTERSIZE; j++)
-			reg[i][j]=0;
-	}
-	for(i = 0; i < MAXGMEM; i++)
-		gmem[i] = 0;
-}
 
