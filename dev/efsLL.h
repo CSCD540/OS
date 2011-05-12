@@ -11,7 +11,7 @@
 #ifndef _GLOBALS_H_
 #incldue "globals.h"
 #endif
-#include "block.h"
+//#include "block.h"
 
 /* Definitions */
 #define LIST_EMPTY 0

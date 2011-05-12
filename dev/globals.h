@@ -30,6 +30,11 @@
 
 #define keyhit(a) {if(DBGCPU1){printf("hit enter --(%d)", a); getchar();}}
 
+struct block {
+  int blockNum;
+  int instructions[BLOCKSIZE];
+};
+
 struct process{
     int pid;
     char filename[];
@@ -37,6 +42,7 @@ struct process{
 };
 
 // Variables
+struct block disk[NUMBLOCKS]; //Our virtual HD
 int  gmem[MAXGMEM];         // global var sit here
 int  mem[MAXPRO][MAXMEM];   // Main mem for each process
 int  reg[MAXPRO][REGISTERSIZE];

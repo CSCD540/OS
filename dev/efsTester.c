@@ -8,7 +8,7 @@
 int save_file(char *filename);
 int write(struct fileNode **fileListNode, int data[], int count, int writeMode);
 
-struct block disk[NUMBLOCKS];
+//struct block disk[NUMBLOCKS];
 
 int main(int argc, char *argv[])
 {
