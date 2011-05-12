@@ -8,7 +8,7 @@
 #include "helpers.h"
 #include "shell.h"
 #include "pt.h"
-#include "efs.h"
+// #include "efs.h"
 
 // Methods declaration
 int  exe(int stack[][STACKSIZE],int sp[],int reg[][REGISTERSIZE], int next_instruct[],int next_inst[], int cur_proc, int *terminate);
@@ -25,6 +25,7 @@ void reset_memory();
 
 int main(int argc, char *argv[])
 {
+  init_disk(disk);
   /* 
    * Shell command 
    * Commands: save,del,ls,exit,run,help
@@ -32,7 +33,8 @@ int main(int argc, char *argv[])
   //Load a program from the disk
   if(argc > 1)
     load_program(argv[1]);
-    
+  
+  int status;
   while(machineOn)
   {
     printf("evm$ ");
@@ -99,10 +101,13 @@ int main(int argc, char *argv[])
     }
     else if(strcmp(cmd, "save")==0)
     {
-      save_file(arg1);
+      status = save_file(arg1);
+      if(status != 0) print_error(status);
+      
     }
     else if(strcmp(cmd, "showBlocks")==0)
     {
+      print_disk(disk);
     }
     else if(strcmp(cmd, "showGlobalMem")==0)
     {
@@ -190,8 +195,7 @@ void executeit()
 
       if(proc_complete[cur_proc] == 1)
       {
-        if (DEBUG!=0)
-         printf("----------------------------cur_proc: %d\n",cur_proc);
+        if (DEBUG) printf("----------------------------cur_proc: %d\n",cur_proc);
         goto checkdone;
       }
 

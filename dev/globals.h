@@ -11,20 +11,27 @@
 #define UNLOCKED      2   // remove lock
 #define ENDPROCESS    3
 
-#define p0WRITE       4                           // tells p0 to run-p0 should only run after a write to gmem
+#define p0WRITE       4   // tells p0 to run-p0 should only run after a write to gmem
 #define DBGCPU        1
 #define DBGCPU1       0
 
-//General
-#define BLOCKSIZE     4                           // size for per block
+// General
+#define BLOCKSIZE     4   // size for per block
 
-//Filesystem 
-//#define DISKSIZE      (16*1024)                   // 16kB
-#define DISKSIZE      ((BLOCKSIZE) * 14)          // Total size of the disk
+// Filesystem 
+#define DISKSIZE      ((BLOCKSIZE) * 20)          // Total size of the disk
 #define BLOCKS        ((DISKSIZE) / (BLOCKSIZE))  // total number of blocks
 #define NUMBLOCKS     ((DISKSIZE) / (BLOCKSIZE))  // Total number of blocks on the disk
 
-//Memory
+// Write
+#define APPEND 1 // begin writeing at the end of the file
+#define OVERWRITE 2 // begin writing at the beginning of the file
+#define NEWFILE 3 // new file
+#define DISK_FULL 4 // No more room on the disk!
+#define FILE_NOT_FOUND 5 // File was not located
+#define LIST_EMPTY 6
+
+// Memory
 #define PAGESIZE      ((BLOCKSIZE) * 4)           // size of each page in words 2-bytes
 #define NUMPAGES      ((MAXMEM) / (PAGESIZE))     // Number of pages in page table
 
