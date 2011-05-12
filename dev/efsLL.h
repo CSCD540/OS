@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 #ifndef _GLOBALS_H_
-#incldue "globals.h"
+#include "globals.h"
 #endif
 //#include "block.h"
 
@@ -23,7 +23,7 @@ struct fileNode * add_file_node(struct fileNode **fileList, char *filename, int 
 int delete_block_node(struct blockNode **blockList, struct block *block);
 struct fileNode * find_file(struct fileNode **fileList, char *filename);
 struct blockNode * get_block_node(struct blockNode **blockList, int blockIndex);
-int get_block_count(struct blockNode *blockList)
+int get_block_count(struct blockNode *blockList);
 void print_error(int errno);
 /* End Forward Declarations */
 
