@@ -149,38 +149,6 @@ void print_disk(struct block disk[])
 
 
 /* 
- * void print_error(int errno)
- * Description:
- *    Print out the error message associated with the errno
- * Input:
- *    int errno : The error number
- * Output:
- *    Screen output of what error occurred.
- */
-void print_error(int errno)
-{
-  printf("\nERROR: ");
-  switch(errno)
-  {
-    case LIST_EMPTY:
-      printf("List is empty.\n");
-      break;
-      
-    case FILE_NOT_FOUND:
-      printf("File not found.\n");
-      break;
-      
-    case DISK_FULL:
-      printf("Not enough room on the disk.\n");
-      break;
-      
-    default:
-      printf("An unspecified has error occurred.\n");
-  }
-}
-
-
-/* 
  * void print_file_list(struct fileNode *head)
  * Description:
  *    Print out all the file currently stored on the disk
