@@ -15,6 +15,12 @@
 #endif
 // #include "efs.h"
 
+int lookup(int pid, int vpn, int rw);
+int page_fault(int pid, int vpn, int rw);
+init_pg_tbl();
+print_page_table();
+int disk_read(char *filename, int pageNum);
+
 //#define MAXPRO        1   // max num of processes
 //#define MAXMEM        64  // max size of a process in word/sizeof(int) bytes
 //#define PAGESIZE      16            // size of each page in words 2-bytes

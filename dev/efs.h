@@ -7,6 +7,14 @@
 //#define DISKSIZE    BLOCKSIZE * 14        // Total size of the disk
 //#define NUMBLOCKS   DISKSIZE / BLOCKSIZE  // Total number of blocks on the disk
 
+struct fileNode * add_file(char *filename, int numBlocks);
+struct fileNode * get_file(char *filename);
+struct blockNode * get_free_block_node();
+void init_disk(struct block disk[]);
+void print_block_list(struct blockNode *blockList);
+void print_disk(struct block disk[]);
+void print_file_list(struct fileNode *head);
+
 struct fileNode *fileList = NULL;
 struct blockNode *freeBlockList = NULL;
 

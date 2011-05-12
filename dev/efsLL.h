@@ -18,6 +18,12 @@
 /* End Definitions */
 
 /* Forward Declarations */
+struct blockNode * add_block_node(struct blockNode **blockList, struct block *block);
+struct fileNode * add_file_node(struct fileNode **fileList, char *filename, int numBlocks);
+int delete_block_node(struct blockNode **blockList, struct block *block);
+struct fileNode * find_file(struct fileNode **fileList, char *filename);
+struct blockNode * get_block_node(struct blockNode **blockList, int blockIndex);
+int get_block_count(struct blockNode *blockList)
 void print_error(int errno);
 /* End Forward Declarations */
 
