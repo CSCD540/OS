@@ -89,7 +89,7 @@ void print_mem()
         printf("Process %d: Addresses 0 - %d\n", i, MAXMEM);
         for(j = 0; j < MAXMEM; ++j)
         {
-            printf("%d\t", i, j, mem[i][j]);
+            printf("%d\t", mem[i][j]);
             if( j == (MAXMEM - 1) || (j + 1) % 8 == 0)
                 printf(" | %d\n", j);
         }

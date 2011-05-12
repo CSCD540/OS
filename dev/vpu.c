@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
   //Load a program from the disk
   if(argc > 1)
     load_program(argv[1]);
-   
+    
   while(machineOn)
   {
     printf("evm$ ");
