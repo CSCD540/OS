@@ -2,11 +2,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "easm.tab.h"
 #include "globals.h"
 #include "helpers.h"
 #include "shell.h"
-#include "easm.tab.h"
 #include "pt.h"
+#include "efs.h"
 
 // Methods declaration
 int  exe(int stack[][STACKSIZE],int sp[],int reg[][REGISTERSIZE], int next_instruct[],int next_inst[], int cur_proc, int *terminate);
