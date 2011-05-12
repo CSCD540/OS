@@ -1,4 +1,7 @@
-#define BLOCKSIZE   4 // Number of records per block
+#ifndef _GLOBALS_H_
+#incldue "globals.h"
+#endif
+//#define BLOCKSIZE   4 // Number of records per block
 
 /* 
  * struct block

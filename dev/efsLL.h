@@ -4,10 +4,14 @@
  * A lot of this stuff came from http://www.daniweb.com/software-development/c/threads/216353
  */
 
-#include "block.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifndef _GLOBALS_H_
+#incldue "globals.h"
+#endif
+#include "block.h"
 
 /* Definitions */
 #define LIST_EMPTY 0
