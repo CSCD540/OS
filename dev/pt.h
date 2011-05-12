@@ -20,7 +20,7 @@
 //#define PAGESIZE      16            // size of each page in words 2-bytes
 //#define NUMPAGES MAXMEM / PAGESIZE  // Number of pages in page table
 
-int  mem[MAXPRO][MAXMEM];   // Main mem for each process
+//int  mem[MAXPRO][MAXMEM];   // Main mem for each process
 
 // The process table array which is indexed on the process id, and
 //  contains the priority (?), and the file descriptor/filename

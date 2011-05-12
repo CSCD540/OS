@@ -65,9 +65,9 @@ void print_mem()
     {
       if(j % PAGESIZE == 0)
       {
-        printf("|                |\r\n", j / PAGESIZE);
+        printf("|                |\r\n");
         printf("|-- PhysPage %d --|\r\n", j / PAGESIZE);
-        printf("|                |\r\n", j / PAGESIZE);
+        printf("|                |\r\n");
         printf("|PhysAddr | Value|\r\n");
         printf("|-------- | -----|\r\n");
       }
