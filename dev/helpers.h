@@ -1,14 +1,20 @@
+#ifndef _HELPERS_H_ 
+#define _HELPERS_H_ 1
+
 #ifndef _GLOBALS_H_
 #include "globals.h"
 #endif
 
 void init_gmem();
 void init_mem();
+void init_pt();
 void init_reg();
 void reset_memory();
 
 void print_gmem();
 void print_mem();
+void print_mem_pages();
+void print_pt();
 void print_register(int reg[][REGISTERSIZE]);
 void print_stack(int stack[][STACKSIZE],int sp[]);
 void show_register_data();
@@ -31,6 +37,19 @@ void init_mem()
   for(i = 0; i < MAXPRO; i++)
 	  for(j = 0; j < MAXMEM; j++)
       mem[i][j] = 0;
+}
+
+/* void init_pt() // Internal method
+ * Description: This function initializes the page table to be empty (i.e. -1's)
+ * Input: None
+ * Output: None
+ */
+void init_pt()
+{
+  int i,j;
+  for(i = 0; i < NUMPAGES; i++)
+    for(j = 0; j < 4; j++)
+      pageTable[i][j] = -1;
 }
 
 void init_reg()
@@ -97,6 +116,59 @@ void print_mem()
     }
 }
 
+void print_mem_pages()
+{
+  printf("\r\n------------------\r\n|%c[%d;%dm   MAIN MEMORY  %c[%dm|\r\n|----------------|\r\n", 27, 1, 42, 27, 0);
+  
+  int i,j;
+  for(i = 0; i < MAXPRO; i++)
+  {
+//    printf("| Mem column: %2d |\r\n", i);
+    for(j = 0; j < MAXMEM; j++)
+    {
+      if(j % PAGESIZE == 0)
+      {
+        printf("|                |\r\n");
+        printf("|-- PhysPage %d --|\r\n", j / PAGESIZE);
+        printf("|                |\r\n");
+        printf("|PhysAddr | Value|\r\n");
+        printf("|-------- | -----|\r\n");
+      }
+      printf("|%5d:   | %5d|\r\n", j, mem[i][j]);
+    }
+  }
+  
+  printf("------------------\r\n");
+}
+
+/* void print_pt()
+ * Description: Prints the current page table
+ * Inputs: None
+ * Output: None
+ */
+void print_pt()
+{
+  printf("\r\nPage Table (%c[%dmLRU in red%c[%dm):\r\n", 27, 31, 27, 0);
+  printf("            -------------------------\r\n");
+  printf("            | pid | vpn | lru | drt |\r\n");
+  printf("------------------|-----|-----|-----|\r\n");
+  int i;
+  for(i = 0; i < NUMPAGES; i++)
+  {
+    if(i == lru)
+    {
+      printf("%c[%d;%dm", 27, 0, 31);
+      printf("|PysPage %2d | %3d | %3d | %3d | %3d |\r\n", i, pageTable[i][0],  pageTable[i][1], pageTable[i][2], pageTable[i][3]);
+      printf("%c[%dm", 27, 0);
+    }
+    else
+      printf("|PysPage %2d | %3d | %3d | %3d | %3d |\r\n", i, pageTable[i][0],  pageTable[i][1], pageTable[i][2], pageTable[i][3]);
+    printf("|-----------------------------------|\r\n");
+  }
+}
+/* end of print_pt() method */
+
+
 void print_register(int reg[][REGISTERSIZE])
 {
   int i, j;
@@ -126,4 +198,6 @@ void print_stack(int stack[][STACKSIZE], int sp[])
     printf("SP at %d\n\n", sp[i]);
   }
 }
+
+#endif //_HELPERS_H_
 

@@ -66,6 +66,17 @@ int  gfd;                   // file discriptor
 
 // end Variables
 
+
+// Page Table Variables
+
+/// The page table array which contains the process id,
+///  virtual page number, dirty bit, and LRU info
+int pageTable[NUMPAGES][4];
+int lru;
+
+// End page table variables
+
+
 // Jordan's Variables
 char input[30]; //Console input
 // end Jordan's Variables

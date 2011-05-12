@@ -10,31 +10,24 @@
  */
 
 #include <stdio.h>
+
 #ifndef _GLOBALS_H_
 #include "globals.h"
 #endif
+
+#ifndef _HELPERS_H_
+#include "helpers.h"
+#endif
+
 // #include "efs.h"
 
 int lookup(int pid, int vpn, int rw);
 int page_fault(int pid, int vpn, int rw);
-init_pg_tbl();
-print_page_table();
-int disk_read(char *filename, int pageNum);
 
-//#define MAXPRO        1   // max num of processes
-//#define MAXMEM        64  // max size of a process in word/sizeof(int) bytes
-//#define PAGESIZE      16            // size of each page in words 2-bytes
-//#define NUMPAGES MAXMEM / PAGESIZE  // Number of pages in page table
-
-//int  mem[MAXPRO][MAXMEM];   // Main mem for each process
 
 // The process table array which is indexed on the process id, and
 //  contains the priority (?), and the file descriptor/filename
 int processTable[MAXPRO][2];
-// The page table array which contains the process id,
-//  virtual page number, dirty bit, and LRU info
-int pageTable[NUMPAGES][4];
-int lru;
 
 /* int lookup(int pid, int vpn, int rw) // Externally accessible method
  *
@@ -201,53 +194,5 @@ int least_recently_used()
 }
  *
  */
-
-/* init_pg_tbl() // Internal method
- * Description: This function initializes the page table to be empty (i.e. -1's)
- * Input: None
- * Output: None
- */
-init_pg_tbl()
-{
-  int i,j;
-  for(i = 0; i < NUMPAGES; i++)
-    for(j = 0; j < 4; j++)
-      pageTable[i][j] = -1;
-}
-
-/* print_page_table(int vpn)
- * Description: Prints the current page table
- * Inputs: None
- * Output: None
- */
-print_page_table()
-{
-  printf("\r\nPage Table (%c[%dmLRU in red%c[%dm):\r\n", 27, 31, 27, 0);
-  printf("            -------------------------\r\n");
-  printf("            | pid | vpn | lru | drt |\r\n");
-  printf("------------------|-----|-----|-----|\r\n");
-  int i;
-  for(i = 0; i < NUMPAGES; i++)
-  {
-    if(i == lru)
-    {
-      printf("%c[%d;%dm", 27, 0, 31);
-      printf("|PysPage %2d | %3d | %3d | %3d | %3d |\r\n", i, pageTable[i][0],  pageTable[i][1], pageTable[i][2], pageTable[i][3]);
-      printf("%c[%dm", 27, 0);
-    }
-    else
-      printf("|PysPage %2d | %3d | %3d | %3d | %3d |\r\n", i, pageTable[i][0],  pageTable[i][1], pageTable[i][2], pageTable[i][3]);
-    printf("|-----------------------------------|\r\n");
-  }
-}
-/* end of page_table method */
-
-
-// Temporary fake disk read function
-int disk_read(char *filename, int pageNum)
-{
-  return 0;
-}
-
 
 
