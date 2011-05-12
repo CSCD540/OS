@@ -10,7 +10,9 @@
  */
 
 #include <stdio.h>
+#ifndef _GLOBALS_H_
 #include "globals.h"
+#endif
 // #include "efs.h"
 
 //#define MAXPRO        1   // max num of processes

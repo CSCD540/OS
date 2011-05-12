@@ -11,20 +11,27 @@
 #define UNLOCKED      2   // remove lock
 #define ENDPROCESS    3
 
-#define p0WRITE       4                     // tells p0 to run-p0 should only run after a write to gmem
-#define DISKSIZE      16*1024               // 16kB
-#define BLOCKSIZE     4                     // size for per block
-#define BLOCKS        DISKSIZE / BLOCKSIZE  // total number of blocks
-#define PAGESIZE      BLOCKSIZE * 4         // size of each page in words 2-bytes
-#define NUMPAGES      MAXMEM / PAGESIZE     // Number of pages in page table
+#define p0WRITE       4                         // tells p0 to run-p0 should only run after a write to gmem
+#define DISKSIZE      16*1024                   // 16kB
+#define BLOCKSIZE     4                         // size for per block
+#define BLOCKS        (DISKSIZE) / (BLOCKSIZE)  // total number of blocks
+#define PAGESIZE      (BLOCKSIZE) * 4           // size of each page in words 2-bytes
+#define NUMPAGES      (MAXMEM) / (PAGESIZE)     // Number of pages in page table
 #define DBGCPU        1
 #define DBGCPU1       0
 
 #define keyhit(a) {if(DBGCPU1){printf("hit enter --(%d)", a); getchar();}}
 
+struct process{
+    int pid;
+    char filename[];
+    
+};
+
 // Variables
 int  gmem[MAXGMEM];         // global var sit here
 int  mem[MAXPRO][MAXMEM];   // Main mem for each process
+int  reg[MAXPRO][REGISTERSIZE];
 int  endprog[MAXPRO];       // last instruction of proc
 int  jsym[60];
 int  pid = 0;               // process id
@@ -42,7 +49,7 @@ int  tempmem[MAXPRO][200];  // for PTB - loading all of the process information 
 int  fileMonitor[30];
 int  HALTED=0;
 int  gfd;                   // file discriptor
-int  reg[MAXPRO][REGISTERSIZE];
+
 // end Variables
 
 // Jordan's Variables
