@@ -1,8 +1,10 @@
 #include <stdlib.h>
 #include "efsLL.h"
-
-#define DISKSIZE    BLOCKSIZE * 14        // Total size of the disk
-#define NUMBLOCKS   DISKSIZE / BLOCKSIZE  // Total number of blocks on the disk
+#ifndef _GLOBAL_H_
+#include "globals.h"
+#endif
+//#define DISKSIZE    BLOCKSIZE * 14        // Total size of the disk
+//#define NUMBLOCKS   DISKSIZE / BLOCKSIZE  // Total number of blocks on the disk
 
 struct fileNode *fileList = NULL;
 struct blockNode *freeBlockList = NULL;
