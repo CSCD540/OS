@@ -12,11 +12,11 @@
 #define ENDPROCESS    3
 
 #define p0WRITE       4                         // tells p0 to run-p0 should only run after a write to gmem
-#define DISKSIZE      16*1024                   // 16kB
+#define DISKSIZE      (16*1024)                   // 16kB
 #define BLOCKSIZE     4                         // size for per block
-#define BLOCKS        (DISKSIZE) / (BLOCKSIZE)  // total number of blocks
-#define PAGESIZE      (BLOCKSIZE) * 4           // size of each page in words 2-bytes
-#define NUMPAGES      (MAXMEM) / (PAGESIZE)     // Number of pages in page table
+#define BLOCKS        ((DISKSIZE) / (BLOCKSIZE))  // total number of blocks
+#define PAGESIZE      ((BLOCKSIZE) * 4)           // size of each page in words 2-bytes
+#define NUMPAGES      ((MAXMEM) / (PAGESIZE))     // Number of pages in page table
 #define DBGCPU        1
 #define DBGCPU1       0
 
@@ -57,3 +57,4 @@ char input[30]; //Console input
 // end Jordan's Variables
 
 #endif //_GLOBALS_H_
+
