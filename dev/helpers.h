@@ -15,6 +15,7 @@ void print_gmem();
 void print_mem();
 void print_mem_pages();
 void print_pt();
+void print_lru();
 void print_register(int reg[][REGISTERSIZE]);
 void print_stack(int stack[][STACKSIZE],int sp[]);
 void show_register_data();
@@ -176,7 +177,7 @@ void print_pt()
   printf("\r\nPage Table (%c[%dmLRU in red%c[%dm):\r\n", 27, 31, 27, 0);
   printf("            -------------------------\r\n");
   printf("            | pid | vpn | lru | drt |\r\n");
-  printf("------------------|-----|-----|-----|\r\n");
+  printf("------------|-----|-----|-----|-----|\r\n");
   int i;
   for(i = 0; i < NUMPAGES; i++)
   {
@@ -190,8 +191,15 @@ void print_pt()
       printf("|PysPage %2d | %3d | %3d | %3d | %3d |\r\n", i, pageTable[i][0],  pageTable[i][1], pageTable[i][2], pageTable[i][3]);
     printf("|-----------------------------------|\r\n");
   }
+  printf("\r\n");
 }
 /* end of print_pt() method */
+
+void print_lru()
+{
+  printf("\r\nShould this print just the least recently used page number or the actual page information?\r\n");
+  printf("LRU: %d\r\n\r\n", lru);
+}
 
 
 void print_register(int reg[][REGISTERSIZE])

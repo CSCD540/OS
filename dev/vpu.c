@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
 
     if(strlen(input)<1)
     {
-      continue; // When there is no input string, skiping everything.
+      continue; // When there is no input string, skipping everything.
     }
     else if(strcmp(cmd, "ls")==0) 
     {
@@ -115,9 +115,11 @@ int main(int argc, char *argv[])
     }
     else if(strcmp(cmd, "showLRU")==0)
     {
+      print_lru();
     }
-    else if(strcmp(cmd, "showpage")==0)
+    else if(strcmp(cmd, "showPage")==0)
     {
+      print_pt();
     }
     else if(strcmp(cmd, "showRegisterData")==0)
     {
