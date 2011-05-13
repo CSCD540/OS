@@ -27,7 +27,7 @@ void init_gmem()
   int i;
   
   for(i = 0; i < MAXGMEM; i++)
-    gmem[i] = 0;
+    gmem[i] = -1;
 }
 
 void init_mem()
@@ -36,7 +36,7 @@ void init_mem()
   
   for(i = 0; i < MAXPRO; i++)
 	  for(j = 0; j < MAXMEM; j++)
-      mem[i][j] = 0;
+      mem[i][j] = -1;
 }
 
 /* void init_pt() // Internal method
@@ -58,23 +58,15 @@ void init_reg()
   
   for(i = 0; i < MAXPRO; i++)
 	  for(j = 0; j < REGISTERSIZE; j++)
-      reg[i][j] = 0; 
+      reg[i][j] = -1; 
 }
 
 void reset_memory()
 {
-	int i, j;
-
-	for(i = 0; i < MAXPRO; i++)
-		for(j = 0; j < REGISTERSIZE; j++)
-			reg[i][j]=0;
-	
-	for(i = 0; i < MAXGMEM; i++)
-		gmem[i] = 0;
-		
-	for(i = 0; i < MAXPRO; i++)
-	  for(j = 0; j < MAXMEM; j++)
-      mem[i][j] = 0;
+	init_gmem();
+	init_mem();
+	init_pt();
+	init_reg();
 }
 
 
