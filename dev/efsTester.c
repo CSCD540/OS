@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include "efs.h"
-
-#define APPEND 0 // begin writeing at the end of the file
+/*
+#define APPEND 0 // begin writing at the end of the file
 #define OVERWRITE 1 // begin writing at the beginning of the file
 #define NEWFILE 2 // new file
-
+*/
 int save_file(char *filename);
 int write(struct fileNode **fileListNode, int data[], int count, int writeMode);
 

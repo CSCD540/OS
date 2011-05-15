@@ -11,6 +11,9 @@
 #ifndef _GLOBALS_H_
 #include "globals.h"
 #endif
+#ifndef _HELPERS_H_
+#include "helpers.h"
+#endif
 
 /* Forward Declarations */
 struct blockNode * add_block_node(struct blockNode **blockList, struct block *block);
@@ -19,7 +22,7 @@ int delete_block_node(struct blockNode **blockList, struct block *block);
 struct fileNode * find_file(struct fileNode **fileList, char *filename);
 struct blockNode * get_block_node(struct blockNode **blockList, int blockIndex);
 int get_block_count(struct blockNode *blockList);
-void print_error(int errno);
+//void print_error(int errno);
 /* End Forward Declarations */
 
 

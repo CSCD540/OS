@@ -24,9 +24,9 @@
 #define NUMBLOCKS     ((DISKSIZE) / (BLOCKSIZE))  // Total number of blocks on the disk
 
 // Write
-#define APPEND 1 // begin writing at the end of the file
-#define OVERWRITE 2 // begin writing at the beginning of the file
-#define NEWFILE 3 // new file
+#define APPEND 0 // begin writing at the end of the file
+#define OVERWRITE 1 // begin writing at the beginning of the file
+#define NEWFILE 2 // new file
 #define DISK_FULL 4 // No more room on the disk!
 #define FILE_NOT_FOUND 5 // File was not located
 #define LIST_EMPTY 6
