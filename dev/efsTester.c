@@ -69,6 +69,16 @@ int main(int argc, char *argv[])
     else
       printf("\nFile not saved successfully. Status returned %d. \n", status);
 /*  }*/
+  
+  
+  printf("\n\nTesting overwrite on testFile.out...\nWriting 1-6 with an offset of 5\n");
+  struct fileNode * testFile = get_file("testFile.out");
+  int d[] = {1, 2, 3, 4, 5, 6};
+  writeo(&testFile, d, 6, OVERWRITE, 13);
+  printf("\n%s blockList:\n", testFile->filename);
+  print_block_list(testFile->blockList);
+  
+  
   printf("\n");
   return 0;
 }
@@ -151,6 +161,26 @@ int save_file(char *filename)
  */
 int write(struct fileNode **fileListNode, int data[], int count, int writeMode)
 {
+  // Regular write can just call writeo with an offset of 0
+  writeo(fileListNode, data, count, writeMode, 0);
+} // end write()
+
+/* 
+ * int writeo(struct fileNode **fileListNode, int data[], int count, int writeMode, int offset)
+ * Description:
+ *    Write data to a file on the VFS. If writeMode is OVERWRITE, writing begins after
+ *    offset instructions
+ * Input:
+ *    char *filename : Name of the file on the physical disk. This will also be used
+ *    as the filename in the virtual disk.
+ * Output:
+ *    -1 : File could not be opened. Either it doesn't exist on the physical disk, 
+ *          or somethign else happened.
+ *    -2 : Insufficient disk space
+ *     0 : File was successfully created and written to the virtual disk
+ */
+int writeo(struct fileNode **fileListNode, int data[], int count, int writeMode, int offset)
+{
   int newFile;
   newFile = writeMode;
   struct blockNode *blockNode = (*fileListNode)->blockList;
@@ -179,10 +209,25 @@ int write(struct fileNode **fileListNode, int data[], int count, int writeMode)
   else // OVERWRITE or NEWFILE
     curBlock = blockNode->block;
   
+  if(writeMode == OVERWRITE)
+  {
+    int k = 1;
+    for(; k <= offset; k++)
+      if(k % BLOCKSIZE == 0)
+        blockNode = blockNode->nextBlock;
+    curBlock = blockNode->block;
+    i = offset % BLOCKSIZE;
+  }
+    
   int j;
   for(j = 0; j < count; j++)
   {
-    if((i == 0) && (newFile != NEWFILE))
+    if(writeMode == OVERWRITE && i == 0 && j != 0)
+    {
+      blockNode = blockNode->nextBlock;
+      curBlock = blockNode->block;
+    }
+    else if(writeMode != OVERWRITE && (i == 0) && (newFile != NEWFILE))
     { 
       if(DEBUG) printf("curBlock %p\n", curBlock);
       if(DEBUG) printf("\nadding new blockNode...\n");
@@ -204,7 +249,8 @@ int write(struct fileNode **fileListNode, int data[], int count, int writeMode)
       newFile = 0;
   }
   if(DEBUG) printf("end write : fileListNode->blockList->block %p\n", (*fileListNode)->blockList->block);
-  blockNode->nextBlock = NULL;
+  if(writeMode != OVERWRITE)
+    blockNode->nextBlock = NULL;
   return 0;
-} // end write()
+} // end writeo()
 
