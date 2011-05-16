@@ -16,8 +16,7 @@ void show_help();
 void show_exit();
 
 
-/*
- * Concatenate the contents of the file specified
+/* Concatenate the contents of the file specified
  */
 void concatenate(char *filename)
 {
@@ -25,8 +24,7 @@ void concatenate(char *filename)
 }
 
 
-/* 
- * List the contents of the current directory
+/* List the contents of the current directory
  */
 void list_directory_contents()
 {
@@ -68,8 +66,7 @@ int load_program(char *filename)
 } // End load_file
 
 
-/* 
- * Delete a file from the disk
+/* Delete a file from the disk
  */
 void remove_file(char *filename)
 {
@@ -77,8 +74,7 @@ void remove_file(char *filename)
 }
 
 
-/* 
- * int save_file(char *filename)
+/* int save_file(char *filename)
  * Description:
  *    Attempt to open a file on the physical disk. If it exists, read through it
  *    and count the number of lines (instructions) and number of blocks necessary.
@@ -99,7 +95,7 @@ int save_file(char *filename)
   FILE *fd;
   fd = fopen(filename, "r");
   if(fd == NULL)
-    return FILE_NOT_FOUND;
+    return -1;
 
   int numBlocks = 1; // Start at one block because this is the first block.
   int numInstructs = 0; // Counter for the number of lines in the file
@@ -120,7 +116,7 @@ int save_file(char *filename)
   if(get_block_count(freeBlockList) < numBlocks)
   {
     fclose(fd);
-    return DISK_FULL;
+    return -2;
   }
   rewind(fd);
   int instructions[numInstructs];
@@ -132,14 +128,13 @@ int save_file(char *filename)
   newFile = add_file(filename, numBlocks); // Add a new file to the list and get the pointer to that fileNode
   if(DEBUG) printf("newFile %p\n", newFile);
   newFile->blockList = get_free_block_node();
-  write(&newFile, instructions, numInstructs, NEWFILE);
+  write(&newFile, instructions, numInstructs, NEWFILE, 0);
   
   return 0;
 }// end save_file()
 
 
-/*
- * Show the help screen for the shell
+/* Show the help screen for the shell
  */
 void show_help()
 {
@@ -147,8 +142,7 @@ void show_help()
 }
 
 
-/*
- * Show the exit message and set machineOn to 0 (turn it off)
+/* Show the exit message and set machineOn to 0 (turn it off)
  */
 void show_exit()
 {
@@ -160,19 +154,20 @@ void show_exit()
 }
 
 
-/* 
- * int write(struct fileNode **fileListNode, int data[], int count, int writeMode)
+/* int write(struct fileNode **fileListNode, int data[], int count, int writeMode)
  * Description:
  *    Write data to a file on the VFS. If writeMode is OVERWRITE, writing begins at
- *    the beginning of the file, but 
+ *    the beginning of the file, but
  * Input:
  *    struct fileNode **fileListNode : pointer to the file to be written to
  *    int data[] : Data to be written
  *    int count : How many elements to be written
  *    int writeMode : How to write to the file (Overwrite, append, etc).
+ *    int offset : Used for overwriting. Specifies the location at which to beign overwriting
  * Output:
+ *    SUCCESS : File was written without error.
  */
-int write(struct fileNode **fileListNode, int data[], int count, int writeMode)
+int write(struct fileNode **fileListNode, int data[], int count, int writeMode, int offset)
 {
   int newFile;
   newFile = writeMode;
@@ -181,27 +176,25 @@ int write(struct fileNode **fileListNode, int data[], int count, int writeMode)
   if(DEBUG) printf("\nstart write : fileListNode->blockList->block %p\n", (*fileListNode)->blockList->block);
   if(DEBUG) printf("blockNode %p\n", blockNode);
   // Appending to end of file?
-  int i; // First empty index in instructions array
-  i = 0;
-   // TODO: FIX APPEND.
+  int i = 0; // First empty index in instructions array
+    
   if(writeMode == APPEND)
   {
-/*    // Forward the list to the last node*/
-/*    while(blockNode->nextBlock != NULL)*/
-/*      blockNode = blockNode->nextBlock;*/
-/*    */
-/*    curBlock = blockNode->block;*/
-/*    // Does this block already have data in it?*/
-/*    if(curBlock != NULL)*/
-/*      // Find the first free instruction index*/
-/*      for(i; curBlock->instructions[i] != -1 || i < BLOCKSIZE; i++);*/
-/*    // Get the next free block on the disk*/
-/*    else*/
-/*      curBlock = get_free_block(); // Get the first available block on the disk*/
+    ; // TODO: Implement.
   }
   else // OVERWRITE or NEWFILE
+  {
+    if(offset != 0)
+    {
+      int k = 1;
+      for(; k <= offset; k++)
+        if(k % BLOCKSIZE == 0)
+          blockNode = blockNode->nextBlock;
+      i = offset % BLOCKSIZE;
+    }
     curBlock = blockNode->block;
-  
+  }
+      
   int j;
   for(j = 0; j < count; j++)
   {
@@ -209,7 +202,8 @@ int write(struct fileNode **fileListNode, int data[], int count, int writeMode)
     { 
       if(DEBUG) printf("curBlock %p\n", curBlock);
       if(DEBUG) printf("\nadding new blockNode...\n");
-      blockNode->nextBlock = get_free_block_node();
+      if(blockNode->nextBlock == NULL)
+        blockNode->nextBlock = get_free_block_node();
       blockNode = blockNode->nextBlock;
       curBlock = blockNode->block;
       if(DEBUG) printf("new blockNode %p\n", blockNode);
@@ -227,7 +221,5 @@ int write(struct fileNode **fileListNode, int data[], int count, int writeMode)
       newFile = 0;
   }
   if(DEBUG) printf("end write : fileListNode->blockList->block %p\n", (*fileListNode)->blockList->block);
-  blockNode->nextBlock = NULL;
-  return 0;
+  return SUCCESS;
 } // end write()
-

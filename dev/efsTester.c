@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
   status = save_file("testFile.out");
   struct fileNode * file = get_file("testFile.out");
   
-  if(status == 0 && file != NULL)
+  if(status == SUCCESS && file != NULL)
   {
     printf("File %s found\n", file->filename);
     printf("\nFilelist after adding \"testFile.out\":\n");
@@ -50,8 +50,7 @@ int main(int argc, char *argv[])
   printf("\nSaving file...\n");
   status = save_file("milk1.out");
   file = get_file("milk1.out");
-  
-  if(status == 0 && file != NULL)
+  if(status == SUCCESS && file != NULL)
   {
     printf("File %s found\n", file->filename);
     printf("\nFilelist after adding \"milk1.out\":\n");
@@ -143,13 +142,15 @@ int save_file(char *filename)
 /* int write(struct fileNode **fileListNode, int data[], int count, int writeMode)
  * Description:
  *    Write data to a file on the VFS. If writeMode is OVERWRITE, writing begins at
- *    the beginning of the file, but 
+ *    the beginning of the file, but
  * Input:
  *    struct fileNode **fileListNode : pointer to the file to be written to
  *    int data[] : Data to be written
  *    int count : How many elements to be written
  *    int writeMode : How to write to the file (Overwrite, append, etc).
+ *    int offset : Used for overwriting. Specifies the location at which to beign overwriting
  * Output:
+ *    SUCCESS : File was written without error.
  */
 int write(struct fileNode **fileListNode, int data[], int count, int writeMode, int offset)
 {
@@ -160,23 +161,11 @@ int write(struct fileNode **fileListNode, int data[], int count, int writeMode, 
   if(DEBUG) printf("\nstart write : fileListNode->blockList->block %p\n", (*fileListNode)->blockList->block);
   if(DEBUG) printf("blockNode %p\n", blockNode);
   // Appending to end of file?
-  int i; // First empty index in instructions array
-  i = 0;
-   // TODO: FIX APPEND.
+  int i = 0; // First empty index in instructions array
+    
   if(writeMode == APPEND)
   {
-/*    // Forward the list to the last node*/
-/*    while(blockNode->nextBlock != NULL)*/
-/*      blockNode = blockNode->nextBlock;*/
-/*    */
-/*    curBlock = blockNode->block;*/
-/*    // Does this block already have data in it?*/
-/*    if(curBlock != NULL)*/
-/*      // Find the first free instruction index*/
-/*      for(i; curBlock->instructions[i] != -1 || i < BLOCKSIZE; i++);*/
-/*    // Get the next free block on the disk*/
-/*    else*/
-/*      curBlock = get_free_block(); // Get the first available block on the disk*/
+    ; // TODO: Implement.
   }
   else // OVERWRITE or NEWFILE
   {
@@ -217,6 +206,6 @@ int write(struct fileNode **fileListNode, int data[], int count, int writeMode, 
       newFile = 0;
   }
   if(DEBUG) printf("end write : fileListNode->blockList->block %p\n", (*fileListNode)->blockList->block);
-  return 0;
+  return SUCCESS;
 } // end write()
 

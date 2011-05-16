@@ -62,6 +62,10 @@ int main(int argc, char *argv[])
     else if(strcmp(cmd, "debug")==0)
     {
     }
+    else if(strcmp(cmd, "diskdump")==0)
+    {
+      print_disk(disk);
+    }
     else if(strcmp(cmd, "exit")==0)
     {
       show_exit();
@@ -104,10 +108,6 @@ int main(int argc, char *argv[])
       status = save_file(arg1);
       if(status != 0) print_error(status);
       
-    }
-    else if(strcmp(cmd, "showBlocks")==0)
-    {
-      print_disk(disk);
     }
     else if(strcmp(cmd, "showGlobalMem")==0)
     {

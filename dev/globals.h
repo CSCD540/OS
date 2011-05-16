@@ -23,7 +23,8 @@
 #define BLOCKS        ((DISKSIZE) / (BLOCKSIZE))  // total number of blocks
 #define NUMBLOCKS     ((DISKSIZE) / (BLOCKSIZE))  // Total number of blocks on the disk
 
-// Write
+// Return Values
+#define SUCCESS 0        // No error
 #define APPEND 1         // Begin writing at the end of the file
 #define OVERWRITE 2      // Begin writing at the beginning of the file
 #define NEWFILE 3        // New file
