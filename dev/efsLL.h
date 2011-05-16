@@ -22,12 +22,10 @@ int delete_block_node(struct blockNode **blockList, struct block *block);
 struct fileNode * find_file(struct fileNode **fileList, char *filename);
 struct blockNode * get_block_node(struct blockNode **blockList, int blockIndex);
 int get_block_count(struct blockNode *blockList);
-//void print_error(int errno);
 /* End Forward Declarations */
 
 
-/* 
- * struct blockNode
+/* struct blockNode
  * Description:
  *    This struct defines a blockNode in the list.
  * Input:
@@ -41,8 +39,7 @@ struct blockNode {
 };
 
 
-/* 
- * struct fileNode
+/* struct fileNode
  * Description:
  *    This struct defines a fileNode in the list.
  * Input:
@@ -58,8 +55,7 @@ struct fileNode {
 };
 
 
-/* 
- * void add_block_node(struct blockNode **blockList, struct block *block)
+/* void add_block_node(struct blockNode **blockList, struct block *block)
  * Description:
  *    Add a new block to the list
  * Input:
@@ -103,8 +99,7 @@ struct blockNode * add_block_node(struct blockNode **blockList, struct block *bl
 } // end add_block_node()
 
 
-/* 
- * struct fileNode * add_file_node(fileNode **fileList, char *filename)
+/* struct fileNode * add_file_node(fileNode **fileList, char *filename)
  * Description:
  *    Add a new file to the disk
  * Input:
@@ -148,8 +143,7 @@ struct fileNode * add_file_node(struct fileNode **fileList, char *filename, int 
 } // end add_file_node()
 
 
-/* 
- * int delete_block_node(struct blockNode **blockList, struct block *block)
+/* int delete_block_node(struct blockNode **blockList, struct block *block)
  * Description:
  *    Delete the specified block from the list
  * Input:
@@ -194,8 +188,7 @@ int delete_block_node(struct blockNode **blockList, struct block *block)
 } // end delete_block_node()
 
 
-/* 
- * fileNode * find_file(struct fileNode **fileList, char *filename)
+/* fileNode * find_file(struct fileNode **fileList, char *filename)
  * Description:
  *    Search the fileList for a file with a matching filename
  * Input:
@@ -231,8 +224,7 @@ struct fileNode * find_file(struct fileNode **fileList, char *filename)
 }
 
 
-/* 
- * struct block * get_block(struct blockNode **blockList, int blockIndex)
+/* struct block * get_block(struct blockNode **blockList, int blockIndex)
  * Description:
  *    Get a block in the blockList at the specified index
  * Input:
@@ -262,8 +254,7 @@ struct blockNode * get_block_node(struct blockNode **blockList, int blockIndex)
 }
 
 
-/* 
- * int get_block_count(struct blockNode *blockList)
+/* int get_block_count(struct blockNode *blockList)
  * Description:
  *    Count the number of nodes in the list
  * Input:

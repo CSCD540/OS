@@ -1,12 +1,12 @@
+/* Author : Jordan Bondo */
+
 #include <stdio.h>
 #include "efs.h"
-/*
-#define APPEND 0 // begin writing at the end of the file
-#define OVERWRITE 1 // begin writing at the beginning of the file
-#define NEWFILE 2 // new file
-*/
+
+/* Forward Declarations */
 int save_file(char *filename);
-int write(struct fileNode **fileListNode, int data[], int count, int writeMode);
+int write(struct fileNode **fileListNode, int data[], int count, int writeMode, int offset);
+/* End Forward Declarations */
 
 //struct block disk[NUMBLOCKS];
 
@@ -27,54 +27,50 @@ int main(int argc, char *argv[])
   
   int status;
   
-/*  int i;*/
-/*  for(i = 0; i < 4; i++)*/
-/*  {*/
-    printf("\nSaving file...\n");
-    status = save_file("testFile.out");
-    struct fileNode * file = get_file("testFile.out");
-    
-    if(status == 0 && file != NULL)
-    {
-      printf("File %s found\n", file->filename);
-      printf("\nFilelist after adding \"testFile.out\":\n");
-      print_file_list(fileList);
-      printf("\nDisk after adding file:\n");
-      print_disk(disk);
-      printf("\nfreeBlockList after deleting nodes used for file:\n");
-      print_block_list(freeBlockList);
-      printf("\n%s blockList:\n", file->filename);
-      print_block_list(file->blockList);
-    }
-    else
-      printf("\nFile not saved successfully. Status returned %d. \n", status);
-      
-      
-    printf("\nSaving file...\n");
-    status = save_file("milk1.out");
-    file = get_file("milk1.out");
-    
-    if(status == 0 && file != NULL)
-    {
-      printf("File %s found\n", file->filename);
-      printf("\nFilelist after adding \"milk1.out\":\n");
-      print_file_list(fileList);
-      printf("\nDisk after adding file:\n");
-      print_disk(disk);
-      printf("\nfreeBlockList after deleting nodes used for file:\n");
-      print_block_list(freeBlockList);
-      printf("\n%s blockList:\n", file->filename);
-      print_block_list(file->blockList);
-    }
-    else
-      printf("\nFile not saved successfully. Status returned %d. \n", status);
-/*  }*/
+  printf("\nSaving file...\n");
+  status = save_file("testFile.out");
+  struct fileNode * file = get_file("testFile.out");
   
+  if(status == 0 && file != NULL)
+  {
+    printf("File %s found\n", file->filename);
+    printf("\nFilelist after adding \"testFile.out\":\n");
+    print_file_list(fileList);
+    printf("\nDisk after adding file:\n");
+    print_disk(disk);
+    printf("\nfreeBlockList after deleting nodes used for file:\n");
+    print_block_list(freeBlockList);
+    printf("\n%s blockList:\n", file->filename);
+    print_block_list(file->blockList);
+  }
+  else
+    printf("\nFile not saved successfully. Status returned %d. \n", status);
+    
+    
+  printf("\nSaving file...\n");
+  status = save_file("milk1.out");
+  file = get_file("milk1.out");
   
-  printf("\n\nTesting overwrite on testFile.out...\nWriting 1-6 with an offset of 5\n");
+  if(status == 0 && file != NULL)
+  {
+    printf("File %s found\n", file->filename);
+    printf("\nFilelist after adding \"milk1.out\":\n");
+    print_file_list(fileList);
+    printf("\nDisk after adding file:\n");
+    print_disk(disk);
+    printf("\nfreeBlockList after deleting nodes used for file:\n");
+    print_block_list(freeBlockList);
+    printf("\n%s blockList:\n", file->filename);
+    print_block_list(file->blockList);
+  }
+  else
+    printf("\nFile not saved successfully. Status returned %d. \n", status);
+  
+  int offset = 13;
+  printf("\n\nTesting overwrite on testFile.out...\nWriting 1-6 with an offset of %d\n", offset);
   struct fileNode * testFile = get_file("testFile.out");
   int d[] = {1, 2, 3, 4, 5, 6};
-  writeo(&testFile, d, 6, OVERWRITE, 13);
+  write(&testFile, d, 6, OVERWRITE, offset);
   printf("\n%s blockList:\n", testFile->filename);
   print_block_list(testFile->blockList);
   
@@ -84,8 +80,7 @@ int main(int argc, char *argv[])
 }
 
 
-/* 
- * int save_file(char *filename)
+/* int save_file(char *filename)
  * Description:
  *    Attempt to open a file on the physical disk. If it exists, read through it
  *    and count the number of lines (instructions) and number of blocks necessary.
@@ -139,47 +134,24 @@ int save_file(char *filename)
   newFile = add_file(filename, numBlocks); // Add a new file to the list and get the pointer to that fileNode
   if(DEBUG) printf("newFile %p\n", newFile);
   newFile->blockList = get_free_block_node();
-  write(&newFile, instructions, numInstructs, NEWFILE);
+  write(&newFile, instructions, numInstructs, NEWFILE, 0);
   
   return 0;
 }// end save_file()
 
 
-/* 
- * int write(struct fileNode **fileListNode, int data[], int count, int writeMode)
+/* int write(struct fileNode **fileListNode, int data[], int count, int writeMode)
  * Description:
  *    Write data to a file on the VFS. If writeMode is OVERWRITE, writing begins at
  *    the beginning of the file, but 
  * Input:
- *    char *filename : Name of the file on the physical disk. This will also be used
- *    as the filename in the virtual disk.
+ *    struct fileNode **fileListNode : pointer to the file to be written to
+ *    int data[] : Data to be written
+ *    int count : How many elements to be written
+ *    int writeMode : How to write to the file (Overwrite, append, etc).
  * Output:
- *    -1 : File could not be opened. Either it doesn't exist on the physical disk, 
- *          or somethign else happened.
- *    -2 : Insufficient disk space
- *     0 : File was successfully created and written to the virtual disk
  */
-int write(struct fileNode **fileListNode, int data[], int count, int writeMode)
-{
-  // Regular write can just call writeo with an offset of 0
-  writeo(fileListNode, data, count, writeMode, 0);
-} // end write()
-
-/* 
- * int writeo(struct fileNode **fileListNode, int data[], int count, int writeMode, int offset)
- * Description:
- *    Write data to a file on the VFS. If writeMode is OVERWRITE, writing begins after
- *    offset instructions
- * Input:
- *    char *filename : Name of the file on the physical disk. This will also be used
- *    as the filename in the virtual disk.
- * Output:
- *    -1 : File could not be opened. Either it doesn't exist on the physical disk, 
- *          or somethign else happened.
- *    -2 : Insufficient disk space
- *     0 : File was successfully created and written to the virtual disk
- */
-int writeo(struct fileNode **fileListNode, int data[], int count, int writeMode, int offset)
+int write(struct fileNode **fileListNode, int data[], int count, int writeMode, int offset)
 {
   int newFile;
   newFile = writeMode;
@@ -207,31 +179,27 @@ int writeo(struct fileNode **fileListNode, int data[], int count, int writeMode,
 /*      curBlock = get_free_block(); // Get the first available block on the disk*/
   }
   else // OVERWRITE or NEWFILE
-    curBlock = blockNode->block;
-  
-  if(writeMode == OVERWRITE)
   {
-    int k = 1;
-    for(; k <= offset; k++)
-      if(k % BLOCKSIZE == 0)
-        blockNode = blockNode->nextBlock;
+    if(offset != 0)
+    {
+      int k = 1;
+      for(; k <= offset; k++)
+        if(k % BLOCKSIZE == 0)
+          blockNode = blockNode->nextBlock;
+      i = offset % BLOCKSIZE;
+    }
     curBlock = blockNode->block;
-    i = offset % BLOCKSIZE;
   }
-    
+      
   int j;
   for(j = 0; j < count; j++)
   {
-    if(writeMode == OVERWRITE && i == 0 && j != 0)
-    {
-      blockNode = blockNode->nextBlock;
-      curBlock = blockNode->block;
-    }
-    else if(writeMode != OVERWRITE && (i == 0) && (newFile != NEWFILE))
+    if((i == 0) && (newFile != NEWFILE))
     { 
       if(DEBUG) printf("curBlock %p\n", curBlock);
       if(DEBUG) printf("\nadding new blockNode...\n");
-      blockNode->nextBlock = get_free_block_node();
+      if(blockNode->nextBlock == NULL)
+        blockNode->nextBlock = get_free_block_node();
       blockNode = blockNode->nextBlock;
       curBlock = blockNode->block;
       if(DEBUG) printf("new blockNode %p\n", blockNode);
@@ -245,12 +213,10 @@ int writeo(struct fileNode **fileListNode, int data[], int count, int writeMode,
     if(i == BLOCKSIZE)
       i = 0;
     // If this is a new file, set newFile to 0 so that when i == 0 we will get a new blockNode
-    if(newFile == 2)
+    if(newFile == NEWFILE)
       newFile = 0;
   }
   if(DEBUG) printf("end write : fileListNode->blockList->block %p\n", (*fileListNode)->blockList->block);
-  if(writeMode != OVERWRITE)
-    blockNode->nextBlock = NULL;
   return 0;
-} // end writeo()
+} // end write()
 

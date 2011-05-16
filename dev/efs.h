@@ -1,12 +1,13 @@
+/* Author : Jordan Bondo */
+
 #include <stdlib.h>
 #include "efsLL.h"
 
 #ifndef _GLOBAL_H_
 #include "globals.h"
 #endif
-//#define DISKSIZE    BLOCKSIZE * 14        // Total size of the disk
-//#define NUMBLOCKS   DISKSIZE / BLOCKSIZE  // Total number of blocks on the disk
 
+/* Forward Declarations */
 struct fileNode * add_file(char *filename, int numBlocks);
 struct fileNode * get_file(char *filename);
 struct blockNode * get_free_block_node();
@@ -14,13 +15,14 @@ void init_disk(struct block disk[]);
 void print_block_list(struct blockNode *blockList);
 void print_disk(struct block disk[]);
 void print_file_list(struct fileNode *head);
+/* End Forward Declarations */
+
 
 struct fileNode *fileList = NULL;
 struct blockNode *freeBlockList = NULL;
 
 
-/* 
- * struct blockNode * add_file(char *filename)
+/* struct blockNode * add_file(char *filename)
  * Description:
  *    add a new file with the specified filename to the fileList
  * Input:
@@ -47,8 +49,7 @@ struct fileNode * get_file(char *filename)
 }
 
 
-/* 
- * struct block * get_free_block_node()
+/* struct block * get_free_block_node()
  * Description:
  *    Get the first free blockNode from the freeBlockList, then remove it from the freeBlockList
  * Input:
@@ -62,13 +63,16 @@ struct blockNode * get_free_block_node()
   int blockIndex = 0; // Just want the first free node in the freeBlockList
 
   freeNode = get_block_node(&freeBlockList, blockIndex);
-  delete_block_node(&freeBlockList, freeNode->block);
+  if(freeNode != NULL)
+  {
+    delete_block_node(&freeBlockList, freeNode->block);
+    freeNode->nextBlock = NULL;
+  }
   return freeNode;
 }
 
 
-/* 
- * void init_disk(block disk[])
+/* void init_disk(block disk[])
  * Description:
  *    Initialize the passed in disk. Assumes that the disk was created using the constants defined.
  * Input:
@@ -96,8 +100,7 @@ void init_disk(struct block disk[])
 }
 
 
-/* 
- * void print_block_list(struct blockNode *head)
+/* void print_block_list(struct blockNode *head)
  * Description:
  *    Print out all the data in all the blocks in this blockList
  * Input:
@@ -126,8 +129,7 @@ void print_block_list(struct blockNode *blockList)
 }
 
 
-/* 
- * void print_disk(struct block disk[])
+/* void print_disk(struct block disk[])
  * Description:
  *    print out the contents of the disk
  * Input:
@@ -148,8 +150,7 @@ void print_disk(struct block disk[])
 }
 
 
-/* 
- * void print_file_list(struct fileNode *head)
+/* void print_file_list(struct fileNode *head)
  * Description:
  *    Print out all the file currently stored on the disk
  * Input:
