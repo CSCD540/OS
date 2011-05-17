@@ -22,7 +22,7 @@
 // #include "efs.h"
 
 int lookup(int pid, int vpn, int rw);
-int page_fault(int pid, int vpn, int rw);
+int page_fault(int pid, int vpn);//, int rw);
 
 
 // The process table array which is indexed on the process id, and
@@ -73,8 +73,13 @@ int lookup(int pid, int vpn, int rw)
     physPage = i;
   }
   else // If we did not find it, we page fault
-    physPage = page_fault(pid, vpn, rw);
+    physPage = page_fault(pid, vpn);//, rw);
   
+  // Reset this page to be most recently used
+  pageTable[physPage][2] = -1;
+  // Set the dirty bit
+  if(pageTable[physPage][3] != 1)
+    pageTable[physPage][3] = rw;
   
   // Increase every page's recently used counter
   // And update the LRU index
@@ -96,8 +101,6 @@ int lookup(int pid, int vpn, int rw)
     }
   }
   
-  // Reset this page to be most recently used
-  pageTable[physPage][2] = 0;
   
   return physPage;
 }
@@ -115,7 +118,7 @@ int lookup(int pid, int vpn, int rw)
  * Output: Returns the physical page number of the virtual page in memory
  *          or -1 if the virtual page number is beyond the end of the file
  */
-int page_fault(int pid, int vpn, int rw)
+int page_fault(int pid, int vpn)//, int rw)
 {
   printf("\r\n%c[%d;%d;%dmPAGE FAULT%c[%dm\r\n", 27, 5, 37, 41, 27, 0);
   
@@ -131,14 +134,39 @@ int page_fault(int pid, int vpn, int rw)
   else
   {
     printf("Dirty page!\r\n");
+    
+    char * dirtyFname = processTable[pageTable[lru][0]]->filename;
+    struct fileNode * dirtyFile = get_file(dirtyFname);
+    
+    printf("\nFile before writing the dirty page back to disk...\n");
+    print_block_list(dirtyFile->blockList);
+    
+    int k = 0;
+    int dirtyData[PAGESIZE];
+    for(; k < PAGESIZE; k++)
+    {
+      dirtyData[k] = mem[0][PAGESIZE * lru + k];
+      //printf("dirtyData[%d] = mem[0][%d] : %d\n", k, PAGESIZE * lru + k, mem[0][PAGESIZE * lru + k]);
+    }
+    
+    //printf("dirtyFname: %s, dd[0]: %d, dd[15]: %d, pagesize: %d, mode: OVERWRITE, offset: %d\n", dirtyFile->filename, dirtyData[0], dirtyData[15], PAGESIZE, PAGESIZE * pageTable[lru][1]);
+    write(&dirtyFile, dirtyData, PAGESIZE, OVERWRITE, PAGESIZE * pageTable[lru][1]);
+    
+    
+    printf("\nFile after writing the dirty page back to disk...\n");
+    print_block_list(dirtyFile->blockList);
+    
+    pageTable[lru][3] = 0;
+    /*
     printf("Pretending to write existing page from memory to disk...\r\n");
     printf("Writing physical page %d to disk. PID: %d, VPN: %d\r\n",
                                   lru, pageTable[lru][0], pageTable[lru][1]);
+    */
   }
   
   
   printf("\r\nReading new page from virtual disk into memory...\r\n");
-  char * filename = processTable[0]->filename;
+  char * filename = processTable[pid]->filename;
   struct fileNode * file = get_file(filename);
   
   struct blockNode *blockList = file->blockList;
@@ -178,7 +206,7 @@ int page_fault(int pid, int vpn, int rw)
     pageTable[lru][0] = pid;
     pageTable[lru][1] = vpn;
     pageTable[lru][2] = 0;
-    pageTable[lru][3] = rw;
+//    pageTable[lru][3] = rw;
     
     // return physical page num
     return lru;

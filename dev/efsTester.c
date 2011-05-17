@@ -196,7 +196,7 @@ int write(struct fileNode **fileListNode, int data[], int count, int writeMode, 
   int j;
   for(j = 0; j < count; j++)
   {
-    if((i == 0) && (newFile != NEWFILE))
+    if((i == 0) && (j != 0) && (newFile != NEWFILE))
     { 
       if(DEBUG) printf("curBlock %p\n", curBlock);
       if(DEBUG) printf("\nadding new blockNode...\n");

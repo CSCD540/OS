@@ -11,6 +11,7 @@
 
 int save_file(char *filename);
 int write(struct fileNode **fileListNode, int data[], int count, int writeMode, int offset);
+void write2Page(int pid, int vpn);
 void accessPage(int pid, int vpn);
 //void init_main_mem();
 
@@ -35,12 +36,31 @@ main(int argc, char *argv[])
   printf("\r\n--------------------------------------------------------\r\n");
   
   accessPage(0, 0);
-  accessPage(1, 4);
-  accessPage(2, 3);
-  accessPage(1, 2);
-  accessPage(1, 4);
+  accessPage(0, 3);
+  write2Page(0, 3);
+  accessPage(0, 2);
+  accessPage(0, 4);
+  accessPage(0, 7);
+  //accessPage(0, 3);
+  accessPage(0, 2);
+  accessPage(0, 5);
   accessPage(0, 6);
-  accessPage(3, 6);
+}
+
+void write2Page(int pid, int vpn)
+{
+  printf("\r\nLooking up virtual page number %d for process %d\r\n", vpn, pid);
+  
+  print_pt();
+  
+  int physPgNm = lookup(pid, vpn, 1);
+  mem[0][PAGESIZE * physPgNm] = 1024;
+  
+  printf("\r\nPhysical page number is: %d\r\n", physPgNm);
+  
+  print_mem_pages();
+  
+  printf("\r\n--------------------------------------------------------\r\n");
 }
 
 void accessPage(int pid, int vpn)
@@ -167,11 +187,11 @@ int write(struct fileNode **fileListNode, int data[], int count, int writeMode, 
     }
     curBlock = blockNode->block;
   }
-      
+  
   int j;
   for(j = 0; j < count; j++)
   {
-    if((i == 0) && (newFile != NEWFILE))
+    if((i == 0) && (j != 0) && (newFile != NEWFILE))
     { 
       if(DEBUG) printf("curBlock %p\n", curBlock);
       if(DEBUG) printf("\nadding new blockNode...\n");

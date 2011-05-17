@@ -19,7 +19,7 @@
 #define BLOCKSIZE     4   // size for per block
 
 // Filesystem 
-#define DISKSIZE      ((BLOCKSIZE) * 20)          // Total size of the disk
+#define DISKSIZE      ((BLOCKSIZE) * 40)          // Total size of the disk
 #define BLOCKS        ((DISKSIZE) / (BLOCKSIZE))  // total number of blocks
 #define NUMBLOCKS     ((DISKSIZE) / (BLOCKSIZE))  // Total number of blocks on the disk
 
