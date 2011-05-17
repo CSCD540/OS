@@ -19,13 +19,13 @@ main(int argc, char *argv[])
 {
   struct process * firstProc = malloc(sizeof(struct process) + sizeof(char[50]));
   firstProc->pid = 0;
-  firstProc->filename = "testFile.out";
+  firstProc->filename = "testingPT.out";
   printf("First Process - id: %d; filename: %s\n", firstProc->pid, firstProc->filename);
   processTable[0] = firstProc;
   
   init_disk(disk);
-  int status = save_file("testFile.out");
-  printf("Save file testFile.out to vfs status: %d\n", status);
+  int status = save_file("testingPT.out");
+  printf("Save file testingPT.out to vfs status: %d\n", status);
   
   print_disk(disk);
   init_mem();
@@ -45,6 +45,7 @@ main(int argc, char *argv[])
   accessPage(0, 2);
   accessPage(0, 5);
   accessPage(0, 6);
+  accessPage(0, 3);
 }
 
 void write2Page(int pid, int vpn)
