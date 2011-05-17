@@ -27,7 +27,8 @@ int page_fault(int pid, int vpn, int rw);
 
 // The process table array which is indexed on the process id, and
 //  contains the priority (?), and the file descriptor/filename
-int processTable[MAXPRO][2];
+//int processTable[MAXPRO][2];
+
 
 /* int lookup(int pid, int vpn, int rw) // Externally accessible method
  *
@@ -135,30 +136,45 @@ int page_fault(int pid, int vpn, int rw)
                                   lru, pageTable[lru][0], pageTable[lru][1]);
   }
   
-  // read new page in
-  printf("\r\nReading new page from disk into memory...\r\n");
-  FILE * fd = fopen("testingPT.out", "r");
+  
+  printf("\r\nReading new page from virtual disk into memory...\r\n");
+  char * filename = processTable[0]->filename;
+  struct fileNode * file = get_file(filename);
+  
+  struct blockNode *blockList = file->blockList;
+  
   int tmp = 0, i = 0, EOFreached = 0;
   for(; i < PAGESIZE * vpn; i++)
-    if(fscanf(fd, "%d\n", &tmp) == EOF)
+  {
+    if(blockList == NULL || blockList->block->instructions[i % BLOCKSIZE] == -1)
     {
       EOFreached = 1;
       break;
     }
+    else
+    {
+      if((i + 1) % BLOCKSIZE == 0)
+        blockList = blockList->nextBlock;
+    }
+  }
   
   if(!EOFreached)
   {
-    for(i = 0; i < PAGESIZE; i++)
+    for(i = 0; i < PAGESIZE && blockList != NULL; )
     {
-      int res = fscanf(fd, "%d\n", &tmp);
-      if(res != EOF)
-        mem[0][PAGESIZE * lru + i] = tmp;
-      else
-        mem[0][PAGESIZE * lru + i] = -1;
+      int j;
+      for(j = 0; j < BLOCKSIZE; j++)
+      {
+        int res = blockList->block->instructions[j];
+        if(res != -1)
+          mem[0][PAGESIZE * lru + i] = blockList->block->instructions[j];
+        else
+          mem[0][PAGESIZE * lru + i] = -1;
+        i++;
+      }
+      blockList = blockList->nextBlock;
     }
-    //  printf("First int in file: %d\r\n", tmp);
-    fclose(fd);
-
+    
     pageTable[lru][0] = pid;
     pageTable[lru][1] = vpn;
     pageTable[lru][2] = 0;

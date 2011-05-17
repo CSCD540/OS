@@ -45,7 +45,7 @@ struct block {
 
 struct process{
     int pid;
-    char filename[];
+    char * filename;
     
 };
 
@@ -74,6 +74,7 @@ int  gfd;                   // file discriptor
 
 // end Variables
 
+struct process * processTable[MAXPRO];
 
 // Page Table Variables
 
