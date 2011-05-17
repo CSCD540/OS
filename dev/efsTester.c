@@ -26,52 +26,65 @@ int main(int argc, char *argv[])
   print_file_list(fileList);
   
   int status;
+  struct fileNode * file;
   
-  printf("\nSaving file...\n");
-  status = save_file("testFile.out");
-  struct fileNode * file = get_file("testFile.out");
-  
-  if(status == SUCCESS && file != NULL)
+  printf("\nSaving file \"milk1.out\"...");
+  status = save_file("milk1.out");
+  if(status == SUCCESS)
   {
-    printf("File %s found\n", file->filename);
-    printf("\nFilelist after adding \"testFile.out\":\n");
-    print_file_list(fileList);
-    printf("\nDisk after adding file:\n");
-    print_disk(disk);
-    printf("\nfreeBlockList after deleting nodes used for file:\n");
-    print_block_list(freeBlockList);
-    printf("\n%s blockList:\n", file->filename);
-    print_block_list(file->blockList);
+    printf("saved\n");
+    file = get_file("milk1.out");
+    if(file != NULL)
+    {
+      printf("File %s found\n", file->filename);
+      printf("\nFilelist after adding \"milk1.out\":\n");
+      print_file_list(fileList);
+      printf("\nDisk after adding file:\n");
+      print_disk(disk);
+      printf("\nfreeBlockList after deleting nodes used for file:\n");
+      print_block_list(freeBlockList);
+      printf("\n%s blockList:\n", file->filename);
+      print_block_list(file->blockList);
+    }
   }
   else
     printf("\nFile not saved successfully. Status returned %d. \n", status);
-    
-    
-  printf("\nSaving file...\n");
-  status = save_file("milk1.out");
-  file = get_file("milk1.out");
-  if(status == SUCCESS && file != NULL)
+  
+  printf("\nSaving file \"testFile.out\"...");
+  status = save_file("testFile.out");
+  if(status == SUCCESS)
   {
-    printf("File %s found\n", file->filename);
-    printf("\nFilelist after adding \"milk1.out\":\n");
-    print_file_list(fileList);
-    printf("\nDisk after adding file:\n");
-    print_disk(disk);
-    printf("\nfreeBlockList after deleting nodes used for file:\n");
-    print_block_list(freeBlockList);
-    printf("\n%s blockList:\n", file->filename);
-    print_block_list(file->blockList);
+    printf("saved\n");
+    file = get_file("testFile.out");
+    
+    if(file != NULL)
+    {
+      printf("File %s found\n", file->filename);
+      printf("\nFilelist after adding \"testFile.out\":\n");
+      print_file_list(fileList);
+      printf("\nDisk after adding file:\n");
+      print_disk(disk);
+      printf("\nfreeBlockList after deleting nodes used for file:\n");
+      print_block_list(freeBlockList);
+      printf("\n%s blockList:\n", file->filename);
+      print_block_list(file->blockList);
+    }
   }
   else
     printf("\nFile not saved successfully. Status returned %d. \n", status);
   
   int offset = 13;
   printf("\n\nTesting overwrite on testFile.out...\nWriting 1-6 with an offset of %d\n", offset);
-  struct fileNode * testFile = get_file("testFile.out");
-  int d[] = {1, 2, 3, 4, 5, 6};
-  write(&testFile, d, 6, OVERWRITE, offset);
-  printf("\n%s blockList:\n", testFile->filename);
-  print_block_list(testFile->blockList);
+  file = get_file("testFile.out");
+  if(file != NULL)
+  {
+    int d[] = {1, 2, 3, 4, 5, 6};
+    write(&file, d, 6, OVERWRITE, offset);
+    printf("\n%s blockList:\n", file->filename);
+    print_block_list(file->blockList);
+  }
+  else
+    printf("File not found\n");
   
   
   printf("\n");
@@ -208,4 +221,3 @@ int write(struct fileNode **fileListNode, int data[], int count, int writeMode, 
   if(DEBUG) printf("end write : fileListNode->blockList->block %p\n", (*fileListNode)->blockList->block);
   return SUCCESS;
 } // end write()
-
