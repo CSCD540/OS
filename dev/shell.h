@@ -139,6 +139,7 @@ int save_file(char *filename)
 void show_help()
 {
   printf("Print out the help screen for the shell\n");
+  printf("ls cat debug diskdump exit help hdload load man memdump pwd rm run save showGlobalMem showLRU showPage showRegisterData\n");
 }
 
 

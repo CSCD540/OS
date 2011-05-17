@@ -26,6 +26,10 @@ void reset_memory();
 int main(int argc, char *argv[])
 {
   init_disk(disk);
+  init_mem();
+  init_gmem();
+  init_pt();
+  
   /* 
    * Shell command 
    * Commands: save,del,ls,exit,run,help
