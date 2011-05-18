@@ -16,16 +16,15 @@
 #define UNLOCKED      2   // remove lock
 #define ENDPROCESS    3
 
-#define p0WRITE       4                           // tells p0 to run-p0 should only run after a write to gmem
+#define p0WRITE       4   // tells p0 to run-p0 should only run after a write to gmem
 #define DBGCPU        1
 #define DBGCPU1       0
 
-//General
-#define BLOCKSIZE     4                           // size for per block
+// General
+#define BLOCKSIZE     4   // size for per block
 
-//Filesystem 
-//#define DISKSIZE      (16*1024)                   // 16kB
-#define DISKSIZE      ((BLOCKSIZE) * 14)          // Total size of the disk
+// Filesystem 
+#define DISKSIZE      ((BLOCKSIZE) * 40)          // Total size of the disk
 #define BLOCKS        ((DISKSIZE) / (BLOCKSIZE))  // total number of blocks
 #define NUMBLOCKS     ((DISKSIZE) / (BLOCKSIZE))  // Total number of blocks on the disk
 #define LIST_EMPTY 0
@@ -33,7 +32,16 @@
 #define OVERWRITE 1 // begin writing at the beginning of the file
 #define NEWFILE 2 // new file
 
-//Memory
+// Return Values
+#define SUCCESS 0        // No error
+#define APPEND 1         // Begin writing at the end of the file
+#define OVERWRITE 2      // Begin writing at the beginning of the file
+#define NEWFILE 3        // New file
+#define DISK_FULL 4      // No more room on the disk!
+#define FILE_NOT_FOUND 5 // File was not located
+#define LIST_EMPTY 6     // List contains no elements
+
+// Memory
 #define PAGESIZE      ((BLOCKSIZE) * 4)           // size of each page in words 2-bytes
 #define NUMPAGES      ((MAXMEM) / (PAGESIZE))     // Number of pages in page table
 
@@ -122,6 +130,7 @@ int processTable[MAXPRO][2];
 int pageTable[NUMPAGES][4];
 int lru;
 //End pagetable variables
+struct process * processTable[MAXPRO];
 
 // Jordan's Variables
 char input[30]; //Console input

@@ -11,6 +11,9 @@
 #ifndef _GLOBALS_H_
 #include "globals.h"
 #endif
+#ifndef _HELPERS_H_
+#include "helpers.h"
+#endif
 
 /* Forward Declarations */
 struct blockNode * add_block_node(struct blockNode **blockList, struct block *block);
@@ -25,6 +28,42 @@ void print_error(int errno);
 
 /* 
  * void add_block_node(struct blockNode **blockList, struct block *block)
+=======
+/* End Forward Declarations */
+
+
+/* struct blockNode
+ * Description:
+ *    This struct defines a blockNode in the list.
+ * Input:
+ *    none
+ * Output:
+ *    none
+ */
+struct blockNode {
+  struct block     *block; // Pointer to a block on the disk
+  struct blockNode *nextBlock;  // Pointer to the next blockNode in the list.
+};
+
+
+/* struct fileNode
+ * Description:
+ *    This struct defines a fileNode in the list.
+ * Input:
+ *    none
+ * Output:
+ *    none
+ */
+struct fileNode {
+  char   *filename; // This file's name
+  int    numBlocks; // The number of block this file occupies
+  struct blockNode  *blockList; // Pointer to the location where the file's first block begins, or the first node in it's blockList
+  struct fileNode   *nextFile;   // Pointer to the next file in the file list
+};
+
+
+/* void add_block_node(struct blockNode **blockList, struct block *block)
+>>>>>>> ffb6dfd3d60e75ecd9d01c81219e2501717de561
  * Description:
  *    Add a new block to the list
  * Input:
@@ -34,7 +73,7 @@ void print_error(int errno);
  */
 struct blockNode * add_block_node(struct blockNode **blockList, struct block *block)
 {
-  // printf("add_block_node:in-block: %p\n", block);
+  if(DEBUG) printf("add_block_node:in-block: %p\n", block);
   struct blockNode *temp;
   // List is empty. Add first.
   if((*blockList)->block == NULL)
@@ -42,7 +81,7 @@ struct blockNode * add_block_node(struct blockNode **blockList, struct block *bl
     temp = malloc(sizeof(struct blockNode));
     temp->block = malloc(sizeof(struct block *));
     temp->block = block;
-    printf("add_block->new list %p\n", temp->block);
+    if(DEBUG) printf("add_block->new list %p\n", temp->block);
     temp->nextBlock = NULL;
     *blockList = temp;
      return *blockList;
@@ -60,7 +99,7 @@ struct blockNode * add_block_node(struct blockNode **blockList, struct block *bl
     next = malloc(sizeof(struct blockNode));
     next->block = malloc(sizeof(struct block *));
     next->block = block;
-    printf("add_block->old list %p\n", next->block);
+    if(DEBUG) printf("add_block->old list %p\n", next->block);
     next->nextBlock = NULL;
     temp->nextBlock = next;
     return next;
@@ -68,8 +107,7 @@ struct blockNode * add_block_node(struct blockNode **blockList, struct block *bl
 } // end add_block_node()
 
 
-/* 
- * struct fileNode * add_file_node(fileNode **fileList, char *filename)
+/* struct fileNode * add_file_node(fileNode **fileList, char *filename)
  * Description:
  *    Add a new file to the disk
  * Input:
@@ -90,7 +128,7 @@ struct fileNode * add_file_node(struct fileNode **fileList, char *filename, int 
     temp->blockList = malloc(sizeof(struct blockList *));
     temp->nextFile = NULL;
     *fileList = temp;
-    // printf("fileNode %p\n", *fileList);
+    if(DEBUG) printf("fileNode %p\n", *fileList);
   }
   else
   {
@@ -108,13 +146,12 @@ struct fileNode * add_file_node(struct fileNode **fileList, char *filename, int 
     temp->nextFile = next;
     temp = temp->nextFile;
   }
-  printf("add file node %p\n", temp);
+  if(DEBUG) printf("add file node %p\n", temp);
   return temp;
 } // end add_file_node()
 
 
-/* 
- * int delete_block_node(struct blockNode **blockList, struct block *block)
+/* int delete_block_node(struct blockNode **blockList, struct block *block)
  * Description:
  *    Delete the specified block from the list
  * Input:
@@ -159,6 +196,16 @@ int delete_block_node(struct blockNode **blockList, struct block *block)
 } // end delete_block_node()
 
 
+/* fileNode * find_file(struct fileNode **fileList, char *filename)
+ * Description:
+ *    Search the fileList for a file with a matching filename
+ * Input:
+ *    struct fileNode **fileList : A pointer to the file list to be searched
+ *    char *filename : The name of the file to search for
+ * Output:
+ *    NULL : The file was not found, either because the list was empty or the file was not in the list
+ *    file : A pointer to the fileNode containing the file information
+ */
 struct fileNode * find_file(struct fileNode **fileList, char *filename)
 {
   struct fileNode * file = *fileList;
@@ -172,21 +219,20 @@ struct fileNode * find_file(struct fileNode **fileList, char *filename)
   {
     if(strcmp(file->filename, filename) == 0)
     {
-      printf("\nfind_file %p\n", file->blockList->block);
+      if(DEBUG) printf("\nfind_file %p\n", file->blockList->block);
       return file;
     }
     else
     {
       file = file->nextFile;
-      printf("File not found\n");
+      if(DEBUG) printf("File not found\n");
     }
   }
   return NULL;
 }
 
 
-/* 
- * struct block * get_block(struct blockNode **blockList, int blockIndex)
+/* struct block * get_block(struct blockNode **blockList, int blockIndex)
  * Description:
  *    Get a block in the blockList at the specified index
  * Input:
@@ -216,8 +262,7 @@ struct blockNode * get_block_node(struct blockNode **blockList, int blockIndex)
 }
 
 
-/* 
- * int get_block_count(struct blockNode *blockList)
+/* int get_block_count(struct blockNode *blockList)
  * Description:
  *    Count the number of nodes in the list
  * Input:
@@ -244,29 +289,5 @@ int get_block_count(struct blockNode *blockList)
     }
   }
   return i;
-}
-
-
-/* 
- * void print_error(int errno)
- * Description:
- *    Print out the error message associated with the errno
- * Input:
- *    int errno : The error number
- * Output:
- *    Screen output of what error occurred.
- */
-void print_error(int errno)
-{
-  printf("\nERROR: ");
-  switch(errno)
-  {
-    case LIST_EMPTY:
-      printf("List is empty!\n");
-      break;
-      
-    default:
-      printf("An unspecified has error occurred.\n");
-  }
 }
 

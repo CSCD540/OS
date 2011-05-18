@@ -1,5 +1,5 @@
 #ifndef _GLOBALS_H_
-#incldue "globals.h"
+#include "globals.h"
 #endif
 //#define BLOCKSIZE   4 // Number of records per block
 

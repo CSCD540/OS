@@ -1,6 +1,7 @@
 #ifndef _EFS_H_
 #define _EFS_H_ 1
 
+/* Author : Jordan Bondo */
 
 #include <stdlib.h>
 #include "efsLL.h"
@@ -8,9 +9,8 @@
 #ifndef _GLOBAL_H_
 #include "globals.h"
 #endif
-//#define DISKSIZE    BLOCKSIZE * 14        // Total size of the disk
-//#define NUMBLOCKS   DISKSIZE / BLOCKSIZE  // Total number of blocks on the disk
 
+/* Forward Declarations */
 struct fileNode * add_file(char *filename, int numBlocks);
 struct fileNode * get_file(char *filename);
 struct blockNode * get_free_block_node();
@@ -20,13 +20,14 @@ int write(struct fileNode **fileListNode, int data[], int count, int writeMode);
 void print_block_list(struct blockNode *blockList);
 void print_disk(struct block disk[]);
 void print_file_list(struct fileNode *head);
+/* End Forward Declarations */
+
 
 struct fileNode *fileList = NULL;
 struct blockNode *freeBlockList = NULL;
 
 
-/* 
- * struct blockNode * add_file(char *filename)
+/* struct blockNode * add_file(char *filename)
  * Description:
  *    add a new file with the specified filename to the fileList
  * Input:
@@ -38,9 +39,9 @@ struct fileNode * add_file(char *filename, int numBlocks)
 {
   // Add a new file to the fileList and get a pointer to the first block.  
   struct fileNode * newFileNode = malloc(sizeof(struct fileNode *));
-  printf("pre add file  %p\n", newFileNode);
+  if(DEBUG) printf("pre add file  %p\n", newFileNode);
   newFileNode = add_file_node(&fileList, filename, numBlocks);
-  printf("post add file %p\n", newFileNode);
+  if(DEBUG) printf("post add file %p\n", newFileNode);
   return newFileNode;
 }
 
@@ -49,13 +50,11 @@ struct fileNode * get_file(char *filename)
 {
   struct fileNode * file;
   file = find_file(&fileList, filename);
-  // printf("get_file %p\n", file->blockList->block);
   return file;
 }
 
 
-/* 
- * struct block * get_free_block_node()
+/* struct block * get_free_block_node()
  * Description:
  *    Get the first free blockNode from the freeBlockList, then remove it from the freeBlockList
  * Input:
@@ -69,13 +68,16 @@ struct blockNode * get_free_block_node()
   int blockIndex = 0; // Just want the first free node in the freeBlockList
 
   freeNode = get_block_node(&freeBlockList, blockIndex);
-  delete_block_node(&freeBlockList, freeNode->block);
+  if(freeNode != NULL)
+  {
+    delete_block_node(&freeBlockList, freeNode->block);
+    freeNode->nextBlock = NULL;
+  }
   return freeNode;
 }
 
 
-/* 
- * void init_disk(block disk[])
+/* void init_disk(block disk[])
  * Description:
  *    Initialize the passed in disk. Assumes that the disk was created using the constants defined.
  * Input:
@@ -237,8 +239,7 @@ int write(struct fileNode **fileListNode, int data[], int count, int writeMode)
   return 0;
 } // end write()
 
-/* 
- * void print_block_list(struct blockNode *head)
+/* void print_block_list(struct blockNode *head)
  * Description:
  *    Print out all the data in all the blocks in this blockList
  * Input:
@@ -254,8 +255,8 @@ void print_block_list(struct blockNode *blockList)
     while(blockList != NULL)
     {
 
-//      printf("blockList: %p\n", blockList);
-//      printf("blockList->block: %p\n", blockList->block);
+      if(DEBUG) printf("blockList: %p\n", blockList);
+      if(DEBUG) printf("blockList->block: %p\n", blockList->block);
       printf("Block #%2d ", blockList->block->blockNum);
       int i;
       for(i = 0; i < BLOCKSIZE; i++)
@@ -267,8 +268,7 @@ void print_block_list(struct blockNode *blockList)
 }
 
 
-/* 
- * void print_disk(struct block disk[])
+/* void print_disk(struct block disk[])
  * Description:
  *    print out the contents of the disk
  * Input:
@@ -289,8 +289,7 @@ void print_disk(struct block disk[])
 }
 
 
-/* 
- * void print_file_list(struct fileNode *head)
+/* void print_file_list(struct fileNode *head)
  * Description:
  *    Print out all the file currently stored on the disk
  * Input:

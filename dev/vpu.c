@@ -8,7 +8,7 @@
 #include "helpers.h"
 #include "shell.h"
 #include "pt.h"
-#include "efs.h"
+// #include "efs.h"
 
 // Methods declaration
 int  exe(int stack[][STACKSIZE],int sp[],int reg[][REGISTERSIZE], int next_instruct[],int next_inst[], int cur_proc, int *terminate);
@@ -23,6 +23,11 @@ int  new_process(char * filename);
 
 int main(int argc, char *argv[])
 {
+  init_disk(disk);
+  init_mem();
+  init_gmem();
+  init_pt();
+  
   /* 
    * Shell command 
    * Commands: save,del,ls,exit,run,help
@@ -33,7 +38,8 @@ int main(int argc, char *argv[])
   //Load a program from the disk
   if(argc > 1)
     load_program(argv[1]);
-    
+  
+  int status;
   while(machineOn)
   {
     printf("evm$ ");
@@ -48,7 +54,7 @@ int main(int argc, char *argv[])
 
     if(strlen(input)<1)
     {
-      continue; // When there is no input string, skiping everything.
+      continue; // When there is no input string, skipping everything.
     }
     else if(strcmp(cmd, "ls")==0) 
     {
@@ -60,6 +66,10 @@ int main(int argc, char *argv[])
     }
     else if(strcmp(cmd, "debug")==0)
     {
+    }
+    else if(strcmp(cmd, "diskdump")==0)
+    {
+      print_disk(disk);
     }
     else if(strcmp(cmd, "exit")==0)
     {
@@ -116,10 +126,9 @@ int main(int argc, char *argv[])
     }
     else if(strcmp(cmd, "save")==0)
     {
-      save_file(arg1);
-    }
-    else if(strcmp(cmd, "showBlocks")==0)
-    {
+      status = save_file(arg1);
+      if(status != 0) print_error(status);
+      
     }
     else if(strcmp(cmd, "showGlobalMem")==0)
     {
@@ -127,9 +136,11 @@ int main(int argc, char *argv[])
     }
     else if(strcmp(cmd, "showLRU")==0)
     {
+      print_lru();
     }
-    else if(strcmp(cmd, "showpage")==0)
+    else if(strcmp(cmd, "showPage")==0)
     {
+      print_pt();
     }
     else if(strcmp(cmd, "showRegisterData")==0)
     {
@@ -194,7 +205,7 @@ void executeit()
       
       if(proc_complete[cur_proc] == 1)
       {
-        if (DEBUG!=0)
+        if (DEBUG)
           printf("----------------------------cur_proc: %d\n",cur_proc);
         goto checkdone;
       }
