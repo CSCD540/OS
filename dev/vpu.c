@@ -76,6 +76,17 @@ int main(int argc, char *argv[])
     else if(strcmp(cmd, "fdisk")==0)
     {
         init_disk(disk);
+    else if(strcmp(cmd, "filedump")==0)
+    {
+      printf("filename: '%s'\n", arg1);
+      struct fileNode * file = get_file(arg1);
+      if(file == NULL)
+      {
+        print_error(FILE_NOT_FOUND);
+        continue;
+      }
+      struct blockNode * blockList = file->blockList;
+      print_block_list(blockList);
     }
     else if(strcmp(cmd, "help")==0)
     {
