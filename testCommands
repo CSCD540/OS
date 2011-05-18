@@ -1,4 +1,5 @@
 load milk1.out
+load sort.out
 memdump
 exit
 
