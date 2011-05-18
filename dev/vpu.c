@@ -313,7 +313,7 @@ int exe(int stack[][STACKSIZE], int sp[], int reg[][REGISTERSIZE], int next_inst
    keyhit(343);
 #endif
 
-   if (DEBUG != 0)	
+   if (DEBUG)	
 		printf("In Main Memory: process %d, program counter %d, content:%d\n\n", cur_proc, i, mem[cur_proc][i]);
    // sleep(1);
 
@@ -334,9 +334,9 @@ int exe(int stack[][STACKSIZE], int sp[], int reg[][REGISTERSIZE], int next_inst
 
       case SEEK :
             tmp = peek(stack, cur_proc, sp, 0) ;
-            if (DEBUG!=0) printf("SEEK offset=  0,  data=%d\n", tmp);
+            if (DEBUG) printf("SEEK offset=  0,  data=%d\n", tmp);
             tmp1 = peek(stack, cur_proc, sp, -1) ;
-            if (DEBUG!=0)
+            if (DEBUG)
             {
 							printf("SEEK offset= -1,  fd =%d\n", tmp1); 
 							printf("OS service call  --- <SEEK> \n");
@@ -346,7 +346,7 @@ int exe(int stack[][STACKSIZE], int sp[], int reg[][REGISTERSIZE], int next_inst
       case POPD :
 			      tmp = mem[cur_proc][i+1];
             tmp1 = pop(stack, cur_proc, sp, 10) ;
-			      if( DBGCPU ) printf("POPD: popd %d into %d\n", tmp1, tmp);
+			      if(DBGCPU) printf("POPD: popd %d into %d\n", tmp1, tmp);
             if(tmp < 230)
             { gmem[tmp] = tmp1; }
             else
@@ -454,7 +454,7 @@ int exe(int stack[][STACKSIZE], int sp[], int reg[][REGISTERSIZE], int next_inst
           break;
 
       case END : 
-            if (DEBUG!=0) printf("Process %d completed normally\n", cur_proc);
+            if (DEBUG) printf("Process %d completed normally\n", cur_proc);
             p0running=0;
             *terminate = 1;
             return ENDPROCESS;
@@ -550,7 +550,7 @@ int exe(int stack[][STACKSIZE], int sp[], int reg[][REGISTERSIZE], int next_inst
             if(tmp1 < 230)
             {
               gmem[tmp1] = tmp;
-              if (DEBUG !=0) printf("Process %d wrote to global mem in index %d, %d\n", cur_proc, tmp1, gmem[tmp1]);
+              if (DEBUG) printf("Process %d wrote to global mem in index %d, %d\n", cur_proc, tmp1, gmem[tmp1]);
               // printf("returning p0WRITE\n"); keyhit(99);
               next_inst[cur_proc]++;
               return p0WRITE;
@@ -568,15 +568,15 @@ int exe(int stack[][STACKSIZE], int sp[], int reg[][REGISTERSIZE], int next_inst
             tmp1 = pop(stack, cur_proc, sp, 72);
             // printf("%d\n",tmp1);
             gmem[tmp] = tmp1;
-            if (DEBUG !=0) printf("process %d wrote to global mem in index %d, %d\n", cur_proc, tmp, gmem[tmp]);
+            if (DEBUG) printf("process %d wrote to global mem in index %d, %d\n", cur_proc, tmp, gmem[tmp]);
             return p0WRITE;
 
       case LOCK :
-			      if (DEBUG!=0) printf("LOCK called by process %d\n", cur_proc); 
+			      if (DEBUG) printf("LOCK called by process %d\n", cur_proc); 
             return LOCKED;
 
       case UNLOCK : 
-  					if (DEBUG!=0) printf("UNLOCK called\n");
+  					if (DEBUG) printf("UNLOCK called\n");
             return UNLOCKED;
 
       case HALT :
@@ -624,7 +624,7 @@ int exe(int stack[][STACKSIZE], int sp[], int reg[][REGISTERSIZE], int next_inst
 int peek(int stack[][STACKSIZE], int proc_id, int sp[], int offset)
 {
   int val = stack[proc_id][sp[proc_id] + offset];
-  if (DEBUG != 0)
+  if (DEBUG)
     printf("peek : %d\n", val);
   return val;
 }

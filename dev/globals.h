@@ -4,6 +4,7 @@
 //-----------------------------------------------------------------------------
 //                          Constants
 //-----------------------------------------------------------------------------
+#define DEBUG   0 // Run debugging
 
 #define MAXPRO        1   // max num of processes
 #define MAXPROGRAMS   8   // max number of program a CPU can run
@@ -16,30 +17,32 @@
 #define UNLOCKED      2   // remove lock
 #define ENDPROCESS    3
 
-#define p0WRITE       4   // tells p0 to run-p0 should only run after a write to gmem
-#define DBGCPU        1
-#define DBGCPU1       0
+#define p0WRITE   4  // tells p0 to run-p0 should only run after a write to gmem
+#define DBGCPU    1
+#define DBGCPU1   0
 
 // General
-#define BLOCKSIZE     4   // size for per block
+#define BLOCKSIZE  4  // number of instructions per block
 
 // Filesystem 
 #define DISKSIZE      ((BLOCKSIZE) * 40)          // Total size of the disk
-#define BLOCKS        ((DISKSIZE) / (BLOCKSIZE))  // total number of blocks
+#define BLOCKS        ((DISKSIZE) / (BLOCKSIZE))  // Total number of blocks
+#define MAXFILES      1000                        // How many files can be opened at once
 #define NUMBLOCKS     ((DISKSIZE) / (BLOCKSIZE))  // Total number of blocks on the disk
 
 // Return Values
-#define SUCCESS 0        // No error
-#define APPEND 1         // Begin writing at the end of the file
-#define OVERWRITE 2      // Begin writing at the beginning of the file
-#define NEWFILE 3        // New file
-#define DISK_FULL 4      // No more room on the disk!
-#define FILE_NOT_FOUND 5 // File was not located
-#define LIST_EMPTY 6     // List contains no elements
+#define SUCCESS         0   // No error
+#define APPEND          1   // Begin writing at the end of the file
+#define OVERWRITE       2   // Begin writing at the beginning of the file
+#define NEWFILE         3   // New file
+#define DISK_FULL       4   // No more room on the disk!
+#define FILE_NOT_FOUND  -5  // File was not located
+#define LIST_EMPTY      6   // List contains no elements
+#define FD_LIMIT_EXCEED -7  // Maximum number of file descriptors has been reached
 
 // Memory
-#define PAGESIZE      ((BLOCKSIZE) * 4)           // size of each page in words 2-bytes
-#define NUMPAGES      ((MAXMEM) / (PAGESIZE))     // Number of pages in page table
+#define PAGESIZE   ((BLOCKSIZE) * 4)        // size of each page in words 2-bytes
+#define NUMPAGES   ((MAXMEM) / (PAGESIZE))  // Number of pages in page table
 
 #define keyhit(a) {if(DBGCPU1){printf("hit enter --(%d)", a); getchar();}}
 
@@ -79,8 +82,23 @@ struct fileNode {
   struct fileNode   *nextFile;   // Pointer to the next file in the file list
 };
 
+
+/* struct fileDescriptor
+ * Description:
+ *    This struct defines a file descriptor. It is used to hold information about a
+ *    file that is currently open and being accessed.
+ */
+struct fileDescriptor {
+  char * filename;
+  int fdNum;
+  int curInstruction;
+  struct blockNode * curBlockNode;
+};
+
+
 struct process{
     int pid;
+<<<<<<< HEAD
     char *filename;
     int ip;     //virtual IP this is where the process believes it's at
     int status; //0 = not finished, 1 = terminated
@@ -100,22 +118,26 @@ int  endprog[MAXPRO];                   // last instruction of proc
 int  jsym[60];
 int  pageBits = 0;
 int  curProcesses = 0;                  //Number of processes loaded
-int  p0running;
-int  sizeOfDisk = DISKSIZE;
-int  DEBUG = 0;
-int  totalBlocks = BLOCKS;  // Total blocks
-int  fileIndex=0;           // main index
-int  searchIndex=0;         // temp index for search
-char *cmd;                  // The command(save, load, ls...etc.)
-char *arg1;                 // The argument(file's name)
-int  diskIndex=0;           // main index
-int  machineOn = 1;
-int  tempmem[MAXPRO][200];  // for PTB - loading all of the process information here
-int  fileMonitor[30];
-int  HALTED=0;
-int  gfd;                   // file discriptor
+char * filename;
+};
 
-// end Variables
+
+// Variables
+int  HALTED = 0;
+
+int  endprog[MAXPRO];       // Last instruction of proc
+int  gmem[MAXGMEM];         // Global var sit here
+int  jsym[60];
+int  mem[MAXPRO][MAXMEM];   // Main mem for each process
+int  machineOn = 1;         // Is the machine still running?
+int  pid = 0;               // Process id
+int  p0running;
+int  reg[MAXPRO][REGISTERSIZE];
+int  tempmem[MAXPRO][200];  // For PTB - loading all of the process information here
+
+char *arg1;      // The argument(file's name)
+char *cmd;       // The command(save, load, ls...etc.)
+char input[30];  // Console input
 
 //Pagetable variables
 // The process table array which is indexed on the process id, and
@@ -132,5 +154,17 @@ struct process * processTable[MAXPRO];
 char input[30]; //Console input
 // end Jordan's Variables
 
-#endif //_GLOBALS_H_
+struct block disk[NUMBLOCKS];          // Our virtual HD
+struct fileDescriptor files[MAXFILES]; // File descriptor table
+struct process * processTable[MAXPRO];
+// end Variables
 
+
+// Page Table Variables
+/// The page table array which contains the process id,
+///  virtual page number, dirty bit, and LRU info
+int pageTable[NUMPAGES][4];
+int lru;
+// End page table variables
+
+#endif //_GLOBALS_H_

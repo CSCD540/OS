@@ -172,8 +172,8 @@ int delete_block_node(struct blockNode **blockList, struct block *block)
 struct fileNode * find_file(struct fileNode **fileList, char *filename)
 {
   struct fileNode * file = *fileList;
-  if(file == NULL)
-  {    
+  if(file == NULL || file->blockList == NULL)
+  {
     print_error(LIST_EMPTY);
     return NULL;
   }
