@@ -26,14 +26,6 @@ void init_pg_tbl();
 void print_page_table();
 int disk_read(struct process pid, int pageNum);
 
-// The process table array which is indexed on the process id, and
-//  contains the priority (?), and the file descriptor/filename
-int processTable[MAXPRO][2];
-// The page table array which contains the process id,
-//  virtual page number, dirty bit, and LRU info
-int pageTable[NUMPAGES][4];
-int lru;
-
 /* int lookup(int pid, int vpn, int rw) // Externally accessible method
  *
  * Description: This function takes a virtual page number for a particular
@@ -60,6 +52,7 @@ int lookup(struct process pid, int vpn, int rw)
   for(i = 0; i < NUMPAGES; i++)
   {
     // If we find it, stop looking
+//This is broken if pid.pid == 0!
     if(pageTable[i][0] == pid.pid && pageTable[i][1] == vpn)
     {
       found = 1;

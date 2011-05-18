@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
     {
       struct process pid;
       pid.filename = arg1;
-      pid.pid = 0;
+      pid.pid = 1;
       lookup(pid, 0, 0);
     }
     else if(strcmp(cmd, "man")==0)

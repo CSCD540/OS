@@ -107,6 +107,16 @@ int  gfd;                   // file discriptor
 
 // end Variables
 
+//Pagetable variables
+// The process table array which is indexed on the process id, and
+//  contains the priority (?), and the file descriptor/filename
+int processTable[MAXPRO][2];
+// The page table array which contains the process id,
+//  virtual page number, dirty bit, and LRU info
+int pageTable[NUMPAGES][4];
+int lru;
+//End pagetable variables
+
 // Jordan's Variables
 char input[30]; //Console input
 // end Jordan's Variables

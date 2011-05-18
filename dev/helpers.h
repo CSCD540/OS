@@ -69,9 +69,9 @@ void print_gmem()
   printf("Global memory: size %d\n", MAXGMEM);
   for(i = 0; i < MAXGMEM; i++)
   {
-    printf("%d\t", gmem[i]);
+    printf(" %5d", gmem[i]);
     if( i == (MAXGMEM - 1) || (i + 1) % 8 == 0)
-        printf(" | %d\n", i);
+        printf(" | %5d\n", i);
   }
   printf("\n");
 }
@@ -91,9 +91,9 @@ void print_mem()
         printf("Process %d: Addresses 0 - %d with %d pages of size %d\n", i, MAXMEM, NUMPAGES, PAGESIZE);
         for(j = 0; j < MAXMEM; ++j)
         {
-            printf("%d\t", mem[i][j]);
+            printf(" %5d", mem[i][j]);
             if( j == (MAXMEM - 1) || (j + 1) % PAGESIZE == 0)
-                printf(" | %d\n", j);
+                printf(" | %5d\n", j);
         }
         printf("\n");
     }
@@ -108,7 +108,7 @@ void print_register(int reg[][REGISTERSIZE])
     printf("- Process %d: ",i);
     for(j = 0; j < REGISTERSIZE; j++)
     {
-      printf("%d  ", reg[i][j]);
+      printf(" %5d", reg[i][j]);
     }
     printf("      -\n");
   }
@@ -122,7 +122,7 @@ void print_stack(int stack[][STACKSIZE], int sp[])
   {
     printf("Stack contents for process %d\n", i);
     for(j = 0; j < STACKSIZE; j++)
-      printf("%d\n", stack[i][j]);
+      printf("%5d\n", stack[i][j]);
     printf("SP at %d\n\n", sp[i]);
   }
 }
