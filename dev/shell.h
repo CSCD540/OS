@@ -8,6 +8,7 @@
 // Jordan's method declarations
 void concatenate(char *filename);
 void list_directory_contents();
+void dump_file(char *filename);
 int  load_program(char *filename);
 void remove_file(char *filename);
 int  save_file(char *filename);
@@ -29,6 +30,18 @@ void concatenate(char *filename)
 void list_directory_contents()
 {
 	printf("Print out the contents of PWD.\n");
+}
+
+void dump_file(char *filename)
+{
+    struct fileNode * file = get_file(filename);
+    if(file == NULL)
+    {
+        print_error(FILE_NOT_FOUND);
+        return;
+    }
+    struct blockNode * blockList = file->blockList;
+    print_block_list(blockList);
 }
 
 
