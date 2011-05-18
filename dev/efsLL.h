@@ -202,7 +202,6 @@ int delete_block_node(struct blockNode **blockList, struct block *block)
  */
 struct fileNode * find_file(struct fileNode **fileList, char *filename)
 {
-  printf("filename in find_file: %s\n", filename);
   struct fileNode * file = *fileList;
   if(file == NULL || file->blockList == NULL)
   {
@@ -212,16 +211,15 @@ struct fileNode * find_file(struct fileNode **fileList, char *filename)
   
   while(file != NULL)
   {
-    printf("file->filename: %s\n", file->filename);
     if(strcmp(file->filename, filename) == 0)
     {
-      printf("\nfind_file %p\n", file->blockList->block);
+      if(DEBUG) printf("\nfind_file %p\n", file->blockList->block);
       return file;
     }
     else
     {
       file = file->nextFile;
-      printf("File not found\n");
+      if(DEBUG) printf("File not found\n");
     }
   }
   return NULL;
