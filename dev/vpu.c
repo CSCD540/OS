@@ -25,7 +25,9 @@ int main(int argc, char *argv[])
   /* 
    * Shell command 
    * Commands: save,del,ls,exit,run,help
-   */	
+  */	
+  int nextPid = 0;
+  init_pg_tbl();
   //Load a program from the disk
   if(argc > 1)
     load_program(argv[1]);
@@ -75,11 +77,15 @@ int main(int argc, char *argv[])
     {
       struct process pid;
       pid.filename = arg1;
-      pid.pid = 1;
+      pid.pid = nextPid++;
       lookup(pid, 0, 0);
     }
     else if(strcmp(cmd, "man")==0)
     {
+    }
+    else if(strcmp(cmd, "ptdump")==0)
+    {
+        print_page_table();
     }
     else if(strcmp(cmd, "memdump")==0)
     {

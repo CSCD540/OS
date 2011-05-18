@@ -52,7 +52,6 @@ int lookup(struct process pid, int vpn, int rw)
   for(i = 0; i < NUMPAGES; i++)
   {
     // If we find it, stop looking
-//This is broken if pid.pid == 0!
     if(pageTable[i][0] == pid.pid && pageTable[i][1] == vpn)
     {
       found = 1;
