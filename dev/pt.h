@@ -21,9 +21,26 @@
 
 // #include "efs.h"
 
-int lookup(int pid, int vpn, int rw);
-int page_fault(int pid, int vpn);//, int rw);
+int lookup(struct process pid, int vpn, int rw);
+int page_fault(struct process pid, int vpn);//, int rw);
 
+
+/* int lookup(int pid, int rw) // Externally accessible method
+ *
+ * Description: This function calculates the virtual page number of the instruction
+ *              then calls lookup(int pid, int vpn, int rw)
+ * Input:
+ *        pid - The process id of the virtual page you are looking up
+ *        rw  - Memory read/write designation (0 - read; 1 - write)
+ * Output: Returns the physical instruction number to run
+ *          or -1 if the virtual page number is beyond the end of the file
+ */
+int lookup_ip(struct process pid, int rw)
+{
+  int vpn = 0;
+  vpn = pid.ip>>pageBits;
+  return lookup(pid, vpn, rw) & (pid.ip & (PAGESIZE -1) );
+}
 
 // The process table array which is indexed on the process id, and
 //  contains the priority (?), and the file descriptor/filename
@@ -45,7 +62,7 @@ int page_fault(int pid, int vpn);//, int rw);
  * Output: Returns the physical page number of the virtual page in memory
  *          or -1 if the virtual page number is beyond the end of the file
  */
-int lookup(int pid, int vpn, int rw)
+int lookup(struct process pid, int vpn, int rw)
 {
   int found = 0;
   
@@ -56,7 +73,7 @@ int lookup(int pid, int vpn, int rw)
   for(i = 0; i < NUMPAGES; i++)
   {
     // If we find it, stop looking
-    if(pageTable[i][0] == pid && pageTable[i][1] == vpn)
+    if(pageTable[i][0] == pid.pid && pageTable[i][1] == vpn)
     {
       found = 1;
       break;
@@ -66,7 +83,7 @@ int lookup(int pid, int vpn, int rw)
   
   
   int physPage = -1;
-  
+
   if(found == 1) // If we found it, great...
   {
     printf("\r\n%c[%d;%d;%dmPage Found%c[%dm\r\n", 27, 1, 37, 44, 27, 0);
@@ -101,7 +118,6 @@ int lookup(int pid, int vpn, int rw)
     }
   }
   
-  
   return physPage;
 }
 
@@ -118,7 +134,7 @@ int lookup(int pid, int vpn, int rw)
  * Output: Returns the physical page number of the virtual page in memory
  *          or -1 if the virtual page number is beyond the end of the file
  */
-int page_fault(int pid, int vpn)//, int rw)
+int page_fault(struct process pid, int vpn)//, int rw)
 {
   printf("\r\n%c[%d;%d;%dmPAGE FAULT%c[%dm\r\n", 27, 5, 37, 41, 27, 0);
   
@@ -135,8 +151,7 @@ int page_fault(int pid, int vpn)//, int rw)
   {
     printf("Dirty page!\r\n");
     
-    char * dirtyFname = processTable[pageTable[lru][0]]->filename;
-    struct fileNode * dirtyFile = get_file(dirtyFname);
+    struct fileNode * dirtyFile = get_file(pid.filename);
     
     printf("\nFile before writing the dirty page back to disk...\n");
     print_block_list(dirtyFile->blockList);
@@ -166,8 +181,7 @@ int page_fault(int pid, int vpn)//, int rw)
   
   
   printf("\r\nReading new page from virtual disk into memory...\r\n");
-  char * filename = processTable[pid]->filename;
-  struct fileNode * file = get_file(filename);
+  struct fileNode * file = get_file(pid.filename);
   
   struct blockNode *blockList = file->blockList;
   
@@ -203,7 +217,7 @@ int page_fault(int pid, int vpn)//, int rw)
       blockList = blockList->nextBlock;
     }
     
-    pageTable[lru][0] = pid;
+    pageTable[lru][0] = pid.pid;
     pageTable[lru][1] = vpn;
     pageTable[lru][2] = 0;
 //    pageTable[lru][3] = rw;

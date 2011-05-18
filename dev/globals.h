@@ -27,10 +27,6 @@
 #define DISKSIZE      ((BLOCKSIZE) * 40)          // Total size of the disk
 #define BLOCKS        ((DISKSIZE) / (BLOCKSIZE))  // total number of blocks
 #define NUMBLOCKS     ((DISKSIZE) / (BLOCKSIZE))  // Total number of blocks on the disk
-#define LIST_EMPTY 0
-#define APPEND 0 // begin writeing at the end of the file
-#define OVERWRITE 1 // begin writing at the beginning of the file
-#define NEWFILE 2 // new file
 
 // Return Values
 #define SUCCESS 0        // No error
@@ -124,7 +120,7 @@ int  gfd;                   // file discriptor
 //Pagetable variables
 // The process table array which is indexed on the process id, and
 //  contains the priority (?), and the file descriptor/filename
-int processTable[MAXPRO][2];
+//int processTable[MAXPRO][2];
 // The page table array which contains the process id,
 //  virtual page number, dirty bit, and LRU info
 int pageTable[NUMPAGES][4];

@@ -20,7 +20,6 @@ int  pop(int stack[][STACKSIZE], int proc_id, int sp[], int calledfrom);
 int  new_process(char * filename);
 //end Methods declaration
 
-
 int main(int argc, char *argv[])
 {
   init_disk(disk);
@@ -33,7 +32,6 @@ int main(int argc, char *argv[])
    * Commands: save,del,ls,exit,run,help
   */	
   memset(processes, 0, MAXPROGRAMS * sizeof(struct process));
-  init_pg_tbl();
   
   //Load a program from the disk
   if(argc > 1)
@@ -110,7 +108,7 @@ int main(int argc, char *argv[])
     }
     else if(strcmp(cmd, "ptdump")==0)
     {
-        print_page_table();
+        print_pt();
     }
     else if(strcmp(cmd, "pwd")==0)
     {
@@ -126,8 +124,10 @@ int main(int argc, char *argv[])
     }
     else if(strcmp(cmd, "save")==0)
     {
+      printf("Test 888\n");
       status = save_file(arg1);
       if(status != 0) print_error(status);
+      printf("Test 1000\n");
       
     }
     else if(strcmp(cmd, "showGlobalMem")==0)

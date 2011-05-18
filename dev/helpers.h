@@ -49,6 +49,15 @@ void init_mem()
 void init_pt()
 {
   int i,j;
+  
+  int size = PAGESIZE - 1;//Pagesize is assumed to be a power of 2
+  pageBits = 0;
+  while(size>0)//Count the bits we need to shift for a page
+  {
+    pageBits += size & 1;
+    size = size>>1;
+  }
+  
   for(i = 0; i < NUMPAGES; i++)
     for(j = 0; j < 4; j++)
       pageTable[i][j] = -1;
@@ -103,7 +112,7 @@ void print_error(int errno)
       break;
       
     default:
-      printf("An unspecified has error occurred.\n");
+      printf("An unspecified has error occurred. %d\n", errno);
   }
 }
 
