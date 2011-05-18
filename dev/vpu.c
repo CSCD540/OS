@@ -124,11 +124,8 @@ int main(int argc, char *argv[])
     }
     else if(strcmp(cmd, "save")==0)
     {
-      printf("Test 888\n");
       status = save_file(arg1);
       if(status != 0) print_error(status);
-      printf("Test 1000\n");
-      
     }
     else if(strcmp(cmd, "showGlobalMem")==0)
     {

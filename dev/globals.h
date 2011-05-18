@@ -25,7 +25,7 @@
 #define BLOCKSIZE  4  // number of instructions per block
 
 // Filesystem 
-#define DISKSIZE      ((BLOCKSIZE) * 40)          // Total size of the disk
+#define DISKSIZE      ((BLOCKSIZE) * 512)          // Total size of the disk
 #define BLOCKS        ((DISKSIZE) / (BLOCKSIZE))  // Total number of blocks
 #define MAXFILES      1000                        // How many files can be opened at once
 #define NUMBLOCKS     ((DISKSIZE) / (BLOCKSIZE))  // Total number of blocks on the disk
@@ -98,7 +98,6 @@ struct fileDescriptor {
 
 struct process{
     int pid;
-<<<<<<< HEAD
     char *filename;
     int ip;     //virtual IP this is where the process believes it's at
     int status; //0 = not finished, 1 = terminated
@@ -118,8 +117,6 @@ int  endprog[MAXPRO];                   // last instruction of proc
 int  jsym[60];
 int  pageBits = 0;
 int  curProcesses = 0;                  //Number of processes loaded
-char * filename;
-};
 
 
 // Variables

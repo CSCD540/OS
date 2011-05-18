@@ -136,8 +136,9 @@ int lookup(struct process pid, int vpn, int rw)
  */
 int page_fault(struct process pid, int vpn)//, int rw)
 {
-  printf("\r\n%c[%d;%d;%dmPAGE FAULT%c[%dm\r\n", 27, 5, 37, 41, 27, 0);
-  
+  printf("\r\n%c[%d;%d;%dmPAGE FAULT%c[%dm\r\n", 27, 1, 37, 41, 27, 0);
+  printf("PID %d\n", pid.pid);
+  printf("PID %s\n", pid.filename);
   // find lru
   //int lru = least_recently_used();
   printf("LRU: %d\r\n", lru);
