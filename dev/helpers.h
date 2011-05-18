@@ -65,6 +65,7 @@ void reset_memory()
 void print_gmem()
 {
   int i;
+  printf("\r\n--------------------\r\n|%c[%d;%dm   GLOBAL MEMORY  %c[%dm|\r\n|------------------|\r\n", 27, 1, 42, 27, 0);
   printf("Global memory: size %d\n", MAXGMEM);
   for(i = 0; i < MAXGMEM; i++)
   {
@@ -83,14 +84,15 @@ void print_gmem()
 void print_mem()
 {
     int i,j;
+    printf("\r\n------------------\r\n|%c[%d;%dm   MAIN MEMORY  %c[%dm|\r\n|----------------|\r\n", 27, 1, 42, 27, 0);
     printf("Memory: size %d (per process)\n", MAXMEM);
     for(i = 0; i < MAXPRO; ++i)
     {
-        printf("Process %d: Addresses 0 - %d\n", i, MAXMEM);
+        printf("Process %d: Addresses 0 - %d with %d pages of size %d\n", i, MAXMEM, NUMPAGES, PAGESIZE);
         for(j = 0; j < MAXMEM; ++j)
         {
             printf("%d\t", mem[i][j]);
-            if( j == (MAXMEM - 1) || (j + 1) % 8 == 0)
+            if( j == (MAXMEM - 1) || (j + 1) % PAGESIZE == 0)
                 printf(" | %d\n", j);
         }
         printf("\n");
@@ -100,9 +102,7 @@ void print_mem()
 void print_register(int reg[][REGISTERSIZE])
 {
   int i, j;
-  printf("--------------------------------------------------\n");
-  printf("-                Register data                   -\n");
-  printf("--------------------------------------------------\n");
+  printf("\r\n--------------------\r\n|%c[%d;%dm   REGISTER DATA  %c[%dm|\r\n|------------------|\r\n", 27, 1, 42, 27, 0);
   for(i = 0; i < MAXPRO; i++)
   {
     printf("- Process %d: ",i);

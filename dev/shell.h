@@ -5,7 +5,7 @@ void concatenate(char *filename);
 void list_directory_contents();
 int  load_program(char *filename);
 void remove_file(char *filename);
-void save_file(char *filename);
+//void save_file(char *filename); //In the file system
 void show_help();
 // end Jordan's method declarations
 void show_exit();
@@ -69,10 +69,10 @@ void remove_file(char *filename)
 /* 
  * Save a file to the disk
  */
-void save_file(char *filename)
+/*void save_file(char *filename)
 {
   printf("Save a file to the virtual disk\n");
-}
+}//*/
 
 /*
  * Show the help screen for the shell

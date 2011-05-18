@@ -9,24 +9,22 @@
  *   http://tldp.org/LDP/LGNET/65/padala.html
  */
 
+#ifndef _PT_H_
+#define _PT_H_ 1
+
 #include <stdio.h>
 #ifndef _GLOBALS_H_
 #include "globals.h"
 #endif
-// #include "efs.h"
+#ifndef _EFS_H_
+#include "efs.h"
+#endif
 
-int lookup(int pid, int vpn, int rw);
-int page_fault(int pid, int vpn, int rw);
-init_pg_tbl();
-print_page_table();
-int disk_read(char *filename, int pageNum);
-
-//#define MAXPRO        1   // max num of processes
-//#define MAXMEM        64  // max size of a process in word/sizeof(int) bytes
-//#define PAGESIZE      16            // size of each page in words 2-bytes
-//#define NUMPAGES MAXMEM / PAGESIZE  // Number of pages in page table
-
-//int  mem[MAXPRO][MAXMEM];   // Main mem for each process
+int lookup(struct process pid, int vpn, int rw);
+int page_fault(struct process pid, int vpn, int rw);
+void init_pg_tbl();
+void print_page_table();
+int disk_read(struct process pid, int pageNum);
 
 // The process table array which is indexed on the process id, and
 //  contains the priority (?), and the file descriptor/filename
@@ -51,7 +49,7 @@ int lru;
  * Output: Returns the physical page number of the virtual page in memory
  *          or -1 if the virtual page number is beyond the end of the file
  */
-int lookup(int pid, int vpn, int rw)
+int lookup(struct process pid, int vpn, int rw)
 {
   int found = 0;
   
@@ -62,7 +60,7 @@ int lookup(int pid, int vpn, int rw)
   for(i = 0; i < NUMPAGES; i++)
   {
     // If we find it, stop looking
-    if(pageTable[i][0] == pid && pageTable[i][1] == vpn)
+    if(pageTable[i][0] == pid.pid && pageTable[i][1] == vpn)
     {
       found = 1;
       break;
@@ -121,7 +119,7 @@ int lookup(int pid, int vpn, int rw)
  * Output: Returns the physical page number of the virtual page in memory
  *          or -1 if the virtual page number is beyond the end of the file
  */
-int page_fault(int pid, int vpn, int rw)
+int page_fault(struct process pid, int vpn, int rw)
 {
   printf("\r\n%c[%d;%d;%dmPAGE FAULT%c[%dm\r\n", 27, 5, 37, 41, 27, 0);
   
@@ -144,7 +142,9 @@ int page_fault(int pid, int vpn, int rw)
   
   // read new page in
   printf("\r\nReading new page from disk into memory...\r\n");
-  FILE * fd = fopen("testingPT.out", "r");
+  //We need to read in from the file system here
+  //fileNode file = getFile(pid.filename);
+  FILE * fd = fopen(pid.filename, "r");
   int tmp = 0, i = 0, EOFreached = 0;
   for(; i < PAGESIZE * vpn; i++)
     if(fscanf(fd, "%d\n", &tmp) == EOF)
@@ -166,7 +166,7 @@ int page_fault(int pid, int vpn, int rw)
     //  printf("First int in file: %d\r\n", tmp);
     fclose(fd);
 
-    pageTable[lru][0] = pid;
+    pageTable[lru][0] = pid.pid;
     pageTable[lru][1] = vpn;
     pageTable[lru][2] = 0;
     pageTable[lru][3] = rw;
@@ -207,7 +207,7 @@ int least_recently_used()
  * Input: None
  * Output: None
  */
-init_pg_tbl()
+void init_pg_tbl()
 {
   int i,j;
   for(i = 0; i < NUMPAGES; i++)
@@ -220,7 +220,7 @@ init_pg_tbl()
  * Inputs: None
  * Output: None
  */
-print_page_table()
+void print_page_table()
 {
   printf("\r\nPage Table (%c[%dmLRU in red%c[%dm):\r\n", 27, 31, 27, 0);
   printf("            -------------------------\r\n");
@@ -244,10 +244,10 @@ print_page_table()
 
 
 // Temporary fake disk read function
-int disk_read(char *filename, int pageNum)
+int disk_read(struct process pid, int pageNum)
 {
   return 0;
 }
 
-
+#endif
 

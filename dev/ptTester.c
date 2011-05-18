@@ -7,32 +7,46 @@
  */
 
 #include "pt.h"
+#include "helpers.h"
 
-void accessPage(int pid, int vpn);
-void init_main_mem();
-void print_mem();
+void accessPage(struct process pid, int vpn);
+//void init_main_mem();
+//void print_mem();
 
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
-  init_main_mem();
+  char filename[] = "testingPT.out";
+  struct process pid0, pid1, pid2, pid3;
+  pid0.filename = filename;
+  pid0.pid = 0;
+  pid1.filename = filename;
+  pid1.pid = 1;
+  pid2.filename = filename;
+  pid2.pid = 2;
+  pid3.filename = filename;
+  pid3.pid = 2;
+  
+  init_mem();
   init_pg_tbl();
   
   print_mem();
   
   //print_page_table();
   printf("\r\n--------------------------------------------------------\r\n");
+
+  accessPage(pid1, 4);
+  accessPage(pid2, 3);  
+  accessPage(pid1, 2);
+  accessPage(pid1, 4);
+  accessPage(pid0, 6);
+  accessPage(pid3, 6);
   
-  accessPage(1, 4);
-  accessPage(2, 3);
-  accessPage(1, 2);
-  accessPage(1, 4);
-  accessPage(0, 6);
-  accessPage(3, 6);
+  return 0;
 }
 
-void accessPage(int pid, int vpn)
+void accessPage(struct process pid, int vpn)
 {
-  printf("\r\nLooking up virtual page number %d for process %d\r\n", vpn, pid);
+  printf("\r\nLooking up virtual page number %d for process %d\r\n", vpn, pid.pid);
   
   print_page_table();
   
@@ -45,15 +59,15 @@ void accessPage(int pid, int vpn)
   printf("\r\n--------------------------------------------------------\r\n");
 }
 
-void init_main_mem()
+/*void init_main_mem()
 {
   int i,j;
   for(i = 0; i < MAXPRO; i++)
     for(j = 0; j < MAXMEM; j++)
       mem[i][j] = -1;
-}
+}//*/
 
-void print_mem()
+/*void print_mem()
 {
   printf("\r\n------------------\r\n|%c[%d;%dm   MAIN MEMORY  %c[%dm|\r\n|----------------|\r\n", 27, 1, 42, 27, 0);
   
@@ -76,5 +90,5 @@ void print_mem()
   }
   
   printf("------------------\r\n");
-}
+}//*/
 

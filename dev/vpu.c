@@ -14,12 +14,9 @@
 int  exe(int stack[][STACKSIZE],int sp[],int reg[][REGISTERSIZE], int next_instruct[],int next_inst[], int cur_proc, int *terminate);
 void executeit();
 void grab_data(int index,int *grabdata);
-void init_gmem();
-void init_reg();
 int  peek(int stack[][STACKSIZE], int proc_id, int sp[], int offset);
 void push(int stack[][STACKSIZE], int proc_id, int sp[],int data, int calledfrom);
 int  pop(int stack[][STACKSIZE], int proc_id, int sp[], int calledfrom);
-void reset_memory();
 //end Methods declaration
 
 
@@ -76,7 +73,10 @@ int main(int argc, char *argv[])
     //This should load from VM filesystem
     else if(strcmp(cmd, "load")==0) 
     {
-      load_program(arg1);
+      struct process pid;
+      pid.filename = arg1;
+      pid.pid = 0;
+      lookup(pid, 0, 0);
     }
     else if(strcmp(cmd, "man")==0)
     {
@@ -126,6 +126,11 @@ int main(int argc, char *argv[])
   return 0;
 }
 
+/* void executeit()
+ * Description: This function first scans mem to build the PID table then runs the programs in mem
+ * Input: None
+ * Output: None
+ */
 void executeit()
 {
   int cur_proc, p0=0, msg=-1,m;
@@ -136,6 +141,7 @@ void executeit()
   // int reg[MAXPRO][REGISTERSIZE];
   int locked=UNLOCKED;
   int terminate=0;
+  int i = 0;
 
   memset(stack, 0, MAXPRO*STACKSIZE*sizeof(int));
   memset(sp, -1, MAXPRO*sizeof(int));
@@ -144,31 +150,9 @@ void executeit()
   memset(reg, 0, 10*MAXPRO*sizeof(int));
   srand( time(NULL) );
 
-  next_instruct[0]=10;
-  next_instruct[1]=10;
-  next_instruct[2]=10;
-  next_instruct[3]=10;
-  next_instruct[4]=10;
-  next_instruct[5]=10;
-
-  /*
-  for(i=0;i<pid;i++)
-    for(m=0;m<STACKSIZE;m++)
-       printf("STACK %d: %d\n",i,stack[i][m]);
-
-  while(1) //used for testing a single process
-  {
-    cur_proc=2;
-    if(next_instruct[cur_proc]<endprog[cur_proc])
-    {
-      msg=exe(stack,sp,reg,next_instruct,next_instruct,cur_proc);
-      // increment next_instruction
-      next_instruct[cur_proc]++;
-      printf("loop: %d\n",next_instruct[cur_proc]);
-    }
-    else break;
-  }
-  */
+  //Set the first instruction to 10
+  for(;i<MAXPRO;i++)
+    next_instruct[i]=10;
 
   keyhit(54);
   cur_proc = 0;

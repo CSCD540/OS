@@ -9,13 +9,8 @@
 #include <stdlib.h>
 #include <string.h>
 #ifndef _GLOBALS_H_
-#incldue "globals.h"
+#include "globals.h"
 #endif
-//#include "block.h"
-
-/* Definitions */
-#define LIST_EMPTY 0
-/* End Definitions */
 
 /* Forward Declarations */
 struct blockNode * add_block_node(struct blockNode **blockList, struct block *block);
@@ -23,41 +18,9 @@ struct fileNode * add_file_node(struct fileNode **fileList, char *filename, int 
 int delete_block_node(struct blockNode **blockList, struct block *block);
 struct fileNode * find_file(struct fileNode **fileList, char *filename);
 struct blockNode * get_block_node(struct blockNode **blockList, int blockIndex);
-int get_block_count(struct blockNode *blockList)
+int get_block_count(struct blockNode *blockList);
 void print_error(int errno);
 /* End Forward Declarations */
-
-
-/* 
- * struct blockNode
- * Description:
- *    This struct defines a blockNode in the list.
- * Input:
- *    none
- * Output:
- *    none
- */
-struct blockNode {
-  struct block     *block; // Pointer to a block on the disk
-  struct blockNode *nextBlock;  // Pointer to the next blockNode in the list.
-};
-
-
-/* 
- * struct fileNode
- * Description:
- *    This struct defines a fileNode in the list.
- * Input:
- *    none
- * Output:
- *    none
- */
-struct fileNode {
-  char   *filename; // This file's name
-  int    numBlocks; // The number of block this file occupies
-  struct blockNode  *blockList; // Pointer to the location where the file's first block begins, or the first node in it's blockList
-  struct fileNode   *nextFile;   // Pointer to the next file in the file list
-};
 
 
 /* 

@@ -1,6 +1,10 @@
 #ifndef _GLOBALS_H_ 
 #define _GLOBALS_H_ 1
 
+//-----------------------------------------------------------------------------
+//                          Constants
+//-----------------------------------------------------------------------------
+
 #define MAXPRO        1   // max num of processes
 #define MAXMEM        64  // max size of a process in word/sizeof(int) bytes
 #define STACKSIZE     100 // max size of the stack
@@ -23,6 +27,10 @@
 #define DISKSIZE      ((BLOCKSIZE) * 14)          // Total size of the disk
 #define BLOCKS        ((DISKSIZE) / (BLOCKSIZE))  // total number of blocks
 #define NUMBLOCKS     ((DISKSIZE) / (BLOCKSIZE))  // Total number of blocks on the disk
+#define LIST_EMPTY 0
+#define APPEND 0 // begin writeing at the end of the file
+#define OVERWRITE 1 // begin writing at the beginning of the file
+#define NEWFILE 2 // new file
 
 //Memory
 #define PAGESIZE      ((BLOCKSIZE) * 4)           // size of each page in words 2-bytes
@@ -30,18 +38,51 @@
 
 #define keyhit(a) {if(DBGCPU1){printf("hit enter --(%d)", a); getchar();}}
 
+
+//-----------------------------------------------------------------------------
+//                          Structs
+//-----------------------------------------------------------------------------
+/* 
+ * struct blockNode
+ * Description:
+ *    This struct defines a blockNode in the list.
+ */
 struct block {
   int blockNum;
   int instructions[BLOCKSIZE];
 };
+/* 
+ * struct blockNode
+ * Description:
+ *    This struct defines a blockNode in the list.
+ */
+struct blockNode {
+  struct block     *block; // Pointer to a block on the disk
+  struct blockNode *nextBlock;  // Pointer to the next blockNode in the list.
+};
+
+
+/* 
+ * struct fileNode
+ * Description:
+ *    This struct defines a fileNode in the list.
+ */
+struct fileNode {
+  char   *filename; // This file's name
+  int    numBlocks; // The number of block this file occupies
+  struct blockNode  *blockList; // Pointer to the location where the file's first block begins, or the first node in it's blockList
+  struct fileNode   *nextFile;   // Pointer to the next file in the file list
+};
 
 struct process{
     int pid;
-    char filename[];
-    
+    char *filename;
 };
 
-// Variables
+//-----------------------------------------------------------------------------
+//                          Variables
+//-----------------------------------------------------------------------------
+
 struct block disk[NUMBLOCKS]; //Our virtual HD
 int  gmem[MAXGMEM];         // global var sit here
 int  mem[MAXPRO][MAXMEM];   // Main mem for each process
