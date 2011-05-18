@@ -20,7 +20,6 @@ void print_disk(struct block disk[]);
 void print_file_list(struct fileNode *head);
 /* End Forward Declarations */
 
-
 struct fileNode *fileList = NULL;
 struct blockNode *freeBlockList = NULL;
 

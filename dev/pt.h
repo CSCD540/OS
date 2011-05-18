@@ -21,6 +21,7 @@
 
 // #include "efs.h"
 
+int lookup_ip(struct process pid, int rw);
 int lookup(struct process pid, int vpn, int rw);
 int page_fault(struct process pid, int vpn);//, int rw);
 
@@ -38,8 +39,15 @@ int page_fault(struct process pid, int vpn);//, int rw);
 int lookup_ip(struct process pid, int rw)
 {
   int vpn = 0;
+  int ip = 0;
   vpn = pid.ip>>pageBits;
-  return lookup(pid, vpn, rw) & (pid.ip & (PAGESIZE -1) );
+  ip = lookup(pid, vpn, rw);
+  if(ip == EOF)
+  {
+    printf("End of file.\n");
+    return -1;//Erro
+  }
+  return (ip & & (pid.ip & (PAGESIZE -1) ));
 }
 
 // The process table array which is indexed on the process id, and

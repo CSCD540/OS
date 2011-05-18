@@ -39,6 +39,7 @@
 #define FILE_NOT_FOUND  -5  // File was not located
 #define LIST_EMPTY      6   // List contains no elements
 #define FD_LIMIT_EXCEED -7  // Maximum number of file descriptors has been reached
+#define EOF             -8  // At the end of the process or file
 
 // Memory
 #define PAGESIZE   ((BLOCKSIZE) * 4)        // size of each page in words 2-bytes
