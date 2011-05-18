@@ -116,7 +116,8 @@ struct fileNode * add_file_node(struct fileNode **fileList, char *filename, int 
   {
     temp = malloc(sizeof(struct fileNode));
     temp->numBlocks = numBlocks;
-    temp->filename = filename;
+    temp->filename = malloc(sizeof(filename));
+    strcpy(temp->filename, filename);
     temp->blockList = malloc(sizeof(struct blockList *));
     temp->nextFile = NULL;
     *fileList = temp;
@@ -132,7 +133,8 @@ struct fileNode * add_file_node(struct fileNode **fileList, char *filename, int 
     
     next = malloc(sizeof(struct fileNode));
     next->numBlocks = numBlocks;
-    next->filename = filename;
+    next->filename = malloc(sizeof(filename));
+    strcpy(next->filename, filename);
     next->blockList = malloc(sizeof(struct blockList *));
     next->nextFile = NULL;
     temp->nextFile = next;
@@ -200,6 +202,7 @@ int delete_block_node(struct blockNode **blockList, struct block *block)
  */
 struct fileNode * find_file(struct fileNode **fileList, char *filename)
 {
+  printf("filename in find_file: %s\n", filename);
   struct fileNode * file = *fileList;
   if(file == NULL || file->blockList == NULL)
   {
@@ -209,15 +212,16 @@ struct fileNode * find_file(struct fileNode **fileList, char *filename)
   
   while(file != NULL)
   {
+    printf("file->filename: %s\n", file->filename);
     if(strcmp(file->filename, filename) == 0)
     {
-      if(DEBUG) printf("\nfind_file %p\n", file->blockList->block);
+      printf("\nfind_file %p\n", file->blockList->block);
       return file;
     }
     else
     {
       file = file->nextFile;
-      if(DEBUG) printf("File not found\n");
+      printf("File not found\n");
     }
   }
   return NULL;
