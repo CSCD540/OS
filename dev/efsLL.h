@@ -26,44 +26,7 @@ void print_error(int errno);
 /* End Forward Declarations */
 
 
-/* 
- * void add_block_node(struct blockNode **blockList, struct block *block)
-=======
-/* End Forward Declarations */
-
-
-/* struct blockNode
- * Description:
- *    This struct defines a blockNode in the list.
- * Input:
- *    none
- * Output:
- *    none
- */
-struct blockNode {
-  struct block     *block; // Pointer to a block on the disk
-  struct blockNode *nextBlock;  // Pointer to the next blockNode in the list.
-};
-
-
-/* struct fileNode
- * Description:
- *    This struct defines a fileNode in the list.
- * Input:
- *    none
- * Output:
- *    none
- */
-struct fileNode {
-  char   *filename; // This file's name
-  int    numBlocks; // The number of block this file occupies
-  struct blockNode  *blockList; // Pointer to the location where the file's first block begins, or the first node in it's blockList
-  struct fileNode   *nextFile;   // Pointer to the next file in the file list
-};
-
-
 /* void add_block_node(struct blockNode **blockList, struct block *block)
->>>>>>> ffb6dfd3d60e75ecd9d01c81219e2501717de561
  * Description:
  *    Add a new block to the list
  * Input:
