@@ -1,4 +1,5 @@
 load milk1.out
+piddump
 memdump
 ptdump
 load sort.out
@@ -7,5 +8,6 @@ ptdump
 load milk1.out
 memdump
 ptdump
+piddump
 exit
 

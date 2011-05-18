@@ -9,6 +9,7 @@ void reset_memory();
 
 void print_gmem();
 void print_mem();
+void print_processes();
 void print_register(int reg[][REGISTERSIZE]);
 void print_stack(int stack[][STACKSIZE],int sp[]);
 void show_register_data();
@@ -27,7 +28,7 @@ void init_gmem()
 void init_mem()
 {
   int i,j;
-  
+    
   for(i = 0; i < MAXPRO; i++)
 	  for(j = 0; j < MAXMEM; j++)
       mem[i][j] = 0;
@@ -99,6 +100,22 @@ void print_mem()
     }
 }
 
+void print_processes()
+{
+  printf("\r\nPID Table:\r\n");
+  printf("-------------------------------------\r\n");
+  printf("|     index | pid | filename        |\r\n");
+  printf("|-----------|-----|-----------------|\r\n");
+  int i;
+  for(i = 0; i < MAXPROGRAMS; i++)
+  {
+    //printf("%c[%d;%dm", 27, 0, 31);
+    printf("|Pid     %2d | %3d | %14s  |\r\n", i, processes[i].pid,  processes[i].filename);
+    printf("%c[%dm", 27, 0);
+    printf("|-----------------------------------|\r\n");
+  }
+}
+
 void print_register(int reg[][REGISTERSIZE])
 {
   int i, j;
@@ -126,4 +143,3 @@ void print_stack(int stack[][STACKSIZE], int sp[])
     printf("SP at %d\n\n", sp[i]);
   }
 }
-

@@ -6,6 +6,7 @@
 //-----------------------------------------------------------------------------
 
 #define MAXPRO        1   // max num of processes
+#define MAXPROGRAMS   8   // max number of program a CPU can run
 #define MAXMEM        64  // max size of a process in word/sizeof(int) bytes
 #define STACKSIZE     100 // max size of the stack
 #define REGISTERSIZE  10  // size of each process registers
@@ -77,19 +78,24 @@ struct fileNode {
 struct process{
     int pid;
     char *filename;
+    int ip;     //virtual IP this is where the process believes it's at
+    int status; //0 = not finished, 1 = terminated
+    int state;  //state - running, 0 ready, waiting, suspended  
 };
 
 //-----------------------------------------------------------------------------
 //                          Variables
 //-----------------------------------------------------------------------------
 
-struct block disk[NUMBLOCKS]; //Our virtual HD
-int  gmem[MAXGMEM];         // global var sit here
-int  mem[MAXPRO][MAXMEM];   // Main mem for each process
+struct block disk[NUMBLOCKS];           //Our virtual HD
+struct process processes[MAXPROGRAMS];  //Our pid table
+int  gmem[MAXGMEM];                     // global var sit here
+int  mem[MAXPRO][MAXMEM];               // Main mem for each process
 int  reg[MAXPRO][REGISTERSIZE];
-int  endprog[MAXPRO];       // last instruction of proc
+int  endprog[MAXPRO];                   // last instruction of proc
 int  jsym[60];
-int  pid = 0;               // process id
+int  pageBits = 0;
+int  curProcesses = 0;                  //Number of processes loaded
 int  p0running;
 int  sizeOfDisk = DISKSIZE;
 int  DEBUG = 0;

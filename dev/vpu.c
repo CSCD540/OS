@@ -17,6 +17,7 @@ void grab_data(int index,int *grabdata);
 int  peek(int stack[][STACKSIZE], int proc_id, int sp[], int offset);
 void push(int stack[][STACKSIZE], int proc_id, int sp[],int data, int calledfrom);
 int  pop(int stack[][STACKSIZE], int proc_id, int sp[], int calledfrom);
+int  new_process(char * filename);
 //end Methods declaration
 
 
@@ -26,8 +27,9 @@ int main(int argc, char *argv[])
    * Shell command 
    * Commands: save,del,ls,exit,run,help
   */	
-  int nextPid = 0;
+  memset(processes, 0, MAXPROGRAMS * sizeof(struct process));
   init_pg_tbl();
+  
   //Load a program from the disk
   if(argc > 1)
     load_program(argv[1]);
@@ -63,6 +65,10 @@ int main(int argc, char *argv[])
     {
       show_exit();
     }
+    else if(strcmp(cmd, "fdisk")==0)
+    {
+        init_disk(disk);
+    }
     else if(strcmp(cmd, "help")==0)
     {
       show_help();
@@ -75,21 +81,26 @@ int main(int argc, char *argv[])
     //This should load from VM filesystem
     else if(strcmp(cmd, "load")==0) 
     {
-      struct process pid;
-      pid.filename = arg1;
-      pid.pid = nextPid++;
-      lookup(pid, 0, 0);
+      int p = new_process(arg1);
+      if(p < 0)
+        printf("Error on allocating process\n");
+      else
+        lookup_ip(processes[p], 0);
     }
     else if(strcmp(cmd, "man")==0)
     {
     }
-    else if(strcmp(cmd, "ptdump")==0)
-    {
-        print_page_table();
-    }
     else if(strcmp(cmd, "memdump")==0)
     {
         print_mem();
+    }
+    else if(strcmp(cmd, "piddump")==0)
+    {
+        print_processes();
+    }
+    else if(strcmp(cmd, "ptdump")==0)
+    {
+        print_page_table();
     }
     else if(strcmp(cmd, "pwd")==0)
     {
@@ -133,30 +144,32 @@ int main(int argc, char *argv[])
 }
 
 /* void executeit()
- * Description: This function first scans mem to build the PID table then runs the programs in mem
+ * Description: This function runs all the processes in processes then returns
  * Input: None
  * Output: None
  */
 void executeit()
 {
   int cur_proc, p0=0, msg=-1,m;
-  int stack[MAXPRO][STACKSIZE];
-  int sp[MAXPRO];
-  int next_instruct[MAXPRO];
-  int proc_complete[MAXPRO];
-  // int reg[MAXPRO][REGISTERSIZE];
+  int stack[MAXPRO][STACKSIZE]; //Stack pre process
+  int sp[MAXPRO]; //Stack pointer per process
+  int next_instruct[MAXPRO];  //Next_instruction per process
+  int proc_complete[MAXPRO];  //Is the process done?
   int locked=UNLOCKED;
-  int terminate=0;
-  int i = 0;
+  int terminate = 0;
+  int program = 0; //The program to run on the current process
 
+  //Clear the stack, registers and reset the stack pointers
   memset(stack, 0, MAXPRO*STACKSIZE*sizeof(int));
   memset(sp, -1, MAXPRO*sizeof(int));
+  memset(reg, 0, 10 * MAXPRO * sizeof(int));
   // memset(next_instruct,0,MAXPRO*sizeof(int));
-  memset(proc_complete, 0, MAXPRO*sizeof(int));
-  memset(reg, 0, 10*MAXPRO*sizeof(int));
+  //memset(proc_complete, 0, MAXPRO*sizeof(int));
+  
   srand( time(NULL) );
 
   //Set the first instruction to 10
+  int i = 0;
   for(;i<MAXPRO;i++)
     next_instruct[i]=10;
 
@@ -176,12 +189,13 @@ void executeit()
       {
         // printf("pid=%d\n", pid); //keyhit(8999);
         cur_proc = 0; // only one core 
+        program = rand() % curProcesses; //Find one of the programs to run
       }
-
+      
       if(proc_complete[cur_proc] == 1)
       {
         if (DEBUG!=0)
-         printf("----------------------------cur_proc: %d\n",cur_proc);
+          printf("----------------------------cur_proc: %d\n",cur_proc);
         goto checkdone;
       }
 
@@ -208,7 +222,8 @@ void executeit()
           locked=LOCKED;
         }
          
-#if 0         
+#if 0   
+{      
         // run p0 in its entirety after a gmem write
         // cur_proc=0;
         // while(msg==p0WRITE || p0running)
@@ -245,6 +260,7 @@ void executeit()
           }
         }
         continue;
+}
 #endif
 
       }
@@ -256,7 +272,7 @@ void executeit()
       // check if all processes are done
     checkdone:
       // for(cur_proc=0;cur_proc<pid;cur_proc++)
-      if(terminate ==0)
+      if(terminate == 0)
        goto cont;
       break;
   }
@@ -628,4 +644,23 @@ void push(int stack[][STACKSIZE], int proc_id, int sp[], int data, int calledfro
   stack[proc_id][sp[proc_id]] = data;
 }
 
+/* int newProcess(char * filename)
+ * Description: This function first scans mem to build the PID table then runs the programs in mem
+ * Input: The file to load into the process
+ * Output: Returns the process ID index or -1 if an error occurs
+ */
+int new_process(char * filename)
+{
+  static int nextPid = 0;
+  int len = strlen(arg1);
+  
+  processes[nextPid].filename = (char *) calloc(len,sizeof(char));
+  if (processes[nextPid].filename == NULL)
+    return -1;
+    
+  strncpy(processes[nextPid].filename, arg1, len);
+  processes[nextPid].pid = nextPid;
+  curProcesses = nextPid + 1;
+  return nextPid++;
+}
 

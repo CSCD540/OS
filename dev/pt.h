@@ -20,11 +20,29 @@
 #include "efs.h"
 #endif
 
+int lookup_ip(struct process pid, int rw);
 int lookup(struct process pid, int vpn, int rw);
 int page_fault(struct process pid, int vpn, int rw);
 void init_pg_tbl();
 void print_page_table();
 int disk_read(struct process pid, int pageNum);
+
+/* int lookup(int pid, int rw) // Externally accessible method
+ *
+ * Description: This function calculates the virtual page number of the instruction
+                then calls lookup(int pid, int vpn, int rw)
+ * Input:
+ *        pid - The process id of the virtual page you are looking up
+ *        rw  - Memory read/write designation (0 - read; 1 - write)
+ * Output: Returns the physical instruction number to run
+ *          or -1 if the virtual page number is beyond the end of the file
+ */
+int lookup_ip(struct process pid, int rw)
+{
+  int vpn = 0;
+  vpn = pid.ip>>pageBits;
+  return lookup(pid, vpn, rw) & (pid.ip & (PAGESIZE -1) );
+}
 
 /* int lookup(int pid, int vpn, int rw) // Externally accessible method
  *
@@ -202,6 +220,15 @@ int least_recently_used()
 void init_pg_tbl()
 {
   int i,j;
+  
+  int size = PAGESIZE - 1;//Pagesize is assumed to be a power of 2
+  pageBits = 0;
+  while(size>0)//Count the bits we need to shift for a page
+  {
+    pageBits += size & 1;
+    size = size>>1;
+  }
+  
   for(i = 0; i < NUMPAGES; i++)
     for(j = 0; j < 4; j++)
       pageTable[i][j] = -1;
