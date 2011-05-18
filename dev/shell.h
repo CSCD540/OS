@@ -95,7 +95,7 @@ int save_file(char *filename)
   FILE *fd;
   fd = fopen(filename, "r");
   if(fd == NULL)
-    return -1;
+    return FILE_NOT_FOUND;
 
   int numBlocks = 1; // Start at one block because this is the first block.
   int numInstructs = 0; // Counter for the number of lines in the file
@@ -116,7 +116,7 @@ int save_file(char *filename)
   if(get_block_count(freeBlockList) < numBlocks)
   {
     fclose(fd);
-    return -2;
+    return DISK_FULL;
   }
   rewind(fd);
   int instructions[numInstructs];
@@ -130,7 +130,7 @@ int save_file(char *filename)
   newFile->blockList = get_free_block_node();
   write(&newFile, instructions, numInstructs, NEWFILE, 0);
   
-  return 0;
+  return SUCCESS;
 }// end save_file()
 
 

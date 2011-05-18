@@ -27,19 +27,21 @@
 #define NUMBLOCKS     ((DISKSIZE) / (BLOCKSIZE))  // Total number of blocks on the disk
 
 // Return Values
-#define SUCCESS         0  // No error
-#define APPEND          1  // Begin writing at the end of the file
-#define OVERWRITE       2  // Begin writing at the beginning of the file
-#define NEWFILE         3  // New file
-#define DISK_FULL       4  // No more room on the disk!
-#define FILE_NOT_FOUND  5  // File was not located
-#define LIST_EMPTY      6  // List contains no elements
+#define SUCCESS         0   // No error
+#define APPEND          1   // Begin writing at the end of the file
+#define OVERWRITE       2   // Begin writing at the beginning of the file
+#define NEWFILE         3   // New file
+#define DISK_FULL       4   // No more room on the disk!
+#define FILE_NOT_FOUND  -5  // File was not located
+#define LIST_EMPTY      6   // List contains no elements
+#define FD_LIMIT_EXCEED -7  // Maximum number of file descriptors has been reached
 
 // Memory
 #define PAGESIZE   ((BLOCKSIZE) * 4)        // size of each page in words 2-bytes
 #define NUMPAGES   ((MAXMEM) / (PAGESIZE))  // Number of pages in page table
 
 #define keyhit(a) {if(DBGCPU1){printf("hit enter --(%d)", a); getchar();}}
+
 
 /* struct block
  * Description:
@@ -57,9 +59,10 @@ struct block {
  *    file that is currently open and being accessed.
  */
 struct fileDescriptor {
+  char * filename;
   int fdNum;
   int curInstruction;
-  struct blockNode * curBlock;
+  struct blockNode * curBlockNode;
 };
 
 
