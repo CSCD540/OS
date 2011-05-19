@@ -100,6 +100,7 @@ void reset_memory()
  */
 void print_block_list(struct blockNode *blockList)
 {
+  printf("\n");
   if(blockList == NULL)
     print_error(LIST_EMPTY);
   else
@@ -110,11 +111,12 @@ void print_block_list(struct blockNode *blockList)
       printf("Block #%2d ", blockList->block->blockNum);
       int i;
       for(i = 0; i < BLOCKSIZE; i++)
-        printf(" %d", blockList->block->instructions[i]);
+        printf(" %5d", blockList->block->instructions[i]);
       //  ;
-      printf("\n");
+      printf("|\n");
       blockList = blockList->nextBlock;
     }
+    printf("\n");
 }
 
 /* void print_disk(struct block disk[])
@@ -128,17 +130,18 @@ void print_block_list(struct blockNode *blockList)
 void print_disk(struct block disk[])
 {
   int i, j;
+  printf("\n");
   for(i = 0; i < NUMBLOCKS; i++)
   {
     printf("Block #%2d ", i);
     for(j = 0; j < BLOCKSIZE; j++)
     {
       printf(" %5d", disk[i].instructions[j]);
-      if( j == (BLOCKSIZE - 1) || (j + 1) % PAGESIZE == 0)
+      if( j == (BLOCKSIZE - 1) || (j + 1) % BLOCKSIZE == 0)
           printf(" | %5d\n", j);
     }
-    printf("\n");
   }
+  printf("\n");
 }
 
 /* 
@@ -186,6 +189,7 @@ void print_error(int errno)
  */
 void print_file_list(struct fileNode *head)
 {
+  printf("\n");
   if(head == NULL)
     print_error(LIST_EMPTY);
   else
@@ -195,8 +199,10 @@ void print_file_list(struct fileNode *head)
     {
       printf("%s%11d\n", head->filename, head->numBlocks);
       head = head->nextFile;
+      
     }
   }
+  printf("\n");
 }
 
 void print_gmem()
@@ -221,6 +227,7 @@ void print_gmem()
 void print_mem()
 {
     int i,j;
+    printf("\n");
     printf("\r\n%c[%d;%dm   MAIN MEMORY  %c[%dm\r\n", 27, 1, 42, 27, 0);
     printf("Memory: size %d (per process)\n", MAXMEM);
     for(i = 0; i < MAXPRO; ++i)
@@ -234,6 +241,7 @@ void print_mem()
         }
         printf("\n");
     }
+    printf("\n");
 }
 
 /* void print_mem_pages()
@@ -244,6 +252,7 @@ void print_mem()
  */
 void print_mem_pages()
 {
+  printf("\n");
   printf("\r\n------------------\r\n|%c[%d;%dm   MAIN MEMORY  %c[%dm|\r\n|----------------|\r\n", 27, 1, 42, 27, 0);
   
   int i,j;
@@ -265,10 +274,12 @@ void print_mem_pages()
   }
   
   printf("------------------\r\n");
+  printf("\n");
 }
 
 int print_page(int pageNum)
 {
+  printf("\n");
   if(pageNum >= NUMPAGES || pageNum < 0)
   {
     return OUT_OF_RANGE;
@@ -286,6 +297,7 @@ int print_page(int pageNum)
 
 void print_processes()
 {
+  printf("\n");
   printf("\r\nPID Table:\r\n");
   printf("-------------------------------------\r\n");
   printf("|     index | pid | filename        |\r\n");
@@ -298,6 +310,7 @@ void print_processes()
     printf("%c[%dm", 27, 0);
     printf("|-----------------------------------|\r\n");
   }
+  printf("\n");
 }
 
 /* void print_pt()
@@ -348,11 +361,13 @@ void print_register(int reg[][REGISTERSIZE])
     printf("      -\n");
   }
   printf("--------------------------------------------------\n");
+  printf("\n");
 }
 
 void print_stack(int stack[][STACKSIZE], int sp[])
 {
   int i, j;
+  printf("\n");
   for(i = 0; i < MAXPRO; i++)
   {
     printf("Stack contents for process %d\n", i);
@@ -360,5 +375,6 @@ void print_stack(int stack[][STACKSIZE], int sp[])
       printf("%5d\n", stack[i][j]);
     printf("SP at %d\n\n", sp[i]);
   }
+  printf("\n");
 }
 #endif //_HELPERS_H_

@@ -1,6 +1,6 @@
 # Build all Eagle Virtual Machine end-user tools in the /bin
 # directory.  Created by Rick Nungester 2/11/10.  Last Modified by
-# Rick Nungester 3/6/10.
+# Joshua Olson 5/18/11.
 
 if [ "$1" = "echoOn" ]
 then
@@ -22,5 +22,10 @@ gcc -g lex.yy.c easm.tab.c -lfl -lm -o ../easm
 #Create the Eagle Virtual Machine in the parent directory.
 gcc -o ../vpu vpu.c
 
-./cleanup $1
+if [ "$1" = "noClean" ]
+then
+  echo "Not Cleaning up" 
+else
+  ./cleanup $1
+fi
 

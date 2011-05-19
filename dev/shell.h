@@ -35,6 +35,7 @@ void dump_file(char *filename)
       return;
   }
   struct blockNode * blockList = file->blockList;
+  printf("\n%s\n", filename);
   print_block_list(blockList);
 }
 
