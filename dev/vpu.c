@@ -79,10 +79,15 @@ int main(int argc, char *argv[])
     }
     else if(strcmp(cmd, "echo")==0)
     {
-      if(strcmp(arg1, "on")==0)
-        echoCmd = 1;
-      else if(strcmp(arg1, "off")==0)
-        echoCmd = 0;
+      if(arg1 != NULL)
+      {
+        if(strcmp(arg1, "on")==0)
+          echoCmd = 1;
+        else if(strcmp(arg1, "off")==0)
+          echoCmd = 0;
+        else
+          printf("echo on|off\n");
+      }
       else
         printf("echo on|off\n");
     }

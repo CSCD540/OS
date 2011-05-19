@@ -1,7 +1,12 @@
 # Remove all generated/temporary files.  Created by Rick Nungester
 # 2/11/10, last modified by Rick Nungester 3/11/10.
 
-set -x          # echo each command as executed
+if [ "$1" = "echoOn" ]
+then
+  set -x          # echo each command as executed
+else
+  echo "Cleaning up..."
+fi
 
 # Group together each directory being dealt with.
 
