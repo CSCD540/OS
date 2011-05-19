@@ -139,7 +139,7 @@ void print_gmem()
 void print_mem()
 {
     int i,j;
-    printf("\r\n------------------\r\n|%c[%d;%dm   MAIN MEMORY  %c[%dm|\r\n|----------------|\r\n", 27, 1, 42, 27, 0);
+    printf("\r\n%c[%d;%dm   MAIN MEMORY  %c[%dm\r\n", 27, 1, 42, 27, 0);
     printf("Memory: size %d (per process)\n", MAXMEM);
     for(i = 0; i < MAXPRO; ++i)
     {

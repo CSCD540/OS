@@ -94,7 +94,7 @@ int lookup(struct process pid, int vpn, int rw)
 
   if(found == 1) // If we found it, great...
   {
-    printf("\r\n%c[%d;%d;%dmPage Found%c[%dm\r\n", 27, 1, 37, 44, 27, 0);
+    printf("\n%c[%d;%d;%dmPage Found%c[%dm\n", 27, 1, 37, 44, 27, 0);
     physPage = i;
   }
   else // If we did not find it, we page fault
@@ -144,24 +144,27 @@ int lookup(struct process pid, int vpn, int rw)
  */
 int page_fault(struct process pid, int vpn)//, int rw)
 {
-  printf("\r\n%c[%d;%d;%dmPAGE FAULT%c[%dm\r\n", 27, 1, 37, 41, 27, 0);
+  if (PT_DBG_LVL > 0) printf("\n%c[%d;%d;%dmPAGE FAULT%c[%dm\n\n", 27, 1, 37, 41, 27, 0);
   // find lru
   //int lru = least_recently_used();
-  printf("LRU: %d\r\n", lru);
+  if (PT_DBG_LVL > 1) printf("LRU: %d\n", lru);
   
   // if the lru page has been used and is dirty, write it back to the disk
   if(pageTable[lru][0] == -1)
-    printf("Empty page, no need to write out\r\n");
+    if(PT_DBG_LVL > 2) printf("Empty page, no need to write out\n");
   else if(pageTable[lru][3] == 0)
-    printf("Clean page, no need to write out\r\n");
+    if(PT_DBG_LVL > 2) printf("Clean page, no need to write out\n");
   else
   {
-    printf("Dirty page!\r\n");
+    if(PT_DBG_LVL > 2) printf("Dirty page!\n");
     
     struct fileNode * dirtyFile = get_file(pid.filename);
     
-    printf("\nFile before writing the dirty page back to disk...\n");
-    print_block_list(dirtyFile->blockList);
+    if(PT_DBG_LVL > 3)
+    {
+      printf("\nFile before writing the dirty page back to disk...\n");
+      print_block_list(dirtyFile->blockList);
+    }
     
     int k = 0;
     int dirtyData[PAGESIZE];
@@ -174,20 +177,22 @@ int page_fault(struct process pid, int vpn)//, int rw)
     //printf("dirtyFname: %s, dd[0]: %d, dd[15]: %d, pagesize: %d, mode: OVERWRITE, offset: %d\n", dirtyFile->filename, dirtyData[0], dirtyData[15], PAGESIZE, PAGESIZE * pageTable[lru][1]);
     write(&dirtyFile, dirtyData, PAGESIZE, OVERWRITE, PAGESIZE * pageTable[lru][1]);
     
-    
-    printf("\nFile after writing the dirty page back to disk...\n");
-    print_block_list(dirtyFile->blockList);
+    if(PT_DBG_LVL > 3)
+    {
+      printf("\nFile after writing the dirty page back to disk...\n");
+      print_block_list(dirtyFile->blockList);
+    }
     
     pageTable[lru][3] = 0;
     /*
-    printf("Pretending to write existing page from memory to disk...\r\n");
-    printf("Writing physical page %d to disk. PID: %d, VPN: %d\r\n",
+    printf("Pretending to write existing page from memory to disk...\n");
+    printf("Writing physical page %d to disk. PID: %d, VPN: %d\n",
                                   lru, pageTable[lru][0], pageTable[lru][1]);
     */
   }
   
   
-  printf("\r\nReading new page from virtual disk into memory...\r\n");
+  if(PT_DBG_LVL > 2) printf("\nReading new page from virtual disk into memory...\n");
   struct fileNode * file = get_file(pid.filename);
   
   struct blockNode *blockList = file->blockList;
@@ -228,6 +233,8 @@ int page_fault(struct process pid, int vpn)//, int rw)
     pageTable[lru][1] = vpn;
     pageTable[lru][2] = 0;
 //    pageTable[lru][3] = rw;
+    
+    if (PT_DBG_LVL > 0) printf("Page read into memory\n\n");
     
     // return physical page num
     return lru;

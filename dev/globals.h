@@ -4,7 +4,8 @@
 //-----------------------------------------------------------------------------
 //                          Constants
 //-----------------------------------------------------------------------------
-#define DEBUG   0 // Run debugging
+#define DEBUG         0 // Run debugging
+#define PT_DBG_LVL    1 // The page table debugging level
 
 #define MAXPRO        1   // max num of processes
 #define MAXPROGRAMS   8   // max number of program a CPU can run

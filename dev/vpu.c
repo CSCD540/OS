@@ -20,6 +20,8 @@ int  pop(int stack[][STACKSIZE], int proc_id, int sp[], int calledfrom);
 int  new_process(char * filename);
 //end Methods declaration
 
+int echoCmd = 0; // Echo the command on the shell back to the user?
+
 int main(int argc, char *argv[])
 {
   init_disk(disk);
@@ -49,7 +51,13 @@ int main(int argc, char *argv[])
     // split the cmd and arg(file name)
     cmd = strtok(input, " ");
     arg1= strtok('\0', " ");
-
+    
+    if(echoCmd)
+      if(arg1 != NULL)
+        printf("%s %s\n", cmd, arg1);
+      else
+        printf("%s\n", cmd);
+    
     if(strlen(input)<1)
     {
       continue; // When there is no input string, skipping everything.
@@ -68,6 +76,15 @@ int main(int argc, char *argv[])
     else if(strcmp(cmd, "diskdump")==0)
     {
       print_disk(disk);
+    }
+    else if(strcmp(cmd, "echo")==0)
+    {
+      if(strcmp(arg1, "on")==0)
+        echoCmd = 1;
+      else if(strcmp(arg1, "off")==0)
+        echoCmd = 0;
+      else
+        printf("echo on|off\n");
     }
     else if(strcmp(cmd, "exit")==0)
     {

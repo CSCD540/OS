@@ -152,9 +152,10 @@ int save_file(char *filename)
 void show_help()
 {
   printf("\nls\n   list the contents of the current directory.\n\n");
-  printf("cat\n   display the contents of a file as ascii text\\nn");
+  printf("cat\n   display the contents of a file as ascii text\n\n");
   printf("debug\n   dunno what this is supposed to do\n\n");
   printf("diskdump\n   display out all of the disk information\n\n");
+  printf("echo on|off\n   echo the commands typed on the command line\n\n");
   printf("exit\n   exit the virtual machine\n\n");
   printf("filedump\n   display out the binary representation of a file\n\n");
   printf("help\n   display this document\n\n");
