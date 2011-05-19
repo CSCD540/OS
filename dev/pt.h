@@ -39,15 +39,22 @@ int page_fault(struct process pid, int vpn);//, int rw);
 int lookup_ip(struct process pid, int rw)
 {
   int vpn = 0;
-  int ip = 0;
+  int page = 0;
+  int offset = 0;
+  
   vpn = pid.ip>>pageBits;
-  ip = lookup(pid, vpn, rw);
-  if(ip == EOF)
+  offset = pid.ip & (PAGESIZE - 1);
+  page = (lookup(pid, vpn, rw)) << pageBits; //Left shift it back
+  if(page == ENDF)
   {
     printf("End of file.\n");
     return -1;//Erro
   }
-  return (ip && (pid.ip & (PAGESIZE -1) ));
+  printf("VIP %d\n", pid.ip);
+  printf("V Page %d\n", vpn);
+  printf("Offset %d\n", offset);
+  printf("IP %d\n", page | offset);
+  return (page | offset);
 }
 
 // The process table array which is indexed on the process id, and

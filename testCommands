@@ -1,14 +1,19 @@
+save milk1.out
+load milk1.out
+run
+exit
+
 piddump
 memdump
 ptdump
-save milk1.out
-load milk1.out
+
 save sort.out
 load sort.out
 load milk1.out
 memdump
 ptdump
 piddump
+
+
 filedump sort.out
-exit
 
