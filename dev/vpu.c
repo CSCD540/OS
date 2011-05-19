@@ -190,7 +190,7 @@ int main(int argc, char *argv[])
 }
 
 /* void executeit()
- * Description: This function runs all the processes in processes then returns
+ * Description: This function runs all the program in processes[] then returns
  * Input: None
  * Output: None
  */
@@ -236,6 +236,15 @@ void executeit()
         // printf("pid=%d\n", pid); //keyhit(8999);
         cur_proc = 0; // only one core 
         program = rand() % curProcesses; //Find one of the programs to run
+        
+        next_instruct[cur_proc] = lookup_ip(processes[cur_proc], 0);
+        if(next_instruct[cur_proc] <= -1 || mem[cur_proc][next_instruct[cur_proc]] <= -1)
+        {
+          terminate = 1;
+          proc_complete[cur_proc] = 1;
+        }
+        printf("IP %d\n", next_instruct[cur_proc]);
+        processes[cur_proc].ip++;
       }
       
       if(proc_complete[cur_proc] == 1)
@@ -247,7 +256,11 @@ void executeit()
 
       if(next_instruct[cur_proc]< 256) // safe guard
       {
-        msg=exe(stack,sp,reg,next_instruct,next_instruct,cur_proc, &terminate);
+  printf("%d\n", next_instruct[cur_proc]);
+        msg = exe(stack,sp,reg, next_instruct, next_instruct, cur_proc, &terminate);
+  printf("%d\n", next_instruct[cur_proc]);
+ // msg = 1;
+//  terminate = 1;
         if(msg==ENDPROCESS || terminate == 1)
         {
           proc_complete[cur_proc]=1;
@@ -323,8 +336,8 @@ void executeit()
       break;
   }
   // print_stack(stack,sp); stack should be all 0 and sp at -1
-  print_gmem();
-  print_register(reg);
+  //print_gmem();
+  //print_register(reg);
 }
 
 int exe(int stack[][STACKSIZE], int sp[], int reg[][REGISTERSIZE], int next_instruct[], int next_inst[], int cur_proc, int *terminate)
@@ -706,6 +719,7 @@ int new_process(char * filename)
     
   strncpy(processes[nextPid].filename, arg1, len);
   processes[nextPid].pid = nextPid;
+  processes[nextPid].ip = 10; //First instruction is at 10
   curProcesses = nextPid + 1;
   return nextPid++;
 }
