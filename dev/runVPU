@@ -1,0 +1,27 @@
+#!/bin/bash
+if [ "$1" == "--help" ]
+then
+  echo
+  echo "USAGE: runVPU [evmScript]"
+  echo "If a script is not passed as an argument, vpu will be executed as normal"
+  echo "However, if a script is passed, vpu will attempt to execute the file as an evm shell script"
+  echo
+else
+
+clear
+./vpubld
+if [ $# -eq 1 ]
+then
+  if [ -e $1 ]
+  then
+    echo Running VPU with $1...
+    echo
+    cat $1 | ../vpu
+  fi
+else
+  echo Running VPU...
+  echo
+  ../vpu
+fi
+
+fi
