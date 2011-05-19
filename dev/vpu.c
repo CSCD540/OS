@@ -52,7 +52,8 @@ int main(int argc, char *argv[])
     cmd = strtok(input, " ");
     arg1= strtok('\0', " ");
     
-    if(echoCmd)
+    // If echo is on, print out the command and argument
+    if(echoCmd && !(strcmp(cmd,"echo")==0 && strcmp(arg1,"off")==0))
       if(arg1 != NULL)
         printf("%s %s\n", cmd, arg1);
       else
@@ -82,7 +83,10 @@ int main(int argc, char *argv[])
       if(arg1 != NULL)
       {
         if(strcmp(arg1, "on")==0)
+        {
           echoCmd = 1;
+          printf("echo on\n");
+        }
         else if(strcmp(arg1, "off")==0)
           echoCmd = 0;
         else
@@ -151,7 +155,7 @@ int main(int argc, char *argv[])
     else if(strcmp(cmd, "save")==0)
     {
       status = save_file(arg1);
-      if(status != 0) print_error(status);
+      if(status != SUCCESS) print_error(status);
     }
     else if(strcmp(cmd, "showGlobalMem")==0)
     {
@@ -163,7 +167,15 @@ int main(int argc, char *argv[])
     }
     else if(strcmp(cmd, "showPage")==0)
     {
-      print_pt();
+      if(arg1 != NULL)
+      {
+        int pgNum = atoi(arg1);
+        
+        status = print_page(pgNum);
+        if(status != SUCCESS) print_error(status);
+      }
+      else
+        printf("SYNTAX: showPage page_number\n"); 
     }
     else if(strcmp(cmd, "showRegisterData")==0)
     {

@@ -32,15 +32,16 @@
 #define NUMBLOCKS     ((DISKSIZE) / (BLOCKSIZE))  // Total number of blocks on the disk
 
 // Return Values
-#define SUCCESS         0   // No error
-#define APPEND          1   // Begin writing at the end of the file
-#define OVERWRITE       2   // Begin writing at the beginning of the file
-#define NEWFILE         3   // New file
-#define DISK_FULL       4   // No more room on the disk!
-#define FILE_NOT_FOUND  -5  // File was not located
-#define LIST_EMPTY      6   // List contains no elements
-#define FD_LIMIT_EXCEED -7  // Maximum number of file descriptors has been reached
-#define ENDF            -8  // At the end of the process or file
+#define SUCCESS          0   // No error
+#define APPEND           1   // Begin writing at the end of the file
+#define OVERWRITE        2   // Begin writing at the beginning of the file
+#define NEWFILE          3   // New file
+#define DISK_FULL        4   // No more room on the disk!
+#define FILE_NOT_FOUND  -5   // File was not located
+#define LIST_EMPTY       6   // List contains no elements
+#define FD_LIMIT_EXCEED -7   // Maximum number of file descriptors has been reached
+#define ENDF            -8   // At the end of the process or file
+#define OUT_OF_RANGE    -9   // Argument was out of range
 
 // Memory
 #define PAGESIZE   ((BLOCKSIZE) * 4)        // size of each page in words 2-bytes

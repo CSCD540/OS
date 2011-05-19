@@ -13,8 +13,9 @@ void reset_memory();
 
 void print_gmem();
 void print_mem();
-void print_processes();
 void print_mem_pages();
+int print_page(int pageNum);
+void print_processes();
 void print_pt();
 void print_lru();
 void print_register(int reg[][REGISTERSIZE]);
@@ -110,6 +111,10 @@ void print_error(int errno)
     case DISK_FULL:
       printf("Not enough room on the disk.\n");
       break;
+    
+    case OUT_OF_RANGE:
+      printf("Value out of range.\n");
+      break;
       
     default:
       printf("An unspecified has error occurred. %d\n", errno);
@@ -154,22 +159,12 @@ void print_mem()
     }
 }
 
-void print_processes()
-{
-  printf("\r\nPID Table:\r\n");
-  printf("-------------------------------------\r\n");
-  printf("|     index | pid | filename        |\r\n");
-  printf("|-----------|-----|-----------------|\r\n");
-  int i;
-  for(i = 0; i < MAXPROGRAMS; i++)
-  {
-    //printf("%c[%d;%dm", 27, 0, 31);
-    printf("|Pid     %2d | %3d | %14s  |\r\n", i, processes[i].pid,  processes[i].filename);
-    printf("%c[%dm", 27, 0);
-    printf("|-----------------------------------|\r\n");
-  }
-}
-
+/* void print_mem_pages()
+ * Description: This function does a memory dump of mem[][]
+ * Input: none
+ * Output: Displays the contents of mem on the screen in a long format optimal
+ *           for viewing the memory pages
+ */
 void print_mem_pages()
 {
   printf("\r\n------------------\r\n|%c[%d;%dm   MAIN MEMORY  %c[%dm|\r\n|----------------|\r\n", 27, 1, 42, 27, 0);
@@ -193,6 +188,39 @@ void print_mem_pages()
   }
   
   printf("------------------\r\n");
+}
+
+int print_page(int pageNum)
+{
+  if(pageNum >= NUMPAGES || pageNum < 0)
+  {
+    return OUT_OF_RANGE;
+  }
+  
+  printf("\nPage %d:\n", pageNum);
+  int i = PAGESIZE * pageNum;
+  int lastAddr = i + PAGESIZE;
+  for(; i < lastAddr; i++)
+    printf(" %5d", mem[0][i]);
+  printf("\n\n");
+  
+  return SUCCESS;
+}
+
+void print_processes()
+{
+  printf("\r\nPID Table:\r\n");
+  printf("-------------------------------------\r\n");
+  printf("|     index | pid | filename        |\r\n");
+  printf("|-----------|-----|-----------------|\r\n");
+  int i;
+  for(i = 0; i < MAXPROGRAMS; i++)
+  {
+    //printf("%c[%d;%dm", 27, 0, 31);
+    printf("|Pid     %2d | %3d | %14s  |\r\n", i, processes[i].pid,  processes[i].filename);
+    printf("%c[%dm", 27, 0);
+    printf("|-----------------------------------|\r\n");
+  }
 }
 
 /* void print_pt()

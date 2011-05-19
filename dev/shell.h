@@ -24,14 +24,8 @@ void concatenate(char *filename)
   printf("Concatenate the file %s\n", filename);
 }
 
-
-/* List the contents of the current directory
+/* Dump the contents of the file specified
  */
-void list_directory_contents()
-{
-	printf("Print out the contents of PWD.\n");
-}
-
 void dump_file(char *filename)
 {
   struct fileNode * file = get_file(filename);
@@ -44,6 +38,12 @@ void dump_file(char *filename)
   print_block_list(blockList);
 }
 
+/* List the contents of the current directory
+ */
+void list_directory_contents()
+{
+	printf("Print out the contents of PWD.\n");
+}
 
 /* int load_file(char *file)  
  * Description: This function grabs the program from the disk and loads it into mem[0] starting from [0]
@@ -163,13 +163,15 @@ void show_help()
   printf("load\n   schedule a program to run\n\n");
   printf("man\n   get specific help for a particular command\n\n");
   printf("memdump\n   display out the current contents of memory\n\n");
+  printf("piddump\n   display out the process table\n\n");
+  printf("ptdump\n   display out the page table\n\n");
   printf("pwd\n   print the current working directory\n\n");
   printf("rm\n   delete a file from the disk\n\n");
   printf("run\n   execute all loaded programs\n\n");
   printf("save\n   save a file from the physical disk into the virtual disk\n\n");
   printf("showGlobalMem\n   display the current contents of the global memory\n\n");
   printf("showLRU\n   display the current least recently used page\n\n");
-  printf("showPage\n   display out a page\n\n");
+  printf("showPage\n   display out a physical memory page\n\n");
   printf("showRegisterData\n   display the current regester data\n\n");
 }
 
@@ -255,3 +257,4 @@ int write(struct fileNode **fileListNode, int data[], int count, int writeMode, 
   if(DEBUG) printf("end write : fileListNode->blockList->block %p\n", (*fileListNode)->blockList->block);
   return SUCCESS;
 } // end write()
+

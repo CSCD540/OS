@@ -240,7 +240,7 @@ int page_fault(struct process pid, int vpn)//, int rw)
     return lru;
   }
   
-  return -1; // Page was beyond scope of file
+  return ENDF; // Page was beyond scope of file
 }
 
 /*
