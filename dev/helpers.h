@@ -11,10 +11,14 @@ void init_pt();
 void init_reg();
 void reset_memory();
 
+void print_block_list(struct blockNode *blockList);
+void print_disk(struct block disk[]);
+void print_error();
+void print_file_list(struct fileNode *head);
 void print_gmem();
 void print_mem();
 void print_mem_pages();
-int print_page(int pageNum);
+int  print_page(int pageNum);
 void print_processes();
 void print_pt();
 void print_lru();
@@ -86,6 +90,57 @@ void reset_memory()
     Debug routines 
     ----------------------------------------------------*/
 
+/* void print_block_list(struct blockNode *head)
+ * Description:
+ *    Print out all the data in all the blocks in this blockList
+ * Input:
+ *    struct blockNode *head : Pointer to the first node in this blockList
+ * Output:
+ *    Screen output of the data in the blockList
+ */
+void print_block_list(struct blockNode *blockList)
+{
+  if(blockList == NULL)
+    print_error(LIST_EMPTY);
+  else
+    while(blockList != NULL)
+    {
+      if(DEBUG) printf("blockList: %p\n", blockList);
+      if(DEBUG) printf("blockList->block: %p\n", blockList->block);
+      printf("Block #%2d ", blockList->block->blockNum);
+      int i;
+      for(i = 0; i < BLOCKSIZE; i++)
+        printf(" %d", blockList->block->instructions[i]);
+      //  ;
+      printf("\n");
+      blockList = blockList->nextBlock;
+    }
+}
+
+/* void print_disk(struct block disk[])
+ * Description:
+ *    print out the contents of the disk
+ * Input:
+ *    struct block disk[] : The disk whos content's you wish to print
+ * Output:
+ *    screen output of all data stored in all blocks on the disk
+ */
+void print_disk(struct block disk[])
+{
+  int i, j;
+  for(i = 0; i < NUMBLOCKS; i++)
+  {
+    printf("Block #%2d ", i);
+    for(j = 0; j < BLOCKSIZE; j++)
+    {
+      printf(" %5d", disk[i].instructions[j]);
+      if( j == (BLOCKSIZE - 1) || (j + 1) % PAGESIZE == 0)
+          printf(" | %5d\n", j);
+    }
+    printf("\n");
+  }
+}
+
 /* 
  * void print_error(int errno)
  * Description:
@@ -121,6 +176,28 @@ void print_error(int errno)
   }
 }
 
+/* void print_file_list(struct fileNode *head)
+ * Description:
+ *    Print out all the file currently stored on the disk
+ * Input:
+ *    struct fileNode *head : Pointer to the first node in the fileList
+ * Output:
+ *    Screen output of the files in the fileList
+ */
+void print_file_list(struct fileNode *head)
+{
+  if(head == NULL)
+    print_error(LIST_EMPTY);
+  else
+  {
+    printf("Filename      Blocks\n");
+    while(head != NULL)
+    {
+      printf("%s%11d\n", head->filename, head->numBlocks);
+      head = head->nextFile;
+    }
+  }
+}
 
 void print_gmem()
 {
