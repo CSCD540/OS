@@ -43,7 +43,22 @@ void dump_file(char *filename)
  */
 void list_directory_contents()
 {
-	printf("Print out the contents of PWD.\n");
+  //printf("Print out the contents of current directory.\n");
+//  print_file_list(fileList);
+  struct fileNode *fnode = fileList;
+  printf("\n");
+  if(fnode->filename == NULL)
+    return;
+  while(fnode != NULL)
+  {
+    printf("%s\t", fnode->filename);
+    if(arg1 != NULL && strcmp(arg1, "-l") == 0)
+      printf("\n");
+    fnode = fnode->nextFile;
+  }
+  if(arg1 == NULL || strcmp(arg1, "-l") != 0)
+    printf("\n");
+  printf("\n");
 }
 
 /* int load_file(char *file)  

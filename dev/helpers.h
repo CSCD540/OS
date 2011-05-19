@@ -208,7 +208,7 @@ void print_file_list(struct fileNode *head)
 void print_gmem()
 {
   int i;
-  printf("\r\n--------------------\r\n|%c[%d;%dm   GLOBAL MEMORY  %c[%dm|\r\n|------------------|\r\n", 27, 1, 42, 27, 0);
+  printf("\r\n%c[%d;%dm   GLOBAL MEMORY   %c[%dm\r\n", 27, 1, 42, 27, 0);
   printf("Global memory: size %d\n", MAXGMEM);
   for(i = 0; i < MAXGMEM; i++)
   {
@@ -228,7 +228,7 @@ void print_mem()
 {
     int i,j;
     printf("\n");
-    printf("\r\n%c[%d;%dm   MAIN MEMORY  %c[%dm\r\n", 27, 1, 42, 27, 0);
+    printf("\r\n%c[%d;%dm   MAIN MEMORY   %c[%dm\r\n", 27, 1, 42, 27, 0);
     printf("Memory: size %d (per process)\n", MAXMEM);
     for(i = 0; i < MAXPRO; ++i)
     {
