@@ -32,7 +32,7 @@ struct blockNode *freeBlockList = NULL;
 struct fileNode * add_file(char *filename, int numBlocks)
 {
   // Add a new file to the fileList and get a pointer to the first block.  
-  struct fileNode * newFileNode = malloc(sizeof(struct fileNode *));
+  struct fileNode * newFileNode;// = malloc(sizeof(struct fileNode *));
   if(DEBUG) printf("pre add file  %p\n", newFileNode);
   newFileNode = add_file_node(&fileList, filename, numBlocks);
   if(DEBUG) printf("post add file %p\n", newFileNode);

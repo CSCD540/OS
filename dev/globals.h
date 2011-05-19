@@ -62,6 +62,8 @@ struct block {
   int blockNum;
   int instructions[BLOCKSIZE];
 };
+
+
 /* 
  * struct blockNode
  * Description:
@@ -99,7 +101,7 @@ struct fileDescriptor {
 };
 
 
-struct process{
+struct process {
     int pid;
     char *filename;
     int ip;     //virtual IP this is where the process believes it's at
