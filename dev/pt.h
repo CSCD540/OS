@@ -47,7 +47,7 @@ int lookup_ip(struct process pid, int rw)
     printf("End of file.\n");
     return -1;//Erro
   }
-  return (ip & & (pid.ip & (PAGESIZE -1) ));
+  return (ip && (pid.ip & (PAGESIZE -1) ));
 }
 
 // The process table array which is indexed on the process id, and
