@@ -1,6 +1,6 @@
 memdump
-save ./programs/milk1.out
-load ./programs/milk1.out
+save ./milk1.out
+load ./milk1.out
 run
 exit
 memdump
@@ -10,13 +10,12 @@ piddump
 memdump
 ptdump
 
-save ./programs/sort.out
-load ./programs/sort.out
-load ./programs/milk1.out
+save ./sort.out
+load ./sort.out
+load ./milk1.out
 memdump
 ptdump
 piddump
 
 
-filedump ./programs/sort.out
-
+filedump ./sort.out
