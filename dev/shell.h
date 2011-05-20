@@ -53,10 +53,18 @@ void concatenate(char *filename)
   printf("\n");
 }
 
+
 /* Dump the contents of the file specified
  */
 void dump_file(char *filename)
 {
+  printf("\n");
+  if(filename == NULL)
+  {
+    printf("SYNTAX: filedump filename\n\n");
+    return;
+  }
+  
   struct fileNode * file = get_file(filename);
   if(file == NULL)
   {
@@ -68,12 +76,13 @@ void dump_file(char *filename)
   print_block_list(blockList);
 }
 
+
 /* List the contents of the current directory
  */
 void list_directory_contents()
 {
-  //printf("Print out the contents of current directory.\n");
-//  print_file_list(fileList);
+  // printf("Print out the contents of current directory.\n");
+  // print_file_list(fileList);
   struct fileNode *fnode = fileList;
   printf("\n");
   if(fnode->filename == NULL)
@@ -89,6 +98,7 @@ void list_directory_contents()
     printf("\n");
   printf("\n");
 }
+
 
 /* int load_file(char *file)  
  * Description: This function grabs the program from the disk and loads it into mem[0] starting from [0]
@@ -196,28 +206,28 @@ int save_file(char *filename)
  */
 void show_help()
 {
-  printf("\nls\n   list the contents of the current directory.\n\n");
-  printf("cat\n   display the contents of a file as ascii text\n\n");
-  printf("debug\n   dunno what this is supposed to do\n\n");
-  printf("diskdump\n   display out all of the disk information\n\n");
-  printf("echo on|off\n   echo the commands typed on the command line\n\n");
-  printf("exit\n   exit the virtual machine\n\n");
-  printf("filedump\n   display out the binary representation of a file\n\n");
-  printf("help\n   display this document\n\n");
-  printf("hdload\n   load a previously saved virtual hard disk into the current disk\n\n");
-  printf("load\n   schedule a program to run\n\n");
-  printf("man\n   get specific help for a particular command\n\n");
-  printf("memdump\n   display out the current contents of memory\n\n");
-  printf("piddump\n   display out the process table\n\n");
-  printf("ptdump\n   display out the page table\n\n");
-  printf("pwd\n   print the current working directory\n\n");
-  printf("rm\n   delete a file from the disk\n\n");
-  printf("run\n   execute all loaded programs\n\n");
-  printf("save\n   save a file from the physical disk into the virtual disk\n\n");
-  printf("showGlobalMem\n   display the current contents of the global memory\n\n");
-  printf("showLRU\n   display the current least recently used page\n\n");
-  printf("showPage\n   display out a physical memory page\n\n");
-  printf("showRegisterData\n   display the current regester data\n\n");
+  printf("\n ls\n   list the contents of the current directory.\n\n");
+  printf(" cat\n   display the contents of a file as ascii text\n\n");
+  printf(" debug\n   dunno what this is supposed to do\n\n");
+  printf(" diskdump\n   display out all of the disk information\n\n");
+  printf(" echo on|off\n   echo the commands typed on the command line\n\n");
+  printf(" exit\n   exit the virtual machine\n\n");
+  printf(" filedump\n   display out the binary representation of a file\n\n");
+  printf(" help\n   display this document\n\n");
+  printf(" hdload\n   load a previously saved virtual hard disk into the current disk\n\n");
+  printf(" load\n   schedule a program to run\n\n");
+  printf(" man\n   get specific help for a particular command\n\n");
+  printf(" memdump\n   display out the current contents of memory\n\n");
+  printf(" piddump\n   display out the process table\n\n");
+  printf(" ptdump\n   display out the page table\n\n");
+  printf(" pwd\n   print the current working directory\n\n");
+  printf(" rm\n   delete a file from the disk\n\n");
+  printf(" run\n   execute all loaded programs\n\n");
+  printf(" save\n   save a file from the physical disk into the virtual disk\n\n");
+  printf(" showGlobalMem\n   display the current contents of the global memory\n\n");
+  printf(" showLRU\n   display the current least recently used page\n\n");
+  printf(" showPage\n   display out a physical memory page\n\n");
+  printf(" showRegisterData\n   display the current regester data\n\n");
 }
 
 
@@ -225,11 +235,11 @@ void show_help()
  */
 void show_exit()
 {
-		printf("***********************************************************\n");
-		printf("*       Thanks for using the Eagle Virtual Machine!       *\n");
-		printf("*                         GOOD-BYE!                       *\n");
-		printf("***********************************************************\n");
-		machineOn = 0;
+  printf("***********************************************************\n");
+  printf("*       Thanks for using the Eagle Virtual Machine!       *\n");
+  printf("*                         GOOD-BYE!                       *\n");
+  printf("***********************************************************\n");
+  machineOn = 0;
 }
 
 

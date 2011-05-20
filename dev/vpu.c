@@ -185,7 +185,10 @@ int main(int argc, char *argv[])
       printf("Command Not Found\n");
     }
   } // end while(machineOn)
-
+  
+  free(freeBlockList);
+  free(fileList);
+  
   return 0;
 }
 
