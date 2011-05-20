@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 
 char *yytext;
@@ -10,7 +11,11 @@ FILE *outfile;
 int yy_flex_debug;
 int execute;
 
-
+void showsymtable();
+void showjsym();
+int searchvtable( char *str, int *j, int from);
+void showmem();
+void executeit();
 
 //int nest;
 
@@ -123,6 +128,8 @@ int pid = 0;  //process id
 int exe(int stack[][STACKSIZE],int sp[],int reg[][REGISTERSIZE], int next_instruct[],int next_inst[], int cur_proc);
 int pop(int stack[][STACKSIZE], int proc_id, int sp[], int calledfrom);
 void push(int stack[][STACKSIZE], int proc_id, int sp[],int data, int calledfrom);
+int peek(int stack[][STACKSIZE], int proc_id, int sp[], int offset);
+
 void print_stack(int stack[][STACKSIZE],int sp[]); //debug
 void print_register(int reg[][REGISTERSIZE]); //debug
 void print_gmem();
@@ -165,7 +172,7 @@ printf("%s  ->   %s\n", parse[i].idop, parsecopy[j].idop);
 
 int showterm( int beg)
 { int i;
-        return;
+        return 0;
 
         for (i=beg; i<sindex; i++)
         {
@@ -766,7 +773,7 @@ void yyerror(char *s) {
     return;
 }
 
-main(int argc, char **argv )
+int main(int argc, char **argv )
 {
     execute=0;
     
@@ -811,7 +818,7 @@ main(int argc, char **argv )
 }
 
 
-showsymtable()
+void showsymtable()
 {int i;
      for (i=0; i<vtablex; i++)
      {  printf("%d:  %s\n",
@@ -855,7 +862,7 @@ printf("----------returning %d   and  j= %d\n", vtable[i].address, *j);
    return( vtable[i].address);
 }
 
-showjsym()
+void showjsym()
 { int i, j;
 printf("SHOWSYM %d\n", execute);
   for(i=0; i<locex; i++)
@@ -949,7 +956,7 @@ fprintf(stderr, "--- symbol/label '%s' not found, ERROR!!\n", str);
 }
 
 
-showmem()
+void showmem()
 { int i, k; char name[11];
   int progid;
   
@@ -1153,7 +1160,7 @@ default:
 
 }
 
-executeit()
+void executeit()
 {
   int cur_proc,p0=0, msg=-1,m;
   int stack[MAXPRO][STACKSIZE];

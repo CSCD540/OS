@@ -7,7 +7,7 @@ typedef struct
 } PARSE;
 
 extern PARSE parse[400];
-extern sindex;
+extern int sindex;
 
 unsigned int linenumber = 0;
 void count();

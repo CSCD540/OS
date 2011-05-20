@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "easm.tab.h"
 #include "globals.h"
@@ -592,7 +593,7 @@ int exe(int stack[][STACKSIZE], int sp[], int reg[][REGISTERSIZE], int next_inst
             scanf("%d", &tmp2);
           break;
 
-      case STOR :
+      case STOR : //
             tmp = pop(stack, cur_proc, sp, 68);
             if (i == PAGESIZE-1 || i == PAGESIZE * 2-1) // This is the Boundary between every page.
               tmp1 = mem[cur_proc][i];

@@ -13,6 +13,7 @@ int  load_program(char *filename);
 void remove_file(char *filename);
 int  save_file(char *filename);
 void show_help();
+int write(struct fileNode **fileListNode, int data[], int count, int writeMode, int offset);
 // end Jordan's method declarations
 void show_exit();
 

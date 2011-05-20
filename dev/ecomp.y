@@ -17,6 +17,10 @@ FILE *outfile;
 int yy_flex_debug;
 //int nest;
 
+int checkvar(char *var, int loc);
+int logic(int beg, int end);
+int gen_expr(int beg);
+
 int istack[10];
 int istackptr=0;
 int ijump=0;
@@ -169,12 +173,12 @@ int declr_alloc(int loc)
 
   if( parse[1].type != (char)LBRCT )
   {   
-    return;
+    return 0;
   }
   else
   {
     printf("declr_alloc():  %s", parse[2].idop);
-    return;
+    return 0;
   }
 }
 
@@ -1014,7 +1018,7 @@ void yyerror(char *s) {
     return;
 }
 
-main(int argc, char **argv )
+int main(int argc, char **argv )
 {
     ++argv, --argc;  /* skip over program name */
     if ( argc == 2 )

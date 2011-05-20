@@ -140,7 +140,6 @@ int  gmem[MAXGMEM];         // Global var sit here
 int  jsym[60];
 int  mem[MAXPRO][MAXMEM];   // Main mem for each process
 int  machineOn = 1;         // Is the machine still running?
-int  pid = 0;               // Process id
 int  p0running;
 int  reg[MAXPRO][REGISTERSIZE];
 int  tempmem[MAXPRO][200];  // For PTB - loading all of the process information here
