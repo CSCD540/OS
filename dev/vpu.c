@@ -238,13 +238,15 @@ void executeit()
         program = rand() % curProcesses; //Find one of the programs to run
         
         next_instruct[cur_proc] = lookup_ip(processes[cur_proc], 0);
-        if(next_instruct[cur_proc] <= -1 || mem[cur_proc][next_instruct[cur_proc]] <= -1)
+        if(next_instruct[cur_proc] < 0)
+          return;
+        if(mem[cur_proc][next_instruct[cur_proc]] <= -1)
         {
           terminate = 1;
           proc_complete[cur_proc] = 1;
         }
-        printf("IP %d\n", next_instruct[cur_proc]);
-        processes[cur_proc].ip++;
+        //printf("IP %d\n", next_instruct[cur_proc]);
+        
       }
       
       if(proc_complete[cur_proc] == 1)
@@ -256,11 +258,8 @@ void executeit()
 
       if(next_instruct[cur_proc]< 256) // safe guard
       {
-  printf("%d\n", next_instruct[cur_proc]);
+        int temp = next_instruct[cur_proc];
         msg = exe(stack,sp,reg, next_instruct, next_instruct, cur_proc, &terminate);
-  printf("%d\n", next_instruct[cur_proc]);
- // msg = 1;
-//  terminate = 1;
         if(msg==ENDPROCESS || terminate == 1)
         {
           proc_complete[cur_proc]=1;
@@ -270,6 +269,7 @@ void executeit()
         // printf("%d %d\n",cur_proc,next_instruct[cur_proc]+1);
         // increment next_instruction
         next_instruct[cur_proc]++;
+        processes[cur_proc].ip = next_instruct[cur_proc];
         if(msg==UNLOCKED)
         {
           // printf("unlock\n");
@@ -391,7 +391,7 @@ int exe(int stack[][STACKSIZE], int sp[], int reg[][REGISTERSIZE], int next_inst
 						}
           break;
 
-      case POPD :
+      case POPD : //This takes one argument (The next 'instruction' is the register to pop into)
 			      tmp = mem[cur_proc][i+1];
             tmp1 = pop(stack, cur_proc, sp, 10) ;
 			      if(DBGCPU) printf("POPD: popd %d into %d\n", tmp1, tmp);

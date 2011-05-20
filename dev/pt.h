@@ -39,22 +39,20 @@ int page_fault(struct process pid, int vpn);//, int rw);
 int lookup_ip(struct process pid, int rw)
 {
   int vpn = 0;
-  int page = 0;
-  int offset = 0;
   
   vpn = pid.ip>>pageBits;
-  offset = pid.ip & (PAGESIZE - 1);
-  page = (lookup(pid, vpn, rw)) << pageBits; //Left shift it back
-  if(page == ENDF)
+  pid.offset = pid.ip & (PAGESIZE - 1);
+  pid.page = (lookup(pid, vpn, rw)) << pageBits; //Left shift it back
+  if(pid.page == ENDF)
   {
-    printf("End of file.\n");
-    return -1;//Erro
+    printf("ERROR: Page not found.\n");
+    return OUT_OF_RANGE;//Erro
   }
-  printf("VIP %d\n", pid.ip);
-  printf("V Page %d\n", vpn);
-  printf("Offset %d\n", offset);
-  printf("IP %d\n", page | offset);
-  return (page | offset);
+  //printf("VIP %d\n", pid.ip);
+  //printf("V Page %d\n", vpn);
+  //printf("Offset %d\n", offset);
+  //printf("IP %d\n", page | offset);
+  return (pid.page | pid.offset);
 }
 
 // The process table array which is indexed on the process id, and
@@ -101,7 +99,8 @@ int lookup(struct process pid, int vpn, int rw)
 
   if(found == 1) // If we found it, great...
   {
-    printf("\n%c[%d;%d;%dmPage Found%c[%dm\n", 27, 1, 37, 44, 27, 0);
+    if(DEBUG)
+      printf("\n%c[%d;%d;%dmPage Found%c[%dm\n", 27, 1, 37, 44, 27, 0);
     physPage = i;
   }
   else // If we did not find it, we page fault

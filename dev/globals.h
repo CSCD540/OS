@@ -103,6 +103,8 @@ struct process{
     int pid;
     char *filename;
     int ip;     //virtual IP this is where the process believes it's at
+    int page;   //Actual page number returned from lookup
+    int offset; //Offset from the ip
     int status; //0 = not finished, 1 = terminated
     int state;  //state - running, 0 ready, waiting, suspended  
 };

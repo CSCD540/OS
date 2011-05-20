@@ -1,6 +1,9 @@
+memdump
 save milk1.out
 load milk1.out
 run
+exit
+memdump
 exit
 
 piddump
