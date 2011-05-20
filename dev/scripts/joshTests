@@ -1,6 +1,6 @@
 memdump
-save ./programs/milk1.out
-load ./programs/milk1.out
+save ../../milk1.out
+load ../../milk1.out
 run
 exit
 memdump
