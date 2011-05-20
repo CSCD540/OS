@@ -213,8 +213,7 @@ void executeit()
   memset(stack, 0, MAXPRO*STACKSIZE*sizeof(int));
   memset(sp, -1, MAXPRO*sizeof(int));
   memset(reg, 0, 10 * MAXPRO * sizeof(int));
-  // memset(next_instruct,0,MAXPRO*sizeof(int));
-  //memset(proc_complete, 0, MAXPRO*sizeof(int));
+  memset(proc_complete, 0, MAXPRO*sizeof(int));
   
   srand( time(NULL) );
 
@@ -259,7 +258,6 @@ void executeit()
           printf("----------------------------cur_proc: %d\n",cur_proc);
         goto checkdone;
       }
-
       if(next_instruct[cur_proc]< 256) // safe guard
       {
         int temp = next_instruct[cur_proc];

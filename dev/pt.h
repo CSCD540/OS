@@ -41,12 +41,12 @@ int lookup_ip(struct process pid, int rw)
   int vpn = 0;
   
   vpn = pid.ip>>pageBits;
-  pid.offset = pid.ip & (PAGESIZE - 1);
+  pid.offset = pid.ip % PAGESIZE;
   pid.page = (lookup(pid, vpn, rw)) << pageBits; //Left shift it back
   if(pid.page == ENDF)
   {
     printf("ERROR: Page not found.\n");
-    return OUT_OF_RANGE;//Erro
+    return OUT_OF_RANGE;//Error
   }
   //printf("VIP %d\n", pid.ip);
   //printf("V Page %d\n", vpn);
@@ -151,23 +151,23 @@ int lookup(struct process pid, int vpn, int rw)
 int page_fault(struct process pid, int vpn)//, int rw)
 {
 
-  if (PT_DBG_LVL > 0) printf("\n%c[%d;%d;%dmPAGE FAULT%c[%dm\n\n", 27, 1, 37, 41, 27, 0);;
+  if (PT_DBG_LVL > 0) printf("\n%c[%d;%d;%dmPAGE FAULT%c[%dm\n\n", 27, 1, 37, 41, 27, 0);
 
   // find lru
   //int lru = least_recently_used();
   if (PT_DBG_LVL > 1) printf("LRU: %d\n", lru);
-  printf("Test1\n");  
+  
   // if the lru page has been used and is dirty, write it back to the disk
-  if(pageTable[lru][0] == -1 && PT_DBG_LVL > 2)
-    printf("Empty page, no need to write out\n");
+  if(pageTable[lru][0] == -1)
+  {  if(PT_DBG_LVL > 2) printf("Empty page, no need to write out\n");}
 
-  else if(pageTable[lru][3] == 0 && PT_DBG_LVL > 2)
-    printf("Clean page, no need to write out\n");
+  else if(pageTable[lru][3] == 0)
+  {  if(PT_DBG_LVL > 2) printf("Clean page, no need to write out\n");}
 
   else
   {
     if(PT_DBG_LVL > 2) printf("Dirty page!\n");
-     printf("Test2\n");   
+    
     struct fileNode * dirtyFile = get_file(pid.filename);
     
     if(PT_DBG_LVL > 3)
@@ -201,7 +201,6 @@ int page_fault(struct process pid, int vpn)//, int rw)
     */
   }
   
-  printf("Test2\n");
   if(PT_DBG_LVL > 2) printf("\nReading new page from virtual disk into memory...\n");
   
   struct fileNode * file = get_file(pid.filename);
