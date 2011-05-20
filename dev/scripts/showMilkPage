@@ -1,0 +1,5 @@
+echo on
+save milk1.out
+load milk1.out
+showPage 0
+exit
