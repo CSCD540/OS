@@ -156,18 +156,18 @@ int page_fault(struct process pid, int vpn)//, int rw)
   // find lru
   //int lru = least_recently_used();
   if (PT_DBG_LVL > 1) printf("LRU: %d\n", lru);
-  printf("Test1\n");  
+  
   // if the lru page has been used and is dirty, write it back to the disk
   if(pageTable[lru][0] == -1)
-    if(PT_DBG_LVL > 2) printf("Empty page, no need to write out\n");
+  {  if(PT_DBG_LVL > 2) printf("Empty page, no need to write out\n");}
 
   else if(pageTable[lru][3] == 0)
-    if(PT_DBG_LVL > 2) printf("Clean page, no need to write out\n");
+  {  if(PT_DBG_LVL > 2) printf("Clean page, no need to write out\n");}
 
   else
   {
     if(PT_DBG_LVL > 2) printf("Dirty page!\n");
-     printf("Test2\n");   
+    
     struct fileNode * dirtyFile = get_file(pid.filename);
     
     if(PT_DBG_LVL > 3)
@@ -201,7 +201,6 @@ int page_fault(struct process pid, int vpn)//, int rw)
     */
   }
   
-  printf("Test2\n");
   if(PT_DBG_LVL > 2) printf("\nReading new page from virtual disk into memory...\n");
   
   struct fileNode * file = get_file(pid.filename);
