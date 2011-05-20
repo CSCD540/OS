@@ -82,6 +82,8 @@ void init_disk(struct block disk[])
 {
   // Allocate memory for the head node in freeBlockList
   freeBlockList = malloc(sizeof(struct blockNode));
+  freeBlockList->block = NULL;
+  
   
   // Initialize all blocks in the disk and add all blocks to freeBlockList
   int i, j;
@@ -95,6 +97,8 @@ void init_disk(struct block disk[])
   
   // Allocate memory for the head node in fileList
   fileList = malloc(sizeof(struct fileNode));
+  fileList->blockList = NULL;
+  fileList->filename = NULL;
 }
 
 #endif //_EFS_H_
