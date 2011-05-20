@@ -21,7 +21,36 @@ void show_exit();
  */
 void concatenate(char *filename)
 {
-  printf("Concatenate the file %s\n", filename);
+  printf("\n");
+  if(filename == NULL)
+  {
+    printf("SYNTAX: cat filename\n\n");
+    return;
+  }
+  //printf("Concatenate the file %s\n", filename);
+  
+  struct fileNode * file = get_file(filename);
+  
+  if(file == NULL)
+  {
+    print_error(FILE_NOT_FOUND);
+    return;
+  }
+  
+  struct blockNode *blockList = file->blockList;
+  
+  while(blockList != NULL)
+  {
+    int j;
+    for(j = 0; j < BLOCKSIZE; j++)
+    {
+      int res = blockList->block->instructions[j];
+      if(res != -1)
+        printf("%c", res);
+    }
+    blockList = blockList->nextBlock;
+  }
+  printf("\n");
 }
 
 /* Dump the contents of the file specified
