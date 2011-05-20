@@ -32,7 +32,7 @@ struct blockNode *freeBlockList = NULL;
 struct fileNode * add_file(char *filename, int numBlocks)
 {
   // Add a new file to the fileList and get a pointer to the first block.  
-  struct fileNode * newFileNode = malloc(sizeof(struct fileNode *));
+  struct fileNode * newFileNode;// = malloc(sizeof(struct fileNode *));
   if(DEBUG) printf("pre add file  %p\n", newFileNode);
   newFileNode = add_file_node(&fileList, filename, numBlocks);
   if(DEBUG) printf("post add file %p\n", newFileNode);
@@ -82,6 +82,8 @@ void init_disk(struct block disk[])
 {
   // Allocate memory for the head node in freeBlockList
   freeBlockList = malloc(sizeof(struct blockNode));
+  freeBlockList->block = NULL;
+  
   
   // Initialize all blocks in the disk and add all blocks to freeBlockList
   int i, j;
@@ -95,6 +97,8 @@ void init_disk(struct block disk[])
   
   // Allocate memory for the head node in fileList
   fileList = malloc(sizeof(struct fileNode));
+  fileList->blockList = NULL;
+  fileList->filename = NULL;
 }
 
 #endif //_EFS_H_

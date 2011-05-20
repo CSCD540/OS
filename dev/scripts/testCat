@@ -1,0 +1,5 @@
+echo on
+save ascii
+cat ascii
+exit
+

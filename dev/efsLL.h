@@ -42,7 +42,7 @@ struct blockNode * add_block_node(struct blockNode **blockList, struct block *bl
   if((*blockList)->block == NULL)
   {
     temp = malloc(sizeof(struct blockNode));
-    temp->block = malloc(sizeof(struct block *));
+    // temp->block = malloc(sizeof(struct block *));
     temp->block = block;
     if(DEBUG) printf("add_block->new list %p\n", temp->block);
     temp->nextBlock = NULL;
@@ -60,7 +60,7 @@ struct blockNode * add_block_node(struct blockNode **blockList, struct block *bl
     { temp = temp->nextBlock; }
     
     next = malloc(sizeof(struct blockNode));
-    next->block = malloc(sizeof(struct block *));
+    // next->block = malloc(sizeof(struct block *));
     next->block = block;
     if(DEBUG) printf("add_block->old list %p\n", next->block);
     next->nextBlock = NULL;
@@ -87,9 +87,9 @@ struct fileNode * add_file_node(struct fileNode **fileList, char *filename, int 
   {
     temp = malloc(sizeof(struct fileNode));
     temp->numBlocks = numBlocks;
-    temp->filename = malloc(sizeof(filename));
+    temp->filename = malloc(strlen(filename) + 1);
     strcpy(temp->filename, filename);
-    temp->blockList = malloc(sizeof(struct blockList *));
+    // temp->blockList = malloc(sizeof(struct blockList *));
     temp->nextFile = NULL;
     *fileList = temp;
     if(DEBUG) printf("fileNode %p\n", *fileList);
@@ -104,9 +104,9 @@ struct fileNode * add_file_node(struct fileNode **fileList, char *filename, int 
     
     next = malloc(sizeof(struct fileNode));
     next->numBlocks = numBlocks;
-    next->filename = malloc(sizeof(filename));
+    next->filename = malloc(strlen(filename) + 1);
     strcpy(next->filename, filename);
-    next->blockList = malloc(sizeof(struct blockList *));
+    // next->blockList = malloc(sizeof(struct blockList *));
     next->nextFile = NULL;
     temp->nextFile = next;
     temp = temp->nextFile;

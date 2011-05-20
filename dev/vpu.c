@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
     }
     else if(strcmp(cmd, "ls")==0) 
     {
-      list_directory_contents();
+      list_directory_contents(arg1);
     }
     else if(strcmp(cmd, "cat")==0)
     {
@@ -185,7 +185,10 @@ int main(int argc, char *argv[])
       printf("Command Not Found\n");
     }
   } // end while(machineOn)
-
+  
+  free(freeBlockList);
+  free(fileList);
+  
   return 0;
 }
 
