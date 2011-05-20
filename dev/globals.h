@@ -2,10 +2,18 @@
 #define _GLOBALS_H_ 1
 
 //-----------------------------------------------------------------------------
-//                          Constants
+//                          Debug
 //-----------------------------------------------------------------------------
+
 #define DEBUG         0 // Run debugging
 #define PT_DBG_LVL    1 // The page table debugging level
+#define DBGCPU    1
+#define DBGCPU1   0
+
+
+//-----------------------------------------------------------------------------
+//                          Constants
+//-----------------------------------------------------------------------------
 
 #define MAXPRO        1   // max num of processes
 #define MAXPROGRAMS   8   // max number of program a CPU can run
@@ -19,8 +27,6 @@
 #define ENDPROCESS    3
 
 #define p0WRITE   4  // tells p0 to run-p0 should only run after a write to gmem
-#define DBGCPU    1
-#define DBGCPU1   0
 
 // General
 #define BLOCKSIZE  4  // number of instructions per block
