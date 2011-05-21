@@ -227,7 +227,7 @@ void executeit()
   while(1)
   {
     cont:
-      keyhit(55);
+      keyhit(55); 
 
       if (HALTED == 1)
       {
