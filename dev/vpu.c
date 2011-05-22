@@ -239,7 +239,6 @@ void executeit()
         // printf("pid=%d\n", pid); //keyhit(8999);
         cur_proc = 0; // only one core 
         program = rand() % curProcesses; //Find one of the programs to run
-        
         next_instruct[cur_proc] = lookup_ip(processes[cur_proc], 0);
         if(next_instruct[cur_proc] < 0)
           return;
