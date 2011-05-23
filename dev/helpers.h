@@ -157,17 +157,21 @@ void print_error(int errno)
 {
   printf("\nERROR: ");
   switch(errno)
-  {
-    case LIST_EMPTY:
-      printf("List is empty.\n");
+  {  
+    case DISK_FULL:
+      printf("Not enough room on the disk.\n");
+      break;
+    
+    case DUPLICATE_FILE:
+      printf("Another file with that name already exists.\n");
       break;
       
     case FILE_NOT_FOUND:
       printf("File not found.\n");
       break;
-      
-    case DISK_FULL:
-      printf("Not enough room on the disk.\n");
+
+    case LIST_EMPTY:
+      printf("List is empty.\n");
       break;
     
     case OUT_OF_RANGE:

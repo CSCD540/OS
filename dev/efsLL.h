@@ -72,10 +72,11 @@ struct blockNode * add_block_node(struct blockNode **blockList, struct block *bl
 
 /* struct fileNode * add_file_node(fileNode **fileList, char *filename)
  * Description:
- *    Add a new file to the disk
+ *    Add a file to the disk. This is an in-ordered add, so all files are added alphabetically.
  * Input:
  *    fileNode **fileList : Pointer to the current list of files
  *    char *filename : Name of the file to be added
+ *    int numBlocks : The number of blocks this file occupies
  * Output:
  *    New file will be stored on the disk. fileList, blockList and freeBlockList will be updated.
  */
@@ -256,3 +257,8 @@ int get_block_count(struct blockNode *blockList)
   return i;
 }
 
+
+int is_file_list_empty()
+{
+  
+}

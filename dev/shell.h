@@ -92,7 +92,10 @@ void list_directory_contents()
   {
     printf("%s\t", fnode->filename);
     if(arg1 != NULL && strcmp(arg1, "-l") == 0)
+    { 
+      printf("%d blk\t", fnode->numBlocks);
       printf("\n");
+    }
     fnode = fnode->nextFile;
   }
   if(arg1 == NULL || strcmp(arg1, "-l") != 0)
@@ -195,6 +198,8 @@ int save_file(char *filename)
 
   struct fileNode *newFile; // Declare a fileNode pointer
   newFile = add_file(filename, numBlocks); // Add a new file to the list and get the pointer to that fileNode
+  if(newFile == NULL)
+    return DUPLICATE_FILE;
   if(DEBUG) printf("newFile %p\n", newFile);
   newFile->blockList = get_free_block_node();
   write(&newFile, instructions, numInstructs, NEWFILE, 0);
