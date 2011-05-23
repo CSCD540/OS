@@ -1,4 +1,5 @@
 #include "efs.h"
+#include "fileio.h"
 #ifndef _GLOBALS_H_
 #include "globals.h"
 #endif
@@ -6,14 +7,13 @@
 //void show_man_page(char *cmd);  //Not yet implemented
 
 // Jordan's method declarations
-void concatenate(char *filename);
-void list_directory_contents();
-void dump_file(char *filename);
-int  load_program(char *filename);
-void remove_file(char *filename);
-int  save_file(char *filename);
-void show_help();
-int write(struct fileNode **fileListNode, int data[], int count, int writeMode, int offset);
+// void concatenate(char *filename);
+// void list_directory_contents();
+// void dump_file(char *filename);
+// int  load_program(char *filename);
+// void remove_file(char *filename);
+// int  save_file(char *filename);
+// void show_help();
 // end Jordan's method declarations
 void show_exit();
 
@@ -242,75 +242,4 @@ void show_exit()
   printf("***********************************************************\n");
   machineOn = 0;
 }
-
-
-/* int write(struct fileNode **fileListNode, int data[], int count, int writeMode)
- * Description:
- *    Write data to a file on the VFS. If writeMode is OVERWRITE, writing begins at
- *    the beginning of the file, but
- * Input:
- *    struct fileNode **fileListNode : pointer to the file to be written to
- *    int data[] : Data to be written
- *    int count : How many elements to be written
- *    int writeMode : How to write to the file (Overwrite, append, etc).
- *    int offset : Used for overwriting. Specifies the location at which to beign overwriting
- * Output:
- *    SUCCESS : File was written without error.
- */
-int write(struct fileNode **fileListNode, int data[], int count, int writeMode, int offset)
-{
-  int newFile;
-  newFile = writeMode;
-  struct blockNode *blockNode = (*fileListNode)->blockList;
-  struct block *curBlock; // Declare a block pointer.
-  if(DEBUG) printf("\nstart write : fileListNode->blockList->block %p\n", (*fileListNode)->blockList->block);
-  if(DEBUG) printf("blockNode %p\n", blockNode);
-  // Appending to end of file?
-  int i = 0; // First empty index in instructions array
-    
-  if(writeMode == APPEND)
-  {
-    ; // TODO: Implement.
-  }
-  else // OVERWRITE or NEWFILE
-  {
-    if(offset != 0)
-    {
-      int k = 1;
-      for(; k <= offset; k++)
-        if(k % BLOCKSIZE == 0)
-          blockNode = blockNode->nextBlock;
-      i = offset % BLOCKSIZE;
-    }
-    curBlock = blockNode->block;
-  }
-      
-  int j;
-  for(j = 0; j < count; j++)
-  {
-    if((i == 0) && (newFile != NEWFILE))
-    { 
-      if(DEBUG) printf("curBlock %p\n", curBlock);
-      if(DEBUG) printf("\nadding new blockNode...\n");
-      if(blockNode->nextBlock == NULL)
-        blockNode->nextBlock = get_free_block_node();
-      blockNode = blockNode->nextBlock;
-      curBlock = blockNode->block;
-      if(DEBUG) printf("new blockNode %p\n", blockNode);
-      if(DEBUG) printf("new block %p\n", curBlock);
-    }
-    if(DEBUG) printf("writing  %3d  to block  %2d\n", data[j], curBlock->blockNum);
-    curBlock->instructions[i] = data[j];
-
-    i++;
-    // If i == BLOCKSIZE, we have written to the last availble instruction location and need to get a new blockNode next time.
-    if(i == BLOCKSIZE)
-      i = 0;
-    // If this is a new file, set newFile to 0 so that when i == 0 we will get a new blockNode
-    if(newFile == NEWFILE)
-      newFile = 0;
-  }
-  if(DEBUG) printf("end write : fileListNode->blockList->block %p\n", (*fileListNode)->blockList->block);
-  return SUCCESS;
-} // end write()
 

@@ -6,7 +6,7 @@
 //-----------------------------------------------------------------------------
 
 #define DEBUG         0 // Run debugging
-#define PT_DBG_LVL    1 // The page table debugging level
+#define PT_DBG_LVL    0 // The page table debugging level
 #define DBGCPU        1
 #define DBGCPU1       0
 
