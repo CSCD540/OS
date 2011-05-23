@@ -1,3 +1,25 @@
+/* int close(int fd)
+ * Description:
+ *    Close a file. Basically just nulls out all the values stored in the file descriptor.
+ * Input:
+ *    int fd : The index of the file descriptor in the file descriptor table.
+ * Output:
+ *    FILE_NOT_FOUND : The file descriptor specified was not found in the file descriptor table
+ *    SUCCESS : The file was successfully closed and the file descriptor freed up.
+ */
+int close(int fd)
+{
+  if(files[fd].curBlockNode == NULL)
+    return FILE_NOT_FOUND;
+  
+  files[fd].fdNum = -1;
+  files[fd].filename = NULL;
+  files[fd].curInstruction = -1;
+  files[fd].curBlockNode = NULL;
+  return SUCCESS;
+}
+
+
 /* int open(char * filename)
  * Description:
  *    Look for a file on the virtual disk. If it's found, get it's information and setup a 
