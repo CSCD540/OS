@@ -686,7 +686,7 @@ int pop(int stack[][STACKSIZE], int proc_id, int sp[], int calledfrom)
   {
     printf("Stack Underflow: process %d %d\n", proc_id, sp[proc_id]);
     printf("Called from  %d\n", calledfrom);
-    exit(-1);
+    //exit(-1);
   }
   return val;
 }
