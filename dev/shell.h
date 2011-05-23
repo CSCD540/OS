@@ -218,6 +218,7 @@ void show_help()
   printf(" diskdump\n   display out all of the disk information\n\n");
   printf(" echo on|off\n   echo the commands typed on the command line\n\n");
   printf(" exit\n   exit the virtual machine\n\n");
+  printf(" fdisk\n   format the virtual disk\n\n");
   printf(" filedump\n   display out the binary representation of a file\n\n");
   printf(" help\n   display this document\n\n");
   printf(" hdload\n   load a previously saved virtual hard disk into the current disk\n\n");

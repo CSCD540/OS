@@ -138,7 +138,7 @@ void print_disk(struct block disk[])
     {
       printf(" %5d", disk[i].instructions[j]);
       if( j == (BLOCKSIZE - 1) || (j + 1) % BLOCKSIZE == 0)
-          printf(" | %5d\n", j);
+          printf(" | %5d\n", i * BLOCKSIZE + j);
     }
   }
   printf("\n");

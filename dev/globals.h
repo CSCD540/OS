@@ -7,9 +7,8 @@
 
 #define DEBUG         0 // Run debugging
 #define PT_DBG_LVL    0 // The page table debugging level
-#define DBGCPU        1
-#define DBGCPU1       0
-
+#define DBGCPU        1 // Turn CPU debugging on(1)/off(0)
+#define STEPCPU       0 // Make user hit key to advance program counter
 
 //-----------------------------------------------------------------------------
 //                          Constants
@@ -26,10 +25,10 @@
 #define UNLOCKED      2   // remove lock
 #define ENDPROCESS    3
 
-#define p0WRITE   4  // tells p0 to run-p0 should only run after a write to gmem
+#define p0WRITE       4  // tells p0 to run-p0 should only run after a write to gmem
 
 // General
-#define BLOCKSIZE  4  // number of instructions per block
+#define BLOCKSIZE     4  // number of instructions per block
 
 // Filesystem 
 #define DISKSIZE      ((BLOCKSIZE) * 512)          // Total size of the disk
@@ -54,7 +53,7 @@
 #define PAGESIZE   ((BLOCKSIZE) * 4)        // size of each page in words 2-bytes
 #define NUMPAGES   ((MAXMEM) / (PAGESIZE))  // Number of pages in page table
 
-#define keyhit(a) {if(DBGCPU1){printf("hit enter --(%d)", a); getchar();}}
+#define keyhit(a) {if(STEPCPU){printf("hit enter --(%d)", a); getchar();}}
 
 
 //-----------------------------------------------------------------------------

@@ -10,6 +10,10 @@
 #include "shell.h"
 #include "pt.h"
 
+// FILE TO TEST WITH
+char * FILENAME = "sort.out";
+
+
 //int save_file(char *filename);
 //int write(struct fileNode **fileListNode, int data[], int count, int writeMode, int offset);
 void write2Page(int pid, int vpn);
@@ -20,13 +24,14 @@ main(int argc, char *argv[])
 {
   struct process * firstProc = malloc(sizeof(struct process) + sizeof(char[50]));
   firstProc->pid = 0;
-  firstProc->filename = "testingPT.out";
+  firstProc->filename = FILENAME;
   printf("First Process - id: %d; filename: %s\n", firstProc->pid, firstProc->filename);
-  processTable[0] = firstProc;
+  processes[0] = *firstProc;
+
   
   init_disk(disk);
-  int status = save_file("testingPT.out");
-  printf("Save file testingPT.out to vfs status: %d\n", status);
+  int status = save_file(FILENAME);
+  printf("Save file %s to vfs status: %d\n", FILENAME, status);
   
   print_disk(disk);
   init_mem();
@@ -47,6 +52,9 @@ main(int argc, char *argv[])
   accessPage(0, 5);
   accessPage(0, 6);
   accessPage(0, 3);
+  
+  
+  print_disk(disk);
 }
 
 void write2Page(int pid, int vpn)
@@ -55,7 +63,7 @@ void write2Page(int pid, int vpn)
   
   print_pt();
   
-  int physPgNm = lookup(pid, vpn, 1);
+  int physPgNm = lookup(processes[0], vpn, 1);
   mem[0][PAGESIZE * physPgNm] = 1024;
   
   printf("\r\nPhysical page number is: %d\r\n", physPgNm);
@@ -71,7 +79,7 @@ void accessPage(int pid, int vpn)
   
   print_pt();
   
-  int physPgNm = lookup(pid, vpn, 0);
+  int physPgNm = lookup(processes[0], vpn, 0);
   
   printf("\r\nPhysical page number is: %d\r\n", physPgNm);
   
