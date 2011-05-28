@@ -21,10 +21,47 @@
 
 // #include "efs.h"
 
+int lookup_addr(int vip, int cur_proc, int rw);
 int lookup_ip(struct process proc, int rw);
 int lookup(struct process proc, int vpn, int rw);
 int page_fault(struct process proc, int vpn);//, int rw);
 
+/* int lookup_addr(int vip, int rw) // Externally accessible method
+ *
+ * Description: This function calculates the virtual page number of the instruction
+ *              then calls lookup(int proc, int vpn, int rw)
+ * Input:
+ *        vip - The virtual address you are looking up
+ *        cur_proc - the process you are currently in
+ *        rw  - Memory read/write designation (0 - read; 1 - write)
+ * Output: Returns the physical instruction number to run
+ *          or -1 if the virtual page number is beyond the end of the file
+ */
+int lookup_addr(int vip, int cur_proc, int rw)
+{
+  int offset = 0;
+  int page = 0;
+  int vpn = 0;
+  int temp_ip = processes[cur_proc].ip;
+  
+  vpn = vip>>pageBits;
+  offset = vip % PAGESIZE;
+  processes[cur_proc].ip = vip;
+  page = (lookup(processes[cur_proc], vpn, rw)) << pageBits; //Left shift it back
+  if(DEBUG) 
+  { 
+    printf("vpn %d\n", vpn);
+    printf("Offset %d\n", offset);
+    printf("Page %d\n", page);
+  }
+    processes[cur_proc].ip = temp_ip;
+  if(page == ENDF)
+  {
+    printf("ERROR: Page not found.\n");
+    return OUT_OF_RANGE;//Error
+  }
+  return (page | offset);
+}
 
 /* int lookup(int proc, int rw) // Externally accessible method
  *
@@ -43,15 +80,19 @@ int lookup_ip(struct process proc, int rw)
   vpn = proc.ip>>pageBits;
   proc.offset = proc.ip % PAGESIZE;
   proc.page = (lookup(proc, vpn, rw)) << pageBits; //Left shift it back
+  if(DEBUG) 
+  { 
+    printf("vip %d\n", proc.ip);
+    printf("vpn %d\n", vpn);
+    printf("Offset %d\n", proc.offset);
+    printf("Page %d\n", proc.page);
+  }
+  
   if(proc.page == ENDF)
   {
     printf("ERROR: Page not found.\n");
     return OUT_OF_RANGE;//Error
   }
-  //printf("VIP %d\n", proc.ip);
-  //printf("V Page %d\n", vpn);
-  //printf("Offset %d\n", offset);
-  //printf("IP %d\n", page | offset);
   return (proc.page | proc.offset);
 }
 

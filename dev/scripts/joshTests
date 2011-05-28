@@ -1,8 +1,10 @@
 echo on
-memdump
 save ../milk1.out
 load ../milk1.out
+load ../milk1.out
+memdump
 run
+memdump
 exit
 memdump
 exit
@@ -13,7 +15,6 @@ ptdump
 
 save ../sort.out
 load ../sort.out
-load ../milk1.out
 memdump
 ptdump
 piddump
