@@ -50,9 +50,10 @@ int lookup_addr(int vip, int cur_proc, int rw)
   page = (lookup(processes[cur_proc], vpn, rw)) << pageBits; //Left shift it back
   if(DEBUG) 
   { 
+    printf("vip %d\n", vip);
     printf("vpn %d\n", vpn);
     printf("Offset %d\n", offset);
-    printf("Page %d\n", page);
+    printf("Page %d\n", page | offset);
   }
     processes[cur_proc].ip = temp_ip;
   if(page == ENDF)

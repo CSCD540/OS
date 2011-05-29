@@ -14,12 +14,12 @@
 //                          Constants
 //-----------------------------------------------------------------------------
 
-#define MAXPRO        1   // max num of processes
+#define MAXPRO        8   // max num of processes
 #define MAXPROGRAMS   8   // max number of program a CPU can run
 #define MAXMEM        64  // max size of a process in word/sizeof(int) bytes
-#define STACKSIZE     100 // max size of the stack
+#define STACKSIZE     128 // max size of the stack
 #define REGISTERSIZE  10  // size of each process registers
-#define MAXGMEM       20  // max size of global memory
+#define MAXGMEM       32  // max size of global memory
 #define NORMAL        0   // denotes a normal return from exe()
 #define LOCKED        1   // stops process switching until unlock
 #define UNLOCKED      2   // remove lock

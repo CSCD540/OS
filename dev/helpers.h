@@ -234,7 +234,7 @@ void print_mem()
     printf("\n");
     printf("\r\n%c[%d;%dm   MAIN MEMORY   %c[%dm\r\n", 27, 1, 42, 27, 0);
     printf("Memory: size %d (per process)\n", MAXMEM);
-    for(i = 0; i < MAXPRO; ++i)
+    for(i = 0; i < 1/*MAXPRO*/; ++i)
     {
         printf("Process %d: Addresses 0 - %d with %d pages of size %d\n", i, MAXMEM, NUMPAGES, PAGESIZE);
         for(j = 0; j < MAXMEM; ++j)
@@ -372,12 +372,16 @@ void print_stack(int stack[][STACKSIZE], int sp[])
 {
   int i, j;
   printf("\n");
-  for(i = 0; i < MAXPRO; i++)
+  for(i = 1; i < MAXPRO; i++)
   {
     printf("Stack contents for process %d\n", i);
     for(j = 0; j < STACKSIZE; j++)
-      printf("%5d\n", stack[i][j]);
-    printf("SP at %d\n\n", sp[i]);
+    {
+        printf(" %5d", stack[i][j]);
+        if( j == (STACKSIZE - 1) || (j + 1) % PAGESIZE == 0)
+          printf(" | %d\n", j);
+    }
+    printf(" | SP at %5d\n", sp[i]);
   }
   printf("\n");
 }
