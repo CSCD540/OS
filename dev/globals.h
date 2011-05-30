@@ -136,9 +136,8 @@ struct block disk[NUMBLOCKS];           //Our virtual HD
 struct process processes[MAXPROGRAMS];  //Our pid table
 int  gmem[MAXGMEM];                     // global var sit here
 int  mem[MAXPRO][MAXMEM];               // Main mem for each process
-int  reg[MAXPRO][REGISTERSIZE];
-int  endprog[MAXPRO];                   // last instruction of proc
-int  jsym[60];
+//int  endprog[MAXPRO];                   // last instruction of proc
+//int  jsym[60];
 int  pageBits = 0;
 int  curProcesses = 0;                  //Number of processes loaded
 

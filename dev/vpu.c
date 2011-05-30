@@ -12,7 +12,7 @@
 // #include "efs.h"
 
 // Methods declaration
-int  exe(int stack[][STACKSIZE],int sp[],int reg[][REGISTERSIZE], int next_instruct[], int cur_proc, int *terminate);
+int  exe(int stack[][STACKSIZE],int sp[], int next_instruct[], int cur_proc, int *terminate);
 void executeit();
 void grab_data(int index,int *grabdata);
 int  peek(int stack[][STACKSIZE], int proc_id, int sp[], int offset);
@@ -180,9 +180,6 @@ int main(int argc, char *argv[])
       else
         printf("SYNTAX: showPage page_number\n"); 
     }
-    else if(strcmp(cmd, "showRegisterData")==0)
-    {
-    }
     else
 		{
       printf("Command Not Found\n");
@@ -268,7 +265,7 @@ void executeit()
         {
           processes[cur_proc].status = RUNNING;
           next_instruct[cur_proc];
-          msg = exe(stack,sp,reg, next_instruct, cur_proc, &terminate);
+          msg = exe(stack, sp, next_instruct, cur_proc, &terminate);
         }
         else
         {
@@ -312,7 +309,7 @@ void executeit()
   }
 }
 
-int exe(int stack[][STACKSIZE], int sp[], int reg[][REGISTERSIZE], int next_instruct[], int cur_proc, int *terminate)
+int exe(int stack[][STACKSIZE], int sp[], int next_instruct[], int cur_proc, int *terminate)
 {
   int i, k, m; // delete these after all accesses renamed, except i
   int diff, tmp, tmp1, tmp2;
@@ -369,44 +366,43 @@ int exe(int stack[][STACKSIZE], int sp[], int reg[][REGISTERSIZE], int next_inst
           break;
 
       case POPD : //This takes one argument (The next 'instruction' is the register to pop into)
-			      tmp = mem[0][i+1];
             tmp1 = pop(stack, cur_proc, sp, 10) ;
-			      if(DBGCPU) printf("POPD: popd %d into %d\n", tmp1, tmp);
-            if(tmp < 230)
-            { gmem[tmp] = tmp1; }
-            else
+            if((i % PAGESIZE) == PAGESIZE-1) // This is the Boundary between every page.
             {
-              tmp = tmp-230;
-              reg[cur_proc][tmp] = tmp1;
+              next_instruct[cur_proc] = lookup_addr(next_instruct[cur_proc] + 1, cur_proc, 0); 
+              i = next_instruct[cur_proc] - 1;
             }
+			      tmp = mem[0][i+1];
+            if(DBGCPU) printf("POPD %d into %d\n", tmp1, tmp);
+            
+            gmem[tmp] = tmp1; 
             next_instruct[cur_proc]++;
             processes[cur_proc].ip++;
-          break;
+            break;
 
       case POP : 
-          tmp1 = pop(stack, cur_proc, sp, 12);
-          if(DBGCPU) printf("POP %d into nowhere\n",tmp1);
-          break;
+            tmp1 = pop(stack, cur_proc, sp, 12);
+            if(DBGCPU) printf("POP %d into nowhere\n",tmp1);
+            break;
 
       case LD :
             tmp = pop(stack, cur_proc, sp, 14);
             tmp1 = gmem[tmp];
             if(DBGCPU) printf("LD %d from %d\n",tmp1, tmp);
-            // printf("%04d LD %d %d\n",i,tmp1,tmp);
             push(stack, cur_proc, sp, tmp1, 15);
-          break;
+            break;
 
       case LA : 
-            if(DBGCPU) printf("LA %d\n",tmp);
 	          if((i % PAGESIZE) == PAGESIZE-1) // This is the Boundary between every page.
-	          {
-              // load address of start of array
-		          tmp = mem[0][i];
-	          }
-	          else
-	            tmp = mem[0][i+1];
+            {
+              next_instruct[cur_proc] = lookup_addr(next_instruct[cur_proc] + 1, cur_proc, 0); 
+              i = next_instruct[cur_proc] - 1;
+            }
+	          
+	          tmp = mem[0][i+1];
+	          if(DBGCPU) printf("LA %d\n",tmp);
+            
             push(stack, cur_proc, sp, tmp, 17);
-	          // printf("%04d LA %d %d\n",i,tmp);
             next_instruct[cur_proc]++;
             processes[cur_proc].ip++;
           break;
@@ -420,13 +416,8 @@ int exe(int stack[][STACKSIZE], int sp[], int reg[][REGISTERSIZE], int next_inst
             
             tmp = mem[0][i+1];
             
-            if(tmp < 230)
-              tmp1 = gmem[tmp];
-            else
-            {
-              tmp = tmp-230;
-              tmp1 = reg[cur_proc][tmp];
-            }
+            tmp1 = gmem[tmp];
+            
             if(DBGCPU)printf("LOAD %d from index %d\n", tmp1, tmp);
             push(stack, cur_proc, sp, tmp1, 19);
             next_instruct[cur_proc]++;
@@ -455,16 +446,11 @@ int exe(int stack[][STACKSIZE], int sp[], int reg[][REGISTERSIZE], int next_inst
 
             tmp1 = mem[0][i+1];
             
-            if(tmp1 < 230)//What is this for?!?!
-            {
-              gmem[tmp1] = tmp;
-              if (DBGCPU) printf("STOR gmem[%d] = %d\n", tmp1, gmem[tmp1]);
-            } 
-            else
-              reg[cur_proc][tmp1-230] = tmp;
+            gmem[tmp1] = tmp;
+            if (DBGCPU) printf("STOR gmem[%d] = %d\n", tmp1, gmem[tmp1]);
+            
             next_instruct[cur_proc]++;
             processes[cur_proc].ip++;
-          
             break;
 
       case ST :
