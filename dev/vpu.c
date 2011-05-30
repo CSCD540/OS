@@ -12,7 +12,7 @@
 // #include "efs.h"
 
 // Methods declaration
-int  exe(int stack[][STACKSIZE],int sp[],int reg[][REGISTERSIZE], int next_instruct[],int next_inst[], int cur_proc, int *terminate, int * cur_p);
+int  exe(int stack[][STACKSIZE],int sp[],int reg[][REGISTERSIZE], int next_instruct[], int cur_proc, int *terminate);
 void executeit();
 void grab_data(int index,int *grabdata);
 int  peek(int stack[][STACKSIZE], int proc_id, int sp[], int offset);
@@ -209,7 +209,6 @@ void executeit()
   //int proc_complete[MAXPRO];  //Is the process done?
   int locked=UNLOCKED;
   int terminate = 0;
-  int diff = 0;
 
   //Clear the stack, registers and reset the stack pointers
   memset(stack, 0, MAXPRO*STACKSIZE*sizeof(int));
@@ -230,7 +229,6 @@ void executeit()
   {
     cont:
       keyhit(55); 
-
       if (HALTED == TERMINATED)
       {
         HALTED = NOT_FINISHED;
@@ -241,13 +239,12 @@ void executeit()
         if(processes[cur_proc].status == RUNNING)
           processes[cur_proc].status = READY;
           
-        do{
+        do{//Select a new process to run
           cur_proc = (cur_proc + 1) % curProcesses;//rand() % curProcesses; //Find one of the programs to run  
-        }while(processes[cur_proc].status == TERMINATED);//Only use non-terminated processes
+        }while(processes[cur_proc].state == TERMINATED);//Only use non-terminated processes
       }
       
       next_instruct[cur_proc] = lookup_ip(processes[cur_proc], 0);
-      
       if(next_instruct[cur_proc] < 0) //Can't have a negative IP
         return;
         
@@ -264,13 +261,14 @@ void executeit()
           printf("----------------------------cur_proc: %d\n",cur_proc);
         goto checkdone;
       }
+      
       if(next_instruct[cur_proc] < 256) // safe guard
       {
-        diff = next_instruct[cur_proc];
         if(processes[cur_proc].status == READY)
         {
           processes[cur_proc].status = RUNNING;
-          msg = exe(stack,sp,reg, next_instruct, next_instruct, cur_proc, &terminate, &cur_proc);
+          next_instruct[cur_proc];
+          msg = exe(stack,sp,reg, next_instruct, cur_proc, &terminate);
         }
         else
         {
@@ -278,65 +276,57 @@ void executeit()
           //If we pick a number less than 10 out of 1000 the IO returned and set status to 0 ready
           processes[cur_proc].status = READY;
         }
-        
-        if(diff != next_instruct[cur_proc]) processes[cur_proc].ip++;//If the next_instruct changed increment
-        
-        if(msg==ENDPROCESS || terminate == TERMINATED)
+                
+        if(msg == ENDPROCESS || msg == ENDPROGRAM || terminate == TERMINATED)
         {
-          processes[cur_proc].status = TERMINATED; //Terminated
+          processes[cur_proc].state = TERMINATED; //Terminated
+          if(ENDPROGRAM == msg)//End all the programs associated with this process
+          {
+            for(i = 0; i< curProcesses; i++)//If at least one process is still running
+              if(strcmp(processes[i].filename, processes[cur_proc].filename) == 0)
+                processes[i].state = TERMINATED;
+          }
           goto checkdone;
         }
-
-        // increment next_instruction
-        next_instruct[cur_proc]++;
-        processes[cur_proc].ip++;
-        if(DBGCPU && (abs( next_instruct[cur_proc] - diff) > 2) )
-        {    
-          if(0 < cur_proc % 3) printf("\t\t\t\t");
-          if(2 ==cur_proc % 3) printf("\t\t\t\t");
-          printf("Process %d: Next instr %d at Vip %d\n", cur_proc, next_instruct[cur_proc],processes[cur_proc].ip);
-        }
+        
         if(msg==UNLOCKED)
-        {
-          // printf("unlock\n");
           locked=UNLOCKED;
-        }
         else if(msg==LOCKED || locked==LOCKED)
-        {
-          // printf("locked\n");
-          locked=LOCKED;
-        }
+          locked = LOCKED;
+          
       }
       else
       {
-        printf("Process %d complete, terminate=%d\n",cur_proc, terminate);
-        processes[cur_proc].status = TERMINATED;
+        printf("Process %d complete, terminate = %d\n",cur_proc, terminate);
+        processes[cur_proc].state = TERMINATED;
       }
       // check if all processes are done
     checkdone:
       for(i = 0; i< curProcesses; i++)//If at least one process is still running
-        if(processes[i].state == NOT_FINISHED)
+        if(processes[i].state != TERMINATED)
+        {
+          terminate = NOT_FINISHED;
           goto cont;
+        }
       break;
   }
-  // print_stack(stack,sp); stack should be all 0 and sp at -1
-  //print_gmem();
-  //print_register(reg);
 }
 
-int exe(int stack[][STACKSIZE], int sp[], int reg[][REGISTERSIZE], int next_instruct[], int next_inst[], int cur_proc, int *terminate, int *cur_p)
+int exe(int stack[][STACKSIZE], int sp[], int reg[][REGISTERSIZE], int next_instruct[], int cur_proc, int *terminate)
 {
   int i, k, m; // delete these after all accesses renamed, except i
-  int tmp, tmp1, tmp2;
+  int diff, tmp, tmp1, tmp2;
   int real_inst;
   char name[11];
 
-  i = next_inst[cur_proc];
+
+  i = next_instruct[cur_proc];
+  diff = i;
   real_inst = i;
   if(0 < cur_proc % 3)printf("\t\t\t\t");
   if(2 ==cur_proc % 3)printf("\t\t\t\t");
-  printf("(pid=%d) PC = %d:  ", cur_proc, i);
-  printf(" = %d\n", mem[0][i] );
+  printf("(pid=%d) IP = %d:  ", cur_proc, processes[cur_proc].ip);
+  printf("mem[0][%d] = %d\n", i, mem[0][i] );
   if(0 < cur_proc % 3)printf("\t\t\t\t");
   if(2 ==cur_proc % 3)printf("\t\t\t\t");
 
@@ -349,12 +339,12 @@ int exe(int stack[][STACKSIZE], int sp[], int reg[][REGISTERSIZE], int next_inst
      /** OPEN, READ, CLOSE, WRITE, SEEK ::  OS services **/
       case OPEN :
           if (DBGCPU) printf("Open file\n");
-          processes[cur_proc].state = 2; //Set to waiting on IO
+          processes[cur_proc].state = WAITING; //Set to waiting on IO
           break;
           
       case READ :
           if (DBGCPU) printf("Read file\n");
-          processes[cur_proc].state = 2; //Set to waiting on IO
+          processes[cur_proc].state = WAITING; //Set to waiting on IO
           break;
 
       case CLOSE :
@@ -363,13 +353,13 @@ int exe(int stack[][STACKSIZE], int sp[], int reg[][REGISTERSIZE], int next_inst
 
       case WRITE :
           if (DBGCPU) printf("Open file\n");
-          processes[cur_proc].state = 2; //Set to waiting on IO
+          processes[cur_proc].state = WAITING; //Set to waiting on IO
           break;
 
       case SEEK :
             tmp = peek(stack, cur_proc, sp, 0) ;
             if (DBGCPU) printf("SEEK offset=  0,  data=%d\n", tmp);
-            processes[cur_proc].state = 2; //Set to waiting on IO
+            processes[cur_proc].state = WAITING; //Set to waiting on IO
             tmp1 = peek(stack, cur_proc, sp, -1) ;
             if (DBGCPU)
             {
@@ -389,7 +379,8 @@ int exe(int stack[][STACKSIZE], int sp[], int reg[][REGISTERSIZE], int next_inst
               tmp = tmp-230;
               reg[cur_proc][tmp] = tmp1;
             }
-            next_inst[cur_proc]++;
+            next_instruct[cur_proc]++;
+            processes[cur_proc].ip++;
           break;
 
       case POP : 
@@ -407,7 +398,7 @@ int exe(int stack[][STACKSIZE], int sp[], int reg[][REGISTERSIZE], int next_inst
 
       case LA : 
             if(DBGCPU) printf("LA %d\n",tmp);
-	          if(i == PAGESIZE-1 || i == PAGESIZE * 2-1) // This is the Boundary between every page.
+	          if((i % PAGESIZE) == PAGESIZE-1) // This is the Boundary between every page.
 	          {
               // load address of start of array
 		          tmp = mem[0][i];
@@ -416,19 +407,19 @@ int exe(int stack[][STACKSIZE], int sp[], int reg[][REGISTERSIZE], int next_inst
 	            tmp = mem[0][i+1];
             push(stack, cur_proc, sp, tmp, 17);
 	          // printf("%04d LA %d %d\n",i,tmp);
-            next_inst[cur_proc]++;
+            next_instruct[cur_proc]++;
+            processes[cur_proc].ip++;
           break;
 
       case LOAD : //Loads the gmem address at tmp
-            if(DBGCPU)printf("LOAD ");
-	          if(i == PAGESIZE-1 || i == PAGESIZE*2-1) // This is the Boundary between every page.
-	            tmp = mem[0][i];
-	          else
-	            tmp = mem[0][i+1];
-            // printf("load 1 %d\n",tmp);
-            // printf("load 1 mem[%d][%d]\n",cur_proc, i+1);
-            // printf("stack  0= %d\n", peek(stack,cur_proc,sp, 0)) ;
-            // printf("stack -1= %d\n", peek(stack,cur_proc,sp, -1)) ;
+	          if((i % PAGESIZE) == PAGESIZE-1) // This is the Boundary between every page.
+            {
+              next_instruct[cur_proc] = lookup_addr(next_instruct[cur_proc] + 1, cur_proc, 0); 
+              i = next_instruct[cur_proc] - 1;
+            }
+            
+            tmp = mem[0][i+1];
+            
             if(tmp < 230)
               tmp1 = gmem[tmp];
             else
@@ -436,122 +427,122 @@ int exe(int stack[][STACKSIZE], int sp[], int reg[][REGISTERSIZE], int next_inst
               tmp = tmp-230;
               tmp1 = reg[cur_proc][tmp];
             }
-            if(DBGCPU)printf("%d from index %d = %d\n", tmp1, tmp, *cur_p);
+            if(DBGCPU)printf("LOAD %d from index %d\n", tmp1, tmp);
             push(stack, cur_proc, sp, tmp1, 19);
-            // printf("%04d load tmp %d %d %d\n",i+1,tmp,tmp1,cur_proc);
-            // printf("stack  0= %d\n", peek(stack,cur_proc,sp, 0)) ;
-            // printf("stack -1= %d\n", peek(stack,cur_proc,sp, -1)) ;
-            next_inst[cur_proc]++;
+            next_instruct[cur_proc]++;
+            processes[cur_proc].ip++;
           break;
 
       case LOADI : //Load the constant to the stack
-            if(i == PAGESIZE-1 || i == PAGESIZE*2-1) // This is the Boundary between every page.
+            if((i % PAGESIZE) == PAGESIZE-1) // This is the Boundary between every page.
             {
-              push(stack, cur_proc, sp, mem[0][i], 21);
-              if(DBGCPU)printf("LOADI and Push: %d\n",mem[0][i]);
+              next_instruct[cur_proc] = lookup_addr(next_instruct[cur_proc] + 1, cur_proc, 0); 
+              i = next_instruct[cur_proc] - 1;
             }
-            else
-            {
-              push(stack, cur_proc, sp, mem[0][i+1], 21);
-              if(DBGCPU)printf("LOADI Push:%d\n",mem[0][i+1]);
-            } 
-            // printf("%04d loadi %d\n",i,stack[cur_proc][sp[cur_proc]] );
-            next_inst[cur_proc]++;
+            push(stack, cur_proc, sp, mem[0][i + 1], 21);
+            if(DBGCPU)printf("LOADI and Push:%d\n",mem[0][i+1]);
+            next_instruct[cur_proc]++;
+            processes[cur_proc].ip++;
           break;
 
       case STOR : //Stor at the gmem index indicated 
             tmp = pop(stack, cur_proc, sp, 68);
-            if (i == PAGESIZE-1 || i == PAGESIZE * 2-1) // This is the Boundary between every page.
-              tmp1 = mem[0][i];
-            else
-              tmp1 = mem[0][i+1];
-            if(tmp1 < 230)
+            if((i % PAGESIZE) == PAGESIZE-1) // This is the Boundary between every page.
+            {
+              next_instruct[cur_proc] = lookup_addr(next_instruct[cur_proc] + 1, cur_proc, 0); 
+              i = next_instruct[cur_proc] - 1;
+            }
+
+            tmp1 = mem[0][i+1];
+            
+            if(tmp1 < 230)//What is this for?!?!
             {
               gmem[tmp1] = tmp;
-              if (DBGCPU) printf("STOR wrote %d to global mem in index %d\n", gmem[tmp1], tmp1);
-              // printf("returning p0WRITE\n"); keyhit(99);
-              next_inst[cur_proc]++;
-              return p0WRITE;
+              if (DBGCPU) printf("STOR gmem[%d] = %d\n", tmp1, gmem[tmp1]);
             } 
             else
-            {
               reg[cur_proc][tmp1-230] = tmp;
-              next_inst[cur_proc]++;
-            }
-          break;
+            next_instruct[cur_proc]++;
+            processes[cur_proc].ip++;
+          
+            break;
 
       case ST :
             tmp = pop(stack, cur_proc, sp, 70); // does ST ever need to store in a register?
-            // printf("%d\n",tmp);
             tmp1 = pop(stack, cur_proc, sp, 72);
-            // printf("%d\n",tmp1);
-            if(DBGCPU) printf("ST %d int gmem[%d]\n",tmp1, tmp);
-            
             gmem[tmp] = tmp1;
-            if (DBGCPU) printf("process %d wrote to global mem in index %d, %d\n", cur_proc, tmp, gmem[tmp]);
-            return p0WRITE;
-                  
-      case JFALSE : //Jump to the address specified  (needs pt translation)
+            if(DBGCPU) printf("ST %d into gmem[%d]\n",tmp1, tmp);
+            break;
+            
+      case JFALSE : //Conditional Jump to the address specified  (needs pt translation)
             tmp = pop(stack, cur_proc, sp, 74);
-            if(i == PAGESIZE-1 || i == PAGESIZE*2-1) // This is the Boundary between every page.
-            { 
-              int temp = lookup_addr(next_inst[cur_proc]+1,cur_proc,0); 
-              tmp2 = mem[0][temp] - 2;//Need to look up the next page and subtract one so our vitrual i is two less
-            }
-            else
-              tmp2 = mem[0][i+1];
-            if(DBGCPU) printf("JFALSE %d %d \n", tmp, tmp2);
+            if((i % PAGESIZE) == PAGESIZE-1) // This is the Boundary between every page.
+            {
+              next_instruct[cur_proc] = lookup_addr(next_instruct[cur_proc] + 1, cur_proc, 0) - 1; 
+              i = next_instruct[cur_proc];
+            } //This updates our next_inst[cur_proc] and i to point to the next instruction
+            
+            //Locations in mem are absoluate addresses from the beginning of the file starting at 1
+            
+            //Indexing starts at 0 not 1, also adjust for the poffset            
+            tmp2 = mem[0][i+1] - processes[cur_proc].poffset - 1;
             if(tmp == 0)
             {
-              next_instruct[cur_proc] = lookup_addr(tmp2 - 1, cur_proc, 0); // sub one for PC in executeit()
+              next_instruct[cur_proc] = lookup_addr(tmp2, cur_proc, 0) - 1; // sub one for IP increment at end of funciton
               processes[cur_proc].ip = tmp2 - 1;
-            }
+            }//Jump to the right spot
             else
-              next_inst[cur_proc]++;
-          break;
-      case JMP: //Jump to the address specified  (needs pt translation)
-            if(i == PAGESIZE-1 || i == PAGESIZE*2-1) // This is the Boundary between every page.
             {
-              int temp = lookup_addr(next_inst[cur_proc]+1,cur_proc,0); 
-              tmp = mem[0][temp] - 2;//Need to look up the next page and subtract one so our vitrual i is one less
+              next_instruct[cur_proc]++;
+              processes[cur_proc].ip++;
             }
-            else
-              tmp = lookup_addr(mem[0][i], cur_proc, 0);	//mem[0][i];
-            next_instruct[cur_proc] = lookup_addr(tmp - 1, cur_proc, 0); // sub one for PC in executeit() 
+            if(DBGCPU) 
+              printf("JFALSE (%d == 0) goto %d: mem[0][%d] = %d \n", tmp, tmp2, next_instruct[cur_proc] + 1, mem[0][next_instruct[cur_proc] + 1]);
+            
+          break;
+      case JMP: //Unconditional Jump to the address specified  (needs pt translation)
+            if((i % PAGESIZE) == PAGESIZE-1) // This is the Boundary between every page.
+            {
+              next_instruct[cur_proc] = lookup_addr(next_instruct[cur_proc] + 1, cur_proc, 0) - 1; 
+              i = next_instruct[cur_proc];
+            } //This updates our next_inst[cur_proc] and i to point to the next instruction
+
+            //Locations in mem are absoluate addresses from the beginning of the file starting at 1
+            
+            //Indexing starts at 0 not 1, also adjust for the poffset            
+            tmp = mem[0][i + 1] - processes[cur_proc].poffset - 1;
+            
+            next_instruct[cur_proc] = lookup_addr(tmp - 1, cur_proc, 0); // sub one for IP increment at end of funciton
             processes[cur_proc].ip = tmp - 1;
-            if(DBGCPU) printf("JMP to %d\n", i, next_instruct[cur_proc]); 
-            // next_inst[cur_proc]++;
+            if(DBGCPU) printf("JMP goto %d: mem[0][%d] = %d \n", tmp - 1, next_instruct[cur_proc] + 1, mem[0][next_instruct[cur_proc]+1]);
             break;
       
       case LOCK :
-			      if (DEBUG) printf("LOCK called by process %d\n", cur_proc); 
+			      if (DBGCPU) printf("LOCK called by process %d\n", cur_proc); 
             return LOCKED;
 
       case UNLOCK : 
-  					if (DEBUG) printf("UNLOCK called\n");
+  					if (DBGCPU) printf("UNLOCK called by process %d\n", cur_proc);
             return UNLOCKED;
 
       case HALT :
             printf("HALT called by process %d\n\n", cur_proc);
-            // print_gmem();
-            // print_register(reg);
-            HALTED=1;
-            *terminate = 1;
-            // exit(0);
+            HALTED = TERMINATED;
+            *terminate = TERMINATED;
           break;    
           
       case END : 
-            if (DEBUG) printf("Process %d completed normally\n", cur_proc);
-            p0running=0;
-            
+            if (DBGCPU) printf("END: Process %d completed normally\n", cur_proc);
+            *terminate = TERMINATED;
             return ENDPROCESS;
 
-      case ENDP :
-            // printf("ENDP\n");
-            *terminate = 1;
-            break;
+      case ENDP : //This should end all processes in the file.
+            if (DBGCPU) printf("ENDP: Program %s completed normally\n", processes[cur_proc].filename);
+            *terminate = TERMINATED;
+            return ENDPROGRAM;
+            //break;
             
-      case STOP :
+      case STOP : //Wait until a key is pressed
             printf("STOP called by proccess %d, hit any key to continue\n", cur_proc);
             scanf("%d", &tmp2);
           break;    
@@ -559,17 +550,17 @@ int exe(int stack[][STACKSIZE], int sp[], int reg[][REGISTERSIZE], int next_inst
       case ADD :
             tmp1 = pop(stack, cur_proc, sp, 16);
             tmp2 = pop(stack, cur_proc, sp, 18);
+            if(DBGCPU) printf("ADD %d = %d + %d \n", tmp1 + tmp2, tmp1, tmp2);
             tmp1 += tmp2;
             push(stack, cur_proc, sp, tmp1, 23);
-            if(DBGCPU) printf("ADD %d += %d\n",i, tmp1, tmp2);
           break;
 
       case SUB :
             tmp1 = pop(stack, cur_proc, sp, 20);
             tmp2 = pop(stack, cur_proc, sp, 22);
-            tmp1 = tmp2-tmp1;
+            if(DBGCPU) printf("SUB %d = %d - %d \n", tmp2 - tmp1, tmp2, tmp1);
+            tmp1 = tmp2 - tmp1;
             push(stack, cur_proc, sp, tmp1, 25);
-            if(DBGCPU) printf("SUB %d -= %d\n",i, tmp1, tmp2);
           break;
 
       case MUL :
@@ -577,28 +568,30 @@ int exe(int stack[][STACKSIZE], int sp[], int reg[][REGISTERSIZE], int next_inst
             tmp2 = pop(stack, cur_proc, sp, 26);
             tmp1 *= tmp2;
             push(stack, cur_proc, sp, tmp1, 27);
-            if(DBGCPU) printf("MUL %d *= %d\n",i, tmp1, tmp2);
+            if(DBGCPU) printf("MUL %d = %d* %d\n",i, tmp1, tmp1 / tmp2, tmp2);
           break;
 
       case DIV :
             tmp1 = pop(stack, cur_proc, sp, 28);
             tmp2 = pop(stack, cur_proc, sp, 30);
-            tmp1 = tmp2 / tmp1;
+            if(DBGCPU) printf("DIV %d = %d / %d \n", tmp1 / tmp2, tmp1, tmp2);
+            tmp1 /= tmp2;
             push(stack, cur_proc, sp, tmp1, 29);
-            if(DBGCPU) printf("DIV %d /= %d\n",i, tmp1, tmp2);
           break;
       
       case AND :
             tmp1 = pop(stack, cur_proc, sp, 32);
             tmp2 = pop(stack, cur_proc, sp, 34);
+            if(DBGCPU) printf("AND %d = %d && %d \n", tmp1 && tmp2, tmp1, tmp2);
             tmp1 = tmp1 && tmp2;
             push(stack, cur_proc, sp, tmp1, 31);
-            if(DBGCPU) printf("AND %d \n", tmp1); 
+             
           break ;
 
       case OR:
             tmp1 = pop(stack, cur_proc, sp, 36);
             tmp2 = pop(stack, cur_proc, sp, 38);
+            if(DBGCPU) printf("OR %d = %d || %d \n", tmp1 || tmp2, tmp1, tmp2);
             tmp1 = tmp1 || tmp2;
             push(stack, cur_proc, sp, tmp1, 33);
             if(DBGCPU) printf("OR %d \n", tmp1); 
@@ -606,9 +599,9 @@ int exe(int stack[][STACKSIZE], int sp[], int reg[][REGISTERSIZE], int next_inst
 
       case NOT :
             tmp1 = pop(stack, cur_proc, sp, 40);
+            if(DBGCPU) printf("NOT %d = !%d \n", !tmp1, tmp1);
             tmp1 = !tmp1;
             push(stack, cur_proc, sp, tmp1, 35);
-            if(DBGCPU) printf("NOT %d \n", tmp1); 
           break;
 
       case LE_OP :
@@ -616,7 +609,7 @@ int exe(int stack[][STACKSIZE], int sp[], int reg[][REGISTERSIZE], int next_inst
             tmp2 = pop(stack, cur_proc, sp, 44);
             tmp = tmp1 >= tmp2;
             push(stack, cur_proc, sp, tmp, 37);
-            if(DBGCPU) printf("LE_OP %d \n", tmp); 
+            if(DBGCPU) printf("LE_OP (%d >= %d) == %d \n", tmp1, tmp2, tmp); 
           break;
 
       case GE_OP :
@@ -624,7 +617,7 @@ int exe(int stack[][STACKSIZE], int sp[], int reg[][REGISTERSIZE], int next_inst
             tmp2 = pop(stack, cur_proc, sp, 48);
             tmp = tmp1 <= tmp2;
             push(stack, cur_proc, sp, tmp, 39);
-            if(DBGCPU) printf("GE_OP %d \n", tmp);  
+            if(DBGCPU) printf("GE_OP (%d <= %d) == %d \n", tmp1, tmp2, tmp); 
           break;
 
       case LT_OP :
@@ -632,7 +625,7 @@ int exe(int stack[][STACKSIZE], int sp[], int reg[][REGISTERSIZE], int next_inst
             tmp2 = pop(stack, cur_proc, sp, 52);
             tmp = tmp2 < tmp1;
             push(stack, cur_proc, sp, tmp, 41);
-            if(DBGCPU) printf("LT_OP %d \n", tmp);
+            if(DBGCPU) printf("LT_OP (%d < %d) == %d \n", tmp1, tmp2, tmp); 
           break;
 
       case GT_OP :
@@ -640,16 +633,15 @@ int exe(int stack[][STACKSIZE], int sp[], int reg[][REGISTERSIZE], int next_inst
             tmp2 = pop(stack, cur_proc, sp, 56);
             tmp = tmp2 > tmp1;
             push(stack, cur_proc, sp, tmp, 43);
-            if(DBGCPU) printf("GT_OP %d \n", tmp);
+            if(DBGCPU) printf("GT_OP (%d > %d) == %d \n", tmp1, tmp2, tmp); 
           break;
 
       case EQ_OP :
             tmp1 = pop(stack, cur_proc, sp, 58);
-            // printf("step 2 %d\n",sp[cur_proc]);
             tmp2 = pop(stack, cur_proc, sp, 60);
             tmp = tmp1 == tmp2;
             push(stack, cur_proc, sp, tmp, 45);
-            if(DBGCPU) printf("EQ_OP %d\n", tmp);
+            if(DBGCPU) printf("EQ_OP (%d == %d) == %d \n", tmp1, tmp2, tmp); 
           break;
 
       case NE_OP :
@@ -657,14 +649,25 @@ int exe(int stack[][STACKSIZE], int sp[], int reg[][REGISTERSIZE], int next_inst
             tmp2 = pop(stack, cur_proc, sp, 64);
             tmp = tmp1 != tmp2;
             push(stack, cur_proc, sp, tmp, 47);
-            if(DBGCPU) printf("NE_OP %d\n", tmp);
+            if(DBGCPU) printf("NE_OP (%d != %d) == %d \n", tmp1, tmp2, tmp); 
           break;
       default:
-            printf("illegal instruction mem[0][%d] = %d\n", cur_proc,i, mem[0][i]);
-            keyhit(127);
+            printf("Process %d: illegal instruction mem[0][%d] = %d\n", cur_proc,i, mem[0][i]);
+            //keyhit(127);
           break;
-   }
-   return NORMAL;
+  }
+  // increment next_instruction
+  next_instruct[cur_proc]++;
+  processes[cur_proc].ip++;
+  
+  if(DBGCPU && (abs( next_instruct[cur_proc] - diff) > 2) )
+  {    
+    if(0 < cur_proc % 3) printf("\t\t\t\t");
+    if(2 ==cur_proc % 3) printf("\t\t\t\t");
+    printf("Process %d: Next instr %d at Virtual IP %d\n", cur_proc, next_instruct[cur_proc], processes[cur_proc].ip);
+  }
+   
+  return NORMAL;
 }
 
 int peek(int stack[][STACKSIZE], int proc_id, int sp[], int offset)
@@ -683,7 +686,7 @@ int pop(int stack[][STACKSIZE], int proc_id, int sp[], int calledfrom)
   {
     printf("Stack Underflow: process %d %d\n", proc_id, sp[proc_id]);
     printf("Called from  %d\n", calledfrom);
-    //exit(-1);
+    exit(-1);
   }
   return val;
 }
@@ -717,7 +720,8 @@ int new_process(char * filename)
   //Make the first process entry for the file.
   strncpy(processes[nextPid].filename, arg1, len);
   processes[nextPid].pid = nextPid;
-  processes[nextPid].ip = 10; //First instruction is at 10
+  processes[nextPid].ip = 0; //First instruction is at 10 use the poffset to store this
+  processes[nextPid].poffset = 10; //First process in the file
   processes[nextPid].status = READY;
   processes[nextPid].state = NOT_FINISHED;
   curProcesses = nextPid + 1;

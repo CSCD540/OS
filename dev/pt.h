@@ -42,20 +42,21 @@ int lookup_addr(int vip, int cur_proc, int rw)
   int offset = 0;
   int page = 0;
   int vpn = 0;
-  int temp_ip = processes[cur_proc].ip;
   
-  vpn = vip>>pageBits;
-  offset = vip % PAGESIZE;
-  processes[cur_proc].ip = vip;
+  vpn = (vip)>>pageBits;
+  offset = (vip) % PAGESIZE;
   page = (lookup(processes[cur_proc], vpn, rw)) << pageBits; //Left shift it back
   if(DEBUG) 
   { 
     printf("vip %d\n", vip);
+    printf("Process Offset %d\n", processes[cur_proc].poffset);
     printf("vpn %d\n", vpn);
     printf("Offset %d\n", offset);
-    printf("Page %d\n", page | offset);
+    printf("Page %d\n", page>>pageBits);
+    printf("Physical Address %d\n", page | offset);
+    print_mem();
   }
-    processes[cur_proc].ip = temp_ip;
+  
   if(page == ENDF)
   {
     printf("ERROR: Page not found.\n");
@@ -78,15 +79,17 @@ int lookup_ip(struct process proc, int rw)
 {
   int vpn = 0;
   
-  vpn = proc.ip>>pageBits;
-  proc.offset = proc.ip % PAGESIZE;
+  vpn = (proc.poffset + proc.ip)>>pageBits;
+  proc.offset = (proc.poffset + proc.ip) % PAGESIZE;
   proc.page = (lookup(proc, vpn, rw)) << pageBits; //Left shift it back
   if(DEBUG) 
   { 
     printf("vip %d\n", proc.ip);
+    printf("Process Offset %d\n", proc.poffset);
     printf("vpn %d\n", vpn);
     printf("Offset %d\n", proc.offset);
-    printf("Page %d\n", proc.page);
+    printf("Page %d\n", proc.page>>pageBits);
+    printf("Physical Address %d\n", proc.page | proc.offset);
   }
   
   if(proc.page == ENDF)

@@ -24,8 +24,7 @@
 #define LOCKED        1   // stops process switching until unlock
 #define UNLOCKED      2   // remove lock
 #define ENDPROCESS    3
-
-#define p0WRITE       4  // tells p0 to run-p0 should only run after a write to gmem
+#define ENDPROGRAM    4
 
 // General
 #define BLOCKSIZE     4  // number of instructions per block
@@ -121,11 +120,12 @@ struct fileDescriptor {
 struct process {
     int pid;
     char *filename;
-    int ip;     //virtual IP this is where the process believes it's at
-    int page;   //Actual page number returned from lookup
-    int offset; //Offset from the ip
-    int status; //0 = not finished, 1 = terminated
-    int state;  //state - 0 ready, 1 running, 2 waiting on IO, 3 suspended (not implemented)
+    int ip;       //virtual IP this is where the process believes it's at
+    int page;     //Actual page number returned from lookup
+    int offset;   //Offset from the ip
+    int poffset;  //Offset to the beginning of the process
+    int status;   //0 = not finished, 1 = terminated
+    int state;    //state - 0 ready, 1 running, 2 waiting on IO, 3 suspended (not implemented)
 };
 
 //-----------------------------------------------------------------------------
@@ -151,7 +151,6 @@ int  gmem[MAXGMEM];         // Global var sit here
 int  jsym[60];
 int  mem[MAXPRO][MAXMEM];   // Main mem for each process
 int  machineOn = 1;         // Is the machine still running?
-int  p0running;
 int  reg[MAXPRO][REGISTERSIZE];
 int  tempmem[MAXPRO][200];  // For PTB - loading all of the process information here
 
