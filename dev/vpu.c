@@ -30,6 +30,8 @@ int main(int argc, char *argv[])
   init_gmem();
   init_pt();
   
+  int proc_loaded = 0; //Number of processes loaded
+  
   /* 
    * Shell command 
    * Commands: save,del,ls,exit,run,help
@@ -120,11 +122,11 @@ int main(int argc, char *argv[])
     //This should load from VM filesystem
     else if(strcmp(cmd, "load")==0) 
     {
-      int p = new_process(arg1);
-      if(p < 0)
+      proc_loaded = new_process(arg1);
+      if(proc_loaded < 0)
         printf("Error on allocating process\n");
       else
-        lookup_ip(processes[p], 0);
+        lookup_ip(processes[proc_loaded], 0);
     }
     else if(strcmp(cmd, "man")==0)
     {
@@ -151,7 +153,7 @@ int main(int argc, char *argv[])
     }
     else if(strcmp(cmd, "run")==0)
     {
-      executeit();
+      executeit(proc_loaded);
     }
     else if(strcmp(cmd, "save")==0)
     {
@@ -200,11 +202,11 @@ int main(int argc, char *argv[])
  */
 void executeit()
 {
-  int cur_proc = 0, p0=0, msg=-1,m=0;
+  int cur_proc = 0, msg=-1;
   int stack[MAXPRO][STACKSIZE]; //Stack pre process
   int sp[MAXPRO]; //Stack pointer per process
   int next_instruct[MAXPRO];  //Next_instruction per process
-  int proc_complete[MAXPRO];  //Is the process done?
+  //int proc_complete[MAXPRO];  //Is the process done?
   int locked=UNLOCKED;
   int terminate = 0;
   int diff = 0;
@@ -213,7 +215,7 @@ void executeit()
   memset(stack, 0, MAXPRO*STACKSIZE*sizeof(int));
   memset(sp, -1, MAXPRO*sizeof(int));
   memset(reg, 0, 10 * MAXPRO * sizeof(int));
-  memset(proc_complete, 0, MAXPRO*sizeof(int));
+  //memset(proc_complete, 0, MAXPRO*sizeof(int));
   
   srand( time(NULL) );
 
@@ -229,50 +231,66 @@ void executeit()
     cont:
       keyhit(55); 
 
-      if (HALTED == 1)
+      if (HALTED == TERMINATED)
       {
-        HALTED = 0;
+        HALTED = NOT_FINISHED;
         break;
       }
       if(locked == UNLOCKED)
       {
-        cur_proc = (cur_proc+1) % curProcesses;//rand() % curProcesses; //Find one of the programs to run
-        //printf("------------------------------------------------------------------cur_proc: %d\n",cur_proc);
+        if(processes[cur_proc].status == RUNNING)
+          processes[cur_proc].status = READY;
+          
+        do{
+          cur_proc = (cur_proc + 1) % curProcesses;//rand() % curProcesses; //Find one of the programs to run  
+        }while(processes[cur_proc].status == TERMINATED);//Only use non-terminated processes
       }
       
       next_instruct[cur_proc] = lookup_ip(processes[cur_proc], 0);
-      if(next_instruct[cur_proc] < 0)
+      
+      if(next_instruct[cur_proc] < 0) //Can't have a negative IP
         return;
-      if(mem[0][next_instruct[cur_proc]] <= -1)
+        
+      if(mem[0][next_instruct[cur_proc]] <= -1)//-1 means we've reached the end of the program
       {
-        terminate = 1;
-        proc_complete[cur_proc] = 1;
+        terminate = TERMINATED;
+        processes[cur_proc].state = TERMINATED;
         locked = UNLOCKED;
       }
-      //printf("IP %d\n", next_instruct[cur_proc]);
         
-      if(proc_complete[cur_proc] == 1)
+      if(processes[cur_proc].status == TERMINATED)
       {
         if (DEBUG)
           printf("----------------------------cur_proc: %d\n",cur_proc);
         goto checkdone;
       }
-      if(next_instruct[cur_proc]< 256) // safe guard
+      if(next_instruct[cur_proc] < 256) // safe guard
       {
         diff = next_instruct[cur_proc];
-        msg = exe(stack,sp,reg, next_instruct, next_instruct, cur_proc, &terminate, &cur_proc);
-        if(diff < next_instruct[cur_proc]) processes[cur_proc].ip++;
-        if(msg==ENDPROCESS || terminate == 1)
+        if(processes[cur_proc].status == READY)
         {
-          proc_complete[cur_proc]=1;
+          processes[cur_proc].status = RUNNING;
+          msg = exe(stack,sp,reg, next_instruct, next_instruct, cur_proc, &terminate, &cur_proc);
+        }
+        else
+        {
+          //Wait for IO to return
+          //If we pick a number less than 10 out of 1000 the IO returned and set status to 0 ready
+          processes[cur_proc].status = READY;
+        }
+        
+        if(diff != next_instruct[cur_proc]) processes[cur_proc].ip++;//If the next_instruct changed increment
+        
+        if(msg==ENDPROCESS || terminate == TERMINATED)
+        {
+          processes[cur_proc].status = TERMINATED; //Terminated
           goto checkdone;
         }
 
-        // printf("%d %d\n",cur_proc,next_instruct[cur_proc]+1);
         // increment next_instruction
         next_instruct[cur_proc]++;
         processes[cur_proc].ip++;
-        if( abs( next_instruct[cur_proc] - diff) > 2 && DBGCPU)
+        if(DBGCPU && (abs( next_instruct[cur_proc] - diff) > 2) )
         {    
           if(0 < cur_proc % 3) printf("\t\t\t\t");
           if(2 ==cur_proc % 3) printf("\t\t\t\t");
@@ -292,13 +310,13 @@ void executeit()
       else
       {
         printf("Process %d complete, terminate=%d\n",cur_proc, terminate);
-        proc_complete[cur_proc]=1;
+        processes[cur_proc].status = TERMINATED;
       }
       // check if all processes are done
     checkdone:
-      // for(cur_proc=0;cur_proc<pid;cur_proc++)
-      if(terminate == 0)
-       goto cont;
+      for(i = 0; i< curProcesses; i++)//If at least one process is still running
+        if(processes[i].state == NOT_FINISHED)
+          goto cont;
       break;
   }
   // print_stack(stack,sp); stack should be all 0 and sp at -1
@@ -331,10 +349,12 @@ int exe(int stack[][STACKSIZE], int sp[], int reg[][REGISTERSIZE], int next_inst
      /** OPEN, READ, CLOSE, WRITE, SEEK ::  OS services **/
       case OPEN :
           if (DBGCPU) printf("Open file\n");
+          processes[cur_proc].state = 2; //Set to waiting on IO
           break;
           
       case READ :
           if (DBGCPU) printf("Read file\n");
+          processes[cur_proc].state = 2; //Set to waiting on IO
           break;
 
       case CLOSE :
@@ -343,11 +363,13 @@ int exe(int stack[][STACKSIZE], int sp[], int reg[][REGISTERSIZE], int next_inst
 
       case WRITE :
           if (DBGCPU) printf("Open file\n");
+          processes[cur_proc].state = 2; //Set to waiting on IO
           break;
 
       case SEEK :
             tmp = peek(stack, cur_proc, sp, 0) ;
             if (DBGCPU) printf("SEEK offset=  0,  data=%d\n", tmp);
+            processes[cur_proc].state = 2; //Set to waiting on IO
             tmp1 = peek(stack, cur_proc, sp, -1) ;
             if (DBGCPU)
             {
@@ -472,25 +494,31 @@ int exe(int stack[][STACKSIZE], int sp[], int reg[][REGISTERSIZE], int next_inst
       case JFALSE : //Jump to the address specified  (needs pt translation)
             tmp = pop(stack, cur_proc, sp, 74);
             if(i == PAGESIZE-1 || i == PAGESIZE*2-1) // This is the Boundary between every page.
-              tmp2 = mem[0][i];
+            { 
+              int temp = lookup_addr(next_inst[cur_proc]+1,cur_proc,0); 
+              tmp2 = mem[0][temp] - 2;//Need to look up the next page and subtract one so our vitrual i is two less
+            }
             else
               tmp2 = mem[0][i+1];
-            if(DBGCPU) printf("JFALSE %d %d \n", tmp, tmp2 - 1);
+            if(DBGCPU) printf("JFALSE %d %d \n", tmp, tmp2);
             if(tmp == 0)
             {
-              next_instruct[cur_proc] = lookup_addr(tmp2 - 1,cur_proc,0); // sub one for PC in executeit()
+              next_instruct[cur_proc] = lookup_addr(tmp2 - 1, cur_proc, 0); // sub one for PC in executeit()
               processes[cur_proc].ip = tmp2 - 1;
             }
             else
               next_inst[cur_proc]++;
           break;
-
       case JMP: //Jump to the address specified  (needs pt translation)
             if(i == PAGESIZE-1 || i == PAGESIZE*2-1) // This is the Boundary between every page.
-              tmp = lookup_addr(mem[0][i], cur_proc, 0);	//mem[0][i];
+            {
+              int temp = lookup_addr(next_inst[cur_proc]+1,cur_proc,0); 
+              tmp = mem[0][temp] - 2;//Need to look up the next page and subtract one so our vitrual i is one less
+            }
             else
               tmp = lookup_addr(mem[0][i], cur_proc, 0);	//mem[0][i];
-            next_instruct[cur_proc] = tmp-1; // sub one for PC in executeit() 
+            next_instruct[cur_proc] = lookup_addr(tmp - 1, cur_proc, 0); // sub one for PC in executeit() 
+            processes[cur_proc].ip = tmp - 1;
             if(DBGCPU) printf("JMP to %d\n", i, next_instruct[cur_proc]); 
             // next_inst[cur_proc]++;
             break;
@@ -515,11 +543,12 @@ int exe(int stack[][STACKSIZE], int sp[], int reg[][REGISTERSIZE], int next_inst
       case END : 
             if (DEBUG) printf("Process %d completed normally\n", cur_proc);
             p0running=0;
-            *terminate = 1;
+            
             return ENDPROCESS;
 
       case ENDP :
             // printf("ENDP\n");
+            *terminate = 1;
             break;
             
       case STOP :
@@ -685,11 +714,16 @@ int new_process(char * filename)
   processes[nextPid].filename = (char *) calloc(len,sizeof(char));
   if (processes[nextPid].filename == NULL)
     return -1;
-    
+  //Make the first process entry for the file.
   strncpy(processes[nextPid].filename, arg1, len);
   processes[nextPid].pid = nextPid;
   processes[nextPid].ip = 10; //First instruction is at 10
+  processes[nextPid].status = READY;
+  processes[nextPid].state = NOT_FINISHED;
   curProcesses = nextPid + 1;
+  
+  //Scan for more processes in the file.
+  
   return nextPid++;
 }
 

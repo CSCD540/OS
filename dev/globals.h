@@ -36,18 +36,29 @@
 #define MAXFILES      1000                        // How many files can be opened at once
 #define NUMBLOCKS     ((DISKSIZE) / (BLOCKSIZE))  // Total number of blocks on the disk
 
+//Process Status codes
+#define READY             0   //Process ready to run
+#define RUNNING           1   //Process running
+#define WAITING           2   //Process waiting on IO to return
+#define SUSPENDED         3   //Process waiting on IO to return
+
+//Process states
+#define NOT_FINISHED      0   //Processes still running
+#define TERMINATED        1   //Process ended
+
+
 // Return Values
-#define SUCCESS          0   // No error
-#define APPEND           1   // Begin writing at the end of the file
-#define OVERWRITE        2   // Begin writing at the beginning of the file
-#define NEWFILE          3   // New file
-#define DISK_FULL        4   // No more room on the disk!
-#define FILE_NOT_FOUND  -5   // File was not located
-#define LIST_EMPTY       6   // List contains no elements
-#define FD_LIMIT_EXCEED -7   // Maximum number of file descriptors has been reached
-#define ENDF            -8   // At the end of the process or file
-#define OUT_OF_RANGE    -9   // Argument was out of range
-#define DUPLICATE_FILE   10   // Another file with that file name was found in the pwd
+#define SUCCESS           0   // No error
+#define APPEND            1   // Begin writing at the end of the file
+#define OVERWRITE         2   // Begin writing at the beginning of the file
+#define NEWFILE           3   // New file
+#define DISK_FULL         4   // No more room on the disk!
+#define FILE_NOT_FOUND   -5   // File was not located
+#define LIST_EMPTY        6   // List contains no elements
+#define FD_LIMIT_EXCEED  -7   // Maximum number of file descriptors has been reached
+#define ENDF             -8   // At the end of the process or file
+#define OUT_OF_RANGE     -9   // Argument was out of range
+#define DUPLICATE_FILE    10   // Another file with that file name was found in the pwd
 
 // Memory
 #define PAGESIZE   ((BLOCKSIZE) * 4)        // size of each page in words 2-bytes
@@ -114,7 +125,7 @@ struct process {
     int page;   //Actual page number returned from lookup
     int offset; //Offset from the ip
     int status; //0 = not finished, 1 = terminated
-    int state;  //state - running, 0 ready, waiting, suspended  
+    int state;  //state - 0 ready, 1 running, 2 waiting on IO, 3 suspended (not implemented)
 };
 
 //-----------------------------------------------------------------------------

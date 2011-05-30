@@ -1,5 +1,7 @@
 echo on
 save ../milk1.out
+save ../sort.out
+load ../sort.out
 load ../milk1.out
 load ../milk1.out
 memdump
@@ -7,6 +9,7 @@ showGlobalMem
 run
 memdump
 exit
+
 
 piddump
 memdump
