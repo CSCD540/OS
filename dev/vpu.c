@@ -240,11 +240,7 @@ void executeit()
           cur_proc = (cur_proc + 1) % curProcesses;//rand() % curProcesses; //Find one of the programs to run  
         }while(processes[cur_proc].state == TERMINATED);//Only use non-terminated processes
       }
-      
-      next_instruct[cur_proc] = lookup_ip(processes[cur_proc], 0);
-      if(next_instruct[cur_proc] < 0) //Can't have a negative IP
-        return;
-        
+              
       if(mem[0][next_instruct[cur_proc]] <= -1)//-1 means we've reached the end of the program
       {
         terminate = TERMINATED;
@@ -264,14 +260,17 @@ void executeit()
         if(processes[cur_proc].status == READY)
         {
           processes[cur_proc].status = RUNNING;
-          next_instruct[cur_proc];
+          //next_instruct[cur_proc];
           msg = exe(stack, sp, next_instruct, cur_proc, &terminate);
         }
         else
         {
           //Wait for IO to return
           //If we pick a number less than 10 out of 1000 the IO returned and set status to 0 ready
-          processes[cur_proc].status = READY;
+          printf("Process %d: Waiting on IO\n", cur_proc);
+          processes[cur_proc].iodelay--;
+          if(processes[cur_proc].iodelay <= 0)
+            processes[cur_proc].status = READY;
         }
                 
         if(msg == ENDPROCESS || msg == ENDPROGRAM || terminate == TERMINATED)
@@ -311,23 +310,25 @@ void executeit()
 
 int exe(int stack[][STACKSIZE], int sp[], int next_instruct[], int cur_proc, int *terminate)
 {
-  int i, k, m; // delete these after all accesses renamed, except i
+  int i; // delete these after all accesses renamed, except i
   int diff, tmp, tmp1, tmp2;
-  int real_inst;
-  char name[11];
 
-  char * indent = "\t\t\t\t\t";
+  next_instruct[cur_proc] = lookup_ip(processes[cur_proc], 0);
+  if(next_instruct[cur_proc] < 0) //Can't have a negative IP
+    exit(-1); //Error
+  
   i = next_instruct[cur_proc];
   diff = i;
-  real_inst = i;
-  if(0 < cur_proc % 3)printf("%s", indent);
-  if(2 ==cur_proc % 3)printf("%s", indent);
-  printf("(pid=%d) IP = %d:  ", cur_proc, processes[cur_proc].ip);
+  if(0 == cur_proc % 3)
+    indent = (char *)indent0;
+  else if(1 == cur_proc % 3)
+    indent = (char *)indent1;
+  else
+    indent = (char *)indent2;
+  printf("%s(pid=%d) IP = %d:  ", indent, cur_proc, processes[cur_proc].ip);
   printf("mem[0][%d] = %d\n", i, mem[0][i] );
-  if(0 < cur_proc % 3)printf("%s", indent);
-  if(2 ==cur_proc % 3)printf("%s", indent);
-
-
+  printf("%s", indent);
+  
   if (DEBUG)	
     printf("In Main Memory: process %d, program counter %d, content:%d\n\n", cur_proc, i, mem[0][i]);
 
@@ -337,11 +338,13 @@ int exe(int stack[][STACKSIZE], int sp[], int next_instruct[], int cur_proc, int
     case OPEN :
         if (DBGCPU) printf("Open file\n");
         processes[cur_proc].state = WAITING; //Set to waiting on IO
+        processes[cur_proc].iodelay = rand() % 1000;
         break;
         
     case READ :
         if (DBGCPU) printf("Read file\n");
         processes[cur_proc].state = WAITING; //Set to waiting on IO
+        processes[cur_proc].iodelay = rand() % 1000;
         break;
 
     case CLOSE :
@@ -351,19 +354,21 @@ int exe(int stack[][STACKSIZE], int sp[], int next_instruct[], int cur_proc, int
     case WRITE :
         if (DBGCPU) printf("Open file\n");
         processes[cur_proc].state = WAITING; //Set to waiting on IO
+        processes[cur_proc].iodelay = rand() % 1000;
         break;
 
     case SEEK :
           tmp = peek(stack, cur_proc, sp, 0) ;
           if (DBGCPU) printf("SEEK offset=  0,  data=%d\n", tmp);
           processes[cur_proc].state = WAITING; //Set to waiting on IO
+          processes[cur_proc].iodelay = rand() % 1000;
           tmp1 = peek(stack, cur_proc, sp, -1) ;
           if (DBGCPU)
           {
 						printf("SEEK offset= -1,  fd =%d\n", tmp1); 
 						printf("OS service call  --- <SEEK> \n");
 					}
-        break;
+          break;
 
     case POPD : //This takes one argument (The next 'instruction' is the register to pop into)
           tmp1 = pop(stack, cur_proc, sp, 10) ;
@@ -395,10 +400,10 @@ int exe(int stack[][STACKSIZE], int sp[], int next_instruct[], int cur_proc, int
     case LA : 
           if((i % PAGESIZE) == PAGESIZE-1) // This is the Boundary between every page.
           {
-            next_instruct[cur_proc] = lookup_addr(next_instruct[cur_proc] + 1, cur_proc, 0); 
+            int vip = processes[cur_proc].ip + processes[cur_proc].poffset;
+            next_instruct[cur_proc] = lookup_addr(vip + 1, cur_proc, 0); 
             i = next_instruct[cur_proc] - 1;
           }
-          
           tmp = mem[0][i+1];
           if(DBGCPU) printf("LA %d\n",tmp);
           
@@ -410,7 +415,8 @@ int exe(int stack[][STACKSIZE], int sp[], int next_instruct[], int cur_proc, int
     case LOAD : //Loads the gmem address at tmp
           if((i % PAGESIZE) == PAGESIZE-1) // This is the Boundary between every page.
           {
-            next_instruct[cur_proc] = lookup_addr(next_instruct[cur_proc] + 1, cur_proc, 0); 
+            int vip = processes[cur_proc].ip + processes[cur_proc].poffset;
+            next_instruct[cur_proc] = lookup_addr(vip + 1, cur_proc, 0); 
             i = next_instruct[cur_proc] - 1;
           }
           
@@ -427,7 +433,8 @@ int exe(int stack[][STACKSIZE], int sp[], int next_instruct[], int cur_proc, int
     case LOADI : //Load the constant to the stack
           if((i % PAGESIZE) == PAGESIZE-1) // This is the Boundary between every page.
           {
-            next_instruct[cur_proc] = lookup_addr(next_instruct[cur_proc] + 1, cur_proc, 0); 
+            int vip = processes[cur_proc].ip + processes[cur_proc].poffset;
+            next_instruct[cur_proc] = lookup_addr(vip + 1, cur_proc, 0); 
             i = next_instruct[cur_proc] - 1;
           }
           push(stack, cur_proc, sp, mem[0][i + 1], 21);
@@ -440,7 +447,8 @@ int exe(int stack[][STACKSIZE], int sp[], int next_instruct[], int cur_proc, int
           tmp = pop(stack, cur_proc, sp, 68);
           if((i % PAGESIZE) == PAGESIZE-1) // This is the Boundary between every page.
           {
-            next_instruct[cur_proc] = lookup_addr(next_instruct[cur_proc] + 1, cur_proc, 0); 
+            int vip = processes[cur_proc].ip + processes[cur_proc].poffset;
+            next_instruct[cur_proc] = lookup_addr(vip + 1, cur_proc, 0); 
             i = next_instruct[cur_proc] - 1;
           }
 
@@ -464,32 +472,34 @@ int exe(int stack[][STACKSIZE], int sp[], int next_instruct[], int cur_proc, int
           tmp = pop(stack, cur_proc, sp, 74);
           if((i % PAGESIZE) == PAGESIZE-1) // This is the Boundary between every page.
           {
-            next_instruct[cur_proc] = lookup_addr(next_instruct[cur_proc] + 1, cur_proc, 0) - 1; 
+            int vip = processes[cur_proc].ip + processes[cur_proc].poffset;
+            next_instruct[cur_proc] = lookup_addr(vip + 1, cur_proc, 0) - 1; 
             i = next_instruct[cur_proc];
           } //This updates our next_inst[cur_proc] and i to point to the next instruction
           
           //Locations in mem are absoluate addresses from the beginning of the file starting at 1
           
           //Indexing starts at 0 not 1, also adjust for the poffset            
-          tmp2 = mem[0][i+1] - processes[cur_proc].poffset - 1;
+          tmp2 = mem[0][i+1] - 1;
           if(tmp == 0)
           {
             next_instruct[cur_proc] = lookup_addr(tmp2, cur_proc, 0) - 1; // sub one for IP increment at end of funciton
-            processes[cur_proc].ip = tmp2 - 1;
+            processes[cur_proc].ip = tmp2 - processes[cur_proc].poffset - 1;
           }//Jump to the right spot
           else
           {
             next_instruct[cur_proc]++;
             processes[cur_proc].ip++;
           }
-          
+
           if(DBGCPU) printf("JFALSE (%d == 0) goto %d: mem[0][%d] = %d \n", tmp, tmp2, next_instruct[cur_proc] + 1, mem[0][next_instruct[cur_proc] + 1]);
           break;
           
     case JMP: //Unconditional Jump to the address specified  (needs pt translation)
           if((i % PAGESIZE) == PAGESIZE-1) // This is the Boundary between every page.
           {
-            next_instruct[cur_proc] = lookup_addr(next_instruct[cur_proc] + 1, cur_proc, 0) - 1; 
+            int vip = processes[cur_proc].ip + processes[cur_proc].poffset;
+            next_instruct[cur_proc] = lookup_addr(vip + 1, cur_proc, 0) - 1; 
             i = next_instruct[cur_proc];
           } //This updates our next_inst[cur_proc] and i to point to the next instruction
 
@@ -647,9 +657,7 @@ int exe(int stack[][STACKSIZE], int sp[], int next_instruct[], int cur_proc, int
   
   if(DBGCPU && (abs( next_instruct[cur_proc] - diff) > 2) )
   {    
-    if(0 < cur_proc % 3) printf("%s", indent);
-    if(2 ==cur_proc % 3) printf("%s", indent);
-    printf("Process %d: Next instr %d at Virtual IP %d\n", cur_proc, next_instruct[cur_proc], processes[cur_proc].ip);
+    printf("%sProcess %d: Next instr %d at Virtual IP %d\n", indent, cur_proc, next_instruct[cur_proc], processes[cur_proc].ip);
   }
    
   return NORMAL;
@@ -698,6 +706,7 @@ int new_process(char * filename)
 {
   static int nextPid = 0;
   int len = strlen(arg1);
+  int index = 0;
   
   processes[nextPid].filename = (char *) calloc(len,sizeof(char));
   if (processes[nextPid].filename == NULL)
@@ -709,10 +718,11 @@ int new_process(char * filename)
   processes[nextPid].poffset = 10; //First process in the file
   processes[nextPid].status = READY;
   processes[nextPid].state = NOT_FINISHED;
+  processes[nextPid].iodelay = 0;
   curProcesses = nextPid + 1;
   
   //Scan for more processes in the file.
-  
+  //Looking for
   return nextPid++;
 }
 

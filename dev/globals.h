@@ -9,6 +9,10 @@
 #define PT_DBG_LVL    0 // The page table debugging level
 #define DBGCPU        1 // Turn CPU debugging on(1)/off(0)
 #define STEPCPU       0 // Make user hit key to advance program counter
+const char * indent0 = "";
+const char * indent1 = "\t\t\t\t\t";
+const char * indent2 = "\t\t\t\t\t\t\t\t\t\t";
+char * indent;        //Used for formatting scheduled processes
 
 //-----------------------------------------------------------------------------
 //                          Constants
@@ -126,6 +130,7 @@ struct process {
     int poffset;  //Offset to the beginning of the process
     int status;   //0 = not finished, 1 = terminated
     int state;    //state - 0 ready, 1 running, 2 waiting on IO, 3 suspended (not implemented)
+    int iodelay;  //Number of cycles to delay for io simulation
 };
 
 //-----------------------------------------------------------------------------

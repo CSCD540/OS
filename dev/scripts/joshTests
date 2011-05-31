@@ -1,12 +1,13 @@
 echo on
 save ../milk1.out
-save ../sort.out
+save ../sort.out2
+load ../sort.out2
 load ../milk1.out
 load ../milk1.out
-load ../sort.out
 run
 memdump
 exit
+
 
 memdump
 showGlobalMem

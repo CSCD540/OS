@@ -43,18 +43,27 @@ int lookup_addr(int vip, int cur_proc, int rw)
   int page = 0;
   int vpn = 0;
   
+
   vpn = (vip)>>pageBits;
   offset = (vip) % PAGESIZE;
   page = (lookup(processes[cur_proc], vpn, rw)) << pageBits; //Left shift it back
-  if(DEBUG) 
+    
+  if(DBGCPU==0) 
   { 
-    printf("vip %d\n", vip);
-    printf("Process Offset %d\n", processes[cur_proc].poffset);
-    printf("vpn %d\n", vpn);
-    printf("Offset %d\n", offset);
-    printf("Page %d\n", page>>pageBits);
-    printf("Physical Address %d\n", page | offset);
-    print_mem();
+    if(0 == cur_proc % 3)
+      indent = (char *)indent0;
+    else if(1 == cur_proc % 3)
+      indent = (char *)indent1;
+    else
+      indent = (char *)indent2;
+    
+    printf("\n%svip %d\n", indent, vip);
+    printf("%sProcess Offset %d\n", indent, processes[cur_proc].poffset);
+    printf("%svpn %d\n", indent, vpn);
+    printf("%sOffset %d\n", indent, offset);
+    printf("%sPage %d\n", indent, page>>pageBits);
+    printf("%sPhysical Address %d\n%s", indent, page | offset, indent);
+    //print_mem();
   }
   
   if(page == ENDF)
