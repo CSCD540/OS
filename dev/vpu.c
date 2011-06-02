@@ -715,7 +715,7 @@ int new_process(char * filename)
   strncpy(processes[nextPid].filename, arg1, len);
   processes[nextPid].pid = nextPid;
   processes[nextPid].ip = 0; //First instruction is at 10 use the poffset to store this
-  processes[nextPid].poffset = 10; //First process in the file
+  processes[nextPid].poffset = 29; //First process in the file
   processes[nextPid].status = READY;
   processes[nextPid].state = NOT_FINISHED;
   processes[nextPid].iodelay = 0;

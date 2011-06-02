@@ -104,7 +104,7 @@ int  sindex = 0;
 int  pindex = 0;
 int  memloc = 0;
 
-#define MAXPRO 1   //max num of processes
+#define MAXPRO 6   //max num of processes
 #define MAXMEM 200 //max size of a process
 #define STACKSIZE 100 //max size of the stack
 #define REGISTERSIZE 10 //size of each process registers
