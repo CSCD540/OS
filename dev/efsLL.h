@@ -133,7 +133,7 @@ int delete_block_node(struct blockNode **blockList, struct block *block)
   struct blockNode *temp, *last;
   temp = *blockList;
   // Check for empty list
-  if(temp == NULL)
+  if(is_block_list_empty(blockList))
   {
     print_error(LIST_EMPTY);
     return -1;
@@ -175,7 +175,7 @@ int delete_block_node(struct blockNode **blockList, struct block *block)
 struct fileNode * find_file(struct fileNode **fileList, char *filename)
 {
   struct fileNode * file = *fileList;
-  if(file == NULL || file->blockList == NULL)
+  if(is_file_list_empty(fileList) || is_block_list_empty(&(file->blockList)))
   {
     print_error(LIST_EMPTY);
     return NULL;
@@ -258,7 +258,37 @@ int get_block_count(struct blockNode *blockList)
 }
 
 
-int is_file_list_empty()
+/* int is_file_list_empty(struct fileNode **fileList)
+ * Description:
+ *    Check if the fileList is empty
+ * Input:
+ *    struct fileNode ** fileList : Memory address of a file list
+ * Output:
+ *    1 : The file list is empty
+ *    0 : The file list is populated
+ */
+int is_file_list_empty(struct fileNode **fileList)
 {
-  
+  if((*fileList)->filename == NULL)
+    return 1;
+  else
+    return 0;
+}
+
+
+/* int is_block_list_empty(struct blockNode **blockList)
+ * Description:
+ *    Check if the blockList is empty
+ * Input:
+ *    struct blockNode **blockList : Memory address of a block list
+ * Output:
+ *    1 : The block list is empty
+ *    0 : The block list is populated
+ */
+int is_block_list_empty(struct blockNode **blockList)
+{
+  if(*blockList == NULL)
+    return 1;
+  else
+    return 0;
 }
