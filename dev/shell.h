@@ -28,7 +28,6 @@ void concatenate(char *filename)
     printf("SYNTAX: cat filename\n\n");
     return;
   }
-  //printf("Concatenate the file %s\n", filename);
   
   struct fileNode * file = get_file(filename);
   
@@ -38,19 +37,11 @@ void concatenate(char *filename)
     return;
   }
   
-  struct blockNode *blockList = file->blockList;
-  
-  while(blockList != NULL)
-  {
-    int j;
-    for(j = 0; j < BLOCKSIZE; j++)
-    {
-      int res = blockList->block->instructions[j];
-      if(res != -1)
-        printf("%c", res);
-    }
-    blockList = blockList->nextBlock;
-  }
+  int fd = open(file->filename);
+  int res;
+  while((res = read(fd)) != ENDF)
+    if(res != -1)
+      printf("%c", res);
   printf("\n");
 }
 

@@ -1,7 +1,8 @@
 /*
  * Author: Jordan Bondo
  * 
- * A lot of this stuff came from http://www.daniweb.com/software-development/c/threads/216353
+ * Basic linked-list reference stuff came from:
+ *    http://www.daniweb.com/software-development/c/threads/216353
  */
 
 

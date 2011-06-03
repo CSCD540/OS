@@ -74,7 +74,7 @@ int open(char * filename)
 int read(int fd)
 {
   if(files[fd].curBlockNode == NULL)
-    return OUT_OF_RANGE;
+    return ENDF;
   
   int inst;
   inst = (*files[fd].curBlockNode->block).instructions[files[fd].curInstruction];

@@ -48,6 +48,15 @@ struct fileNode * add_file(char *filename, int numBlocks)
 }
 
 
+/* struct fileNode * get_file(char *filename)
+ * Description:
+ *    Searches the filesystem for a matching file and returns the results.
+ * Input:
+ *    char *filename : Name of the file to search for
+ * Output:
+ *    NULL : File was not found in the system
+ *    file : A pointer to the file
+ */
 struct fileNode * get_file(char *filename)
 {
   struct fileNode * file;
@@ -77,6 +86,7 @@ struct blockNode * get_free_block_node()
   }
   return freeNode;
 }
+
 
 /* void init_disk(block disk[])
  * Description:
