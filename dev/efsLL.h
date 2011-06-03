@@ -113,10 +113,7 @@ struct fileNode * add_file_node(struct fileNode **fileList, char *filename, int 
     while(temp->nextFile != NULL && strcmp(filename, temp->nextFile->filename) > 0)
     { temp = temp->nextFile; }
         
-    if(temp->nextFile != NULL)
-      next->nextFile = temp->nextFile;
-    else
-      next->nextFile = NULL;
+    next->nextFile = temp->nextFile;
     temp->nextFile = next;
     temp = temp->nextFile;
   }
