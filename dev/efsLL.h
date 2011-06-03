@@ -42,7 +42,6 @@ struct blockNode * add_block_node(struct blockNode **blockList, struct block *bl
   if((*blockList)->block == NULL)
   {
     temp = malloc(sizeof(struct blockNode));
-    // temp->block = malloc(sizeof(struct block *));
     temp->block = block;
     if(DEBUG) printf("add_block->new list %p\n", temp->block);
     temp->nextBlock = NULL;
@@ -60,7 +59,6 @@ struct blockNode * add_block_node(struct blockNode **blockList, struct block *bl
     { temp = temp->nextBlock; }
     
     next = malloc(sizeof(struct blockNode));
-    // next->block = malloc(sizeof(struct block *));
     next->block = block;
     if(DEBUG) printf("add_block->old list %p\n", next->block);
     next->nextBlock = NULL;
@@ -72,7 +70,7 @@ struct blockNode * add_block_node(struct blockNode **blockList, struct block *bl
 
 /* struct fileNode * add_file_node(fileNode **fileList, char *filename)
  * Description:
- *    Add a file to the disk. This is an in-ordered add, so all files are added alphabetically.
+ *    Add a file to the disk. This is an in-ordered add, so all files are added in lexicographical order.
  * Input:
  *    fileNode **fileList : Pointer to the current list of files
  *    char *filename : Name of the file to be added
@@ -90,7 +88,6 @@ struct fileNode * add_file_node(struct fileNode **fileList, char *filename, int 
     temp->numBlocks = numBlocks;
     temp->filename = malloc(strlen(filename) + 1);
     strcpy(temp->filename, filename);
-    // temp->blockList = malloc(sizeof(struct blockList *));
     temp->nextFile = NULL;
     *fileList = temp;
     if(DEBUG) printf("fileNode %p\n", *fileList);
@@ -99,16 +96,27 @@ struct fileNode * add_file_node(struct fileNode **fileList, char *filename, int 
   {
     struct fileNode *next;
     temp = *fileList;
-    // Advance to the last node in the lsit
-    while(temp->nextFile != NULL)
-    { temp = temp->nextFile; }
-    
     next = malloc(sizeof(struct fileNode));
     next->numBlocks = numBlocks;
     next->filename = malloc(strlen(filename) + 1);
-    strcpy(next->filename, filename);
-    // next->blockList = malloc(sizeof(struct blockList *));
-    next->nextFile = NULL;
+    strcpy(next->filename, filename);    
+     
+    // Add first?
+    if(strcmp(filename, temp->filename) < 0)
+    {
+      next->nextFile = temp;
+      *fileList = next;
+      return next;
+    }
+      
+    // Advance to the correct node in the list
+    while(temp->nextFile != NULL && strcmp(filename, temp->nextFile->filename) > 0)
+    { temp = temp->nextFile; }
+        
+    if(temp->nextFile != NULL)
+      next->nextFile = temp->nextFile;
+    else
+      next->nextFile = NULL;
     temp->nextFile = next;
     temp = temp->nextFile;
   }
