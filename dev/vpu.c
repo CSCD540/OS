@@ -19,6 +19,7 @@ int  peek(int stack[][STACKSIZE], int proc_id, int sp[], int offset);
 void push(int stack[][STACKSIZE], int proc_id, int sp[],int data, int calledfrom);
 int  pop(int stack[][STACKSIZE], int proc_id, int sp[], int calledfrom);
 int  new_process(char * filename);
+void clear_processes();
 //end Methods declaration
 
 int echoCmd = 0; // Echo the command on the shell back to the user?
@@ -36,7 +37,7 @@ int main(int argc, char *argv[])
    * Shell command 
    * Commands: save,del,ls,exit,run,help
   */	
-  memset(processes, 0, MAXPROGRAMS * sizeof(struct process));
+  memset(processes, 0, MAXPRO * sizeof(struct process));
   
   //Load a program from the disk
   if(argc > 1)
@@ -188,6 +189,7 @@ int main(int argc, char *argv[])
   
   free(freeBlockList);
   free(fileList);
+  clear_processes();
   
   return 0;
 }
@@ -210,7 +212,7 @@ void executeit()
   //Clear the stack, registers and reset the stack pointers
   memset(stack, 0, MAXPRO*STACKSIZE*sizeof(int));
   memset(sp, -1, MAXPRO*sizeof(int));
-  memset(reg, 0, 10 * MAXPRO * sizeof(int));
+  //memset(reg, 0, 10 * MAXPRO * sizeof(int));
   //memset(proc_complete, 0, MAXPRO*sizeof(int));
   
   srand( time(NULL) );
@@ -304,6 +306,7 @@ void executeit()
           terminate = NOT_FINISHED;
           goto cont;
         }
+      curProcesses = 0; //We finished and we need to reset the process table
       break;
   }
 }
@@ -708,14 +711,19 @@ int new_process(char * filename)
   int len = strlen(arg1);
   int index = 0;
   
-  processes[nextPid].filename = (char *) calloc(len,sizeof(char));
+  
+  
+  if(0 == curProcesses)
+    nextPid = curProcesses;
+  
+  processes[nextPid].filename = (char *) realloc(processes[nextPid].filename,len * sizeof(char));
   if (processes[nextPid].filename == NULL)
     return -1;
   //Make the first process entry for the file.
   strncpy(processes[nextPid].filename, arg1, len);
   processes[nextPid].pid = nextPid;
   processes[nextPid].ip = 0; //First instruction is at 10 use the poffset to store this
-  processes[nextPid].poffset = 10; //First process in the file
+  processes[nextPid].poffset = 29; //First process in the file
   processes[nextPid].status = READY;
   processes[nextPid].state = NOT_FINISHED;
   processes[nextPid].iodelay = 0;
@@ -726,3 +734,10 @@ int new_process(char * filename)
   return nextPid++;
 }
 
+void clear_processes()
+{
+  int i=0;
+  int status = 0;
+  for(;i<MAXPRO;i++)
+    free(processes[i].filename);
+}

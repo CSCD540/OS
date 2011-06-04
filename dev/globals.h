@@ -19,7 +19,6 @@ char * indent;        //Used for formatting scheduled processes
 //-----------------------------------------------------------------------------
 
 #define MAXPRO        8   // max num of processes
-#define MAXPROGRAMS   8   // max number of program a CPU can run
 #define MAXMEM        64  // max size of a process in word/sizeof(int) bytes
 #define STACKSIZE     128 // max size of the stack
 #define REGISTERSIZE  10  // size of each process registers
@@ -138,7 +137,7 @@ struct process {
 //-----------------------------------------------------------------------------
 
 struct block disk[NUMBLOCKS];           //Our virtual HD
-struct process processes[MAXPROGRAMS];  //Our pid table
+struct process processes[MAXPRO];  //Our pid table
 int  gmem[MAXGMEM];                     // global var sit here
 int  mem[MAXPRO][MAXMEM];               // Main mem for each process
 //int  endprog[MAXPRO];                   // last instruction of proc
@@ -155,7 +154,7 @@ int  gmem[MAXGMEM];         // Global var sit here
 int  jsym[60];
 int  mem[MAXPRO][MAXMEM];   // Main mem for each process
 int  machineOn = 1;         // Is the machine still running?
-int  reg[MAXPRO][REGISTERSIZE];
+//int  reg[MAXPRO][REGISTERSIZE];
 int  tempmem[MAXPRO][200];  // For PTB - loading all of the process information here
 
 char *arg1;      // The argument(file's name)

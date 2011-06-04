@@ -8,7 +8,7 @@
 void init_gmem();
 void init_mem();
 void init_pt();
-void init_reg();
+//void init_reg();
 void reset_memory();
 
 void print_block_list(struct blockNode *blockList);
@@ -22,9 +22,9 @@ int  print_page(int pageNum);
 void print_processes();
 void print_pt();
 void print_lru();
-void print_register(int reg[][REGISTERSIZE]);
+//void print_register(int reg[][REGISTERSIZE]);
 void print_stack(int stack[][STACKSIZE],int sp[]);
-void show_register_data();
+//void show_register_data();
 
 /*  ----------------------------------------------------
     Initialize globals 
@@ -68,21 +68,21 @@ void init_pt()
       pageTable[i][j] = -1;
 }
 
-void init_reg()
+/*void init_reg()
 {
   int i,j;
   
   for(i = 0; i < MAXPRO; i++)
 	  for(j = 0; j < REGISTERSIZE; j++)
       reg[i][j] = -1; 
-}
+}//*/
 
 void reset_memory()
 {
 	init_gmem();
 	init_mem();
 	init_pt();
-	init_reg();
+	//init_reg();
 }
 
 
@@ -307,7 +307,7 @@ void print_processes()
   printf("|     index | pid | filename        |\r\n");
   printf("|-----------|-----|-----------------|\r\n");
   int i;
-  for(i = 0; i < MAXPROGRAMS; i++)
+  for(i = 0; i < MAXPRO; i++)
   {
     //printf("%c[%d;%dm", 27, 0, 31);
     printf("|Pid     %2d | %3d | %14s  |\r\n", i, processes[i].pid,  processes[i].filename);
@@ -351,7 +351,7 @@ void print_lru()
   printf("LRU: %d\r\n\r\n", lru);
 }
 
-void print_register(int reg[][REGISTERSIZE])
+/*void print_register(int reg[][REGISTERSIZE])
 {
   int i, j;
   printf("\r\n--------------------\r\n|%c[%d;%dm   REGISTER DATA  %c[%dm|\r\n|------------------|\r\n", 27, 1, 42, 27, 0);
@@ -366,7 +366,7 @@ void print_register(int reg[][REGISTERSIZE])
   }
   printf("--------------------------------------------------\n");
   printf("\n");
-}
+}//*/
 
 void print_stack(int stack[][STACKSIZE], int sp[])
 {
