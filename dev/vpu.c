@@ -30,6 +30,7 @@ int main(int argc, char *argv[])
   init_mem();
   init_gmem();
   init_pt();
+  init_reg();
   
   int proc_loaded = 0; //Number of processes loaded
   
@@ -230,6 +231,7 @@ void executeit()
   while(1)
   {
     cont:
+      terminate = NOT_FINISHED;
       keyhit(55); 
       if (HALTED == TERMINATED)
       {
@@ -246,26 +248,23 @@ void executeit()
         }while(processes[cur_proc].state == TERMINATED);//Only use non-terminated processes
       }
               
-      if(mem[0][next_instruct[cur_proc]] <= -1)//-1 means we've reached the end of the program
+      /*if(next_instruct[cur_proc] &&mem[0][next_instruct[cur_proc]] <= -1)//-1 means we've reached the end of the program
       {
+        printf("HUH? mem[0][%d] =%d\n",next_instruct[cur_proc],mem[0][next_instruct[cur_proc]]);
+        print_mem();
         terminate = TERMINATED;
         processes[cur_proc].state = TERMINATED;
         locked = UNLOCKED;
-      }
+      }//*/
         
-      if(processes[cur_proc].status == TERMINATED)
-      {
-        if (DEBUG)
-          printf("----------------------------cur_proc: %d\n",cur_proc);
+      if(processes[cur_proc].state == TERMINATED)
         goto checkdone;
-      }
       
       if(next_instruct[cur_proc] < 256) // safe guard
       {
         if(processes[cur_proc].status == READY)
         {
           processes[cur_proc].status = RUNNING;
-          //next_instruct[cur_proc];
           msg = exe(stack, sp, next_instruct, cur_proc, &terminate);
         }
         else
@@ -280,12 +279,18 @@ void executeit()
                 
         if(msg == ENDPROCESS || msg == ENDPROGRAM || terminate == TERMINATED)
         {
+          printf("Process %d complete from state (%d)\n",cur_proc, processes[cur_proc].state);
           processes[cur_proc].state = TERMINATED; //Terminated
           if(ENDPROGRAM == msg)//End all the programs associated with this process
           {
             for(i = 0; i< curProcesses; i++)//If at least one process is still running
+            {
               if(strcmp(processes[i].filename, processes[cur_proc].filename) == 0)
+              {
+                printf("Program complete: terminated process %d\n", i);
                 processes[i].state = TERMINATED;
+              }
+            }
           }
           goto checkdone;
         }
@@ -324,7 +329,7 @@ int exe(int stack[][STACKSIZE], int sp[], int next_instruct[], int cur_proc, int
     exit(-1); //Error
   
   i = next_instruct[cur_proc];
-  diff = i;
+  diff = processes[cur_proc].ip;
   if(0 == cur_proc % 3)
     indent = (char *)indent0;
   else if(1 == cur_proc % 3)
@@ -334,7 +339,7 @@ int exe(int stack[][STACKSIZE], int sp[], int next_instruct[], int cur_proc, int
   printf("%s(pid=%d) IP = %d:  ", indent, cur_proc, processes[cur_proc].ip);
   printf("mem[0][%d] = %d\n", i, mem[0][i] );
   printf("%s", indent);
-  
+
   if (DEBUG)	
     printf("In Main Memory: process %d, program counter %d, content:%d\n\n", cur_proc, i, mem[0][i]);
 
@@ -398,8 +403,13 @@ int exe(int stack[][STACKSIZE], int sp[], int next_instruct[], int cur_proc, int
 
     case LD :
           tmp = pop(stack, cur_proc, sp, 14);
+          if(DBGCPU) printf("LD %d from %d\n",gmem[tmp], tmp);
+          if(tmp >= MAXGMEM)
+          {
+            printf("%sError: GMEM out of bounds\n",indent);
+            break;
+          }
           tmp1 = gmem[tmp];
-          if(DBGCPU) printf("LD %d from %d\n",tmp1, tmp);
           push(stack, cur_proc, sp, tmp1, 15);
           break;
 
@@ -416,6 +426,7 @@ int exe(int stack[][STACKSIZE], int sp[], int next_instruct[], int cur_proc, int
           push(stack, cur_proc, sp, tmp, 17);
           next_instruct[cur_proc]++;
           processes[cur_proc].ip++;
+
           break;
 
     case LOAD : //Loads the gmem address at tmp
@@ -427,10 +438,22 @@ int exe(int stack[][STACKSIZE], int sp[], int next_instruct[], int cur_proc, int
           }
           
           tmp = mem[0][i+1];
+          if(tmp < 230)
+          {
+            if(DBGCPU)printf("LOAD %d from index %d\n", gmem[tmp], tmp);
+            if(tmp >= MAXGMEM)
+            {
+              printf("%sError: GMEM out of bounds\n",indent);
+              break;
+            }
+            tmp1 = gmem[tmp];
+          }
+          else
+          {
+            tmp1 = reg[cur_proc][tmp - 230];
+            if(DBGCPU)printf("LOAD %d = reg[%d]\n", tmp1, tmp - 230);
+          }
           
-          tmp1 = gmem[tmp];
-          
-          if(DBGCPU)printf("LOAD %d from index %d\n", tmp1, tmp);
           push(stack, cur_proc, sp, tmp1, 19);
           next_instruct[cur_proc]++;
           processes[cur_proc].ip++;
@@ -447,6 +470,7 @@ int exe(int stack[][STACKSIZE], int sp[], int next_instruct[], int cur_proc, int
           if(DBGCPU)printf("LOADI and Push:%d\n",mem[0][i+1]);
           next_instruct[cur_proc]++;
           processes[cur_proc].ip++;
+
           break;
 
     case STOR : //Stor at the gmem index indicated 
@@ -459,9 +483,21 @@ int exe(int stack[][STACKSIZE], int sp[], int next_instruct[], int cur_proc, int
           }
 
           tmp1 = mem[0][i+1];
-          
-          gmem[tmp1] = tmp;
-          if (DBGCPU) printf("STOR gmem[%d] = %d\n", tmp1, gmem[tmp1]);
+          if(tmp1 < 230)
+          {
+            if (DBGCPU) printf("STOR gmem[%d] = %d\n", tmp1, tmp);
+            if(tmp1 >= MAXGMEM)
+            {
+              printf("%sError: GMEM out of bounds\n",indent);
+              break;
+            }
+            gmem[tmp1] = tmp;
+          }
+          else
+          {
+            if (DBGCPU) printf("STOR reg[%d] = %d\n", tmp1-230, tmp);
+            reg[cur_proc][tmp1-230] = tmp;
+          }
           
           next_instruct[cur_proc]++;
           processes[cur_proc].ip++;
@@ -470,11 +506,18 @@ int exe(int stack[][STACKSIZE], int sp[], int next_instruct[], int cur_proc, int
     case ST :
           tmp = pop(stack, cur_proc, sp, 70); // does ST ever need to store in a register?
           tmp1 = pop(stack, cur_proc, sp, 72);
-          gmem[tmp] = tmp1;
+
           if(DBGCPU) printf("ST %d into gmem[%d]\n",tmp1, tmp);
+          if(tmp >= MAXGMEM)
+          {
+            printf("%sError: GMEM out of bounds\n",indent);
+            break;
+          }
+          gmem[tmp] = tmp1;
+
           break;
           
-    case JFALSE : //Conditional Jump to the address specified  (needs pt translation)
+    case JFALSE : //Conditional Jump to the address specified within the process  (needs pt translation)
           tmp = pop(stack, cur_proc, sp, 74);
           if((i % PAGESIZE) == PAGESIZE-1) // This is the Boundary between every page.
           {
@@ -486,11 +529,11 @@ int exe(int stack[][STACKSIZE], int sp[], int next_instruct[], int cur_proc, int
           //Locations in mem are absoluate addresses from the beginning of the file starting at 1
           
           //Indexing starts at 0 no need to adjust, also adjust for the poffset            
-          tmp2 = mem[0][i+1];// - processes[cur_proc].poffset;
+          tmp2 = mem[0][i+1] - 1;// - processes[cur_proc].poffset;
           if(tmp == 0)
           {
             next_instruct[cur_proc] = lookup_addr(tmp2, cur_proc, 0) - 1; // sub one for IP increment at end of funciton
-            processes[cur_proc].ip = tmp2 - processes[cur_proc].poffset - 1;
+            processes[cur_proc].ip = tmp2 - 10;
           }//Jump to the right spot
           else
           {
@@ -501,22 +544,24 @@ int exe(int stack[][STACKSIZE], int sp[], int next_instruct[], int cur_proc, int
           if(DBGCPU) printf("JFALSE (%d == 0) goto %d: mem[0][%d] = %d \n", tmp, tmp2, next_instruct[cur_proc] + 1, mem[0][next_instruct[cur_proc] + 1]);
           break;
           
-    case JMP: //Unconditional Jump to the address specified  (needs pt translation)
-          if((i % PAGESIZE) == PAGESIZE-1) // This is the Boundary between every page.
+    case JMP: //Unconditional Jump to the address specified within the process  (needs pt translation)
+          //Ex: JMP 192 is jump to insttruction 192 (starting from 0 which is reg 0 for that process) in the process
+          if((i % PAGESIZE) == PAGESIZE - 1) // This is the Boundary between every page.
           {
             int vip = processes[cur_proc].ip + processes[cur_proc].poffset;
             next_instruct[cur_proc] = lookup_addr(vip + 1, cur_proc, 0) - 1; 
             i = next_instruct[cur_proc];
           } //This updates our next_inst[cur_proc] and i to point to the next instruction
 
-          //Locations in mem are absoluate addresses from the beginning of the file starting at 1
+          //Locations in mem are absoluate addresses from the beginning of the file starting at 0
           
           //Indexing starts at 0, also adjust for the poffset            
-          tmp = mem[0][i + 1];// - processes[cur_proc].poffset;
+          tmp = mem[0][i + 1] - 1;// - processes[cur_proc].poffset;
           
-          next_instruct[cur_proc] = lookup_addr(tmp - 1, cur_proc, 0); // sub one for IP increment at end of funciton
-          processes[cur_proc].ip = tmp2 - processes[cur_proc].poffset - 1;
-          if(DBGCPU) printf("JMP goto %d: mem[0][%d] = %d \n", tmp - 1, next_instruct[cur_proc] + 1, mem[0][next_instruct[cur_proc]+1]);
+          next_instruct[cur_proc] = lookup_addr(tmp, cur_proc, 0); // sub one for IP increment at end of funciton
+          processes[cur_proc].ip = tmp - 10;  //We start the IP after the registers
+
+          if(DBGCPU) printf("JMP goto %d: mem[0][%d] = %d \n", tmp, next_instruct[cur_proc] + 1, mem[0][next_instruct[cur_proc]+1]);
           break;
     
     case LOCK :
@@ -535,7 +580,7 @@ int exe(int stack[][STACKSIZE], int sp[], int next_instruct[], int cur_proc, int
     case ENDP : //This should end all processes in the file.
           if (DBGCPU) printf("ENDP: Program %s completed normally\n", processes[cur_proc].filename);
           *terminate = TERMINATED;
-          return ENDPROGRAM;
+          return ENDPROCESS; //ENDPROGRAM;
           
     case HALT :
           printf("HALT called by process %d\n\n", cur_proc);
@@ -655,16 +700,19 @@ int exe(int stack[][STACKSIZE], int sp[], int next_instruct[], int cur_proc, int
     default:
           printf("Process %d: illegal instruction mem[0][%d] = %d\n", cur_proc,i, mem[0][i]);
           keyhit(127);
+          print_mem();
+          exit(-1);
           break;
   }
   // increment next_instruction
   next_instruct[cur_proc]++;
   processes[cur_proc].ip++;
   
-  if(DBGCPU && (abs( next_instruct[cur_proc] - diff) > 2) )
-  {    
-    printf("%sProcess %d: Next instr %d at Virtual IP %d\n", indent, cur_proc, next_instruct[cur_proc], processes[cur_proc].ip);
-  }
+  if(DBGCPU && (abs( processes[cur_proc].ip - diff) > 2) )
+    printf("%sProcess %d: Next instr %d at Virtual IP %d\n\n", indent, cur_proc, next_instruct[cur_proc], processes[cur_proc].ip);
+  else
+    printf("\n");
+  
    
   return NORMAL;
 }
@@ -685,7 +733,9 @@ int pop(int stack[][STACKSIZE], int proc_id, int sp[], int calledfrom)
   {
     printf("Stack Underflow: process %d %d\n", proc_id, sp[proc_id]);
     printf("Called from  %d\n", calledfrom);
-    //exit(-1);
+    print_mem();
+    print_gmem();
+    exit(-1);
   }
   return val;
 }
@@ -729,6 +779,7 @@ int new_process(char * filename)
   processes[nextPid].pid = nextPid;
   processes[nextPid].ip = 0; //First instruction is at 10 use the poffset to store this
   processes[nextPid].poffset = 10; //First process in the file
+  processes[nextPid].roffset = 0; //First process in the file
   processes[nextPid].status = READY;
   processes[nextPid].state = NOT_FINISHED;
   processes[nextPid].iodelay = 0;
@@ -763,6 +814,7 @@ int new_process(char * filename)
     {
       printf("IP: %d mem[0][%d] = %d\n", processes[nextPid].ip, lookup_ip(processes[nextPid], 0), mem[0][lookup_ip(processes[nextPid], 0)]); 
       processes[nextPid + 1].poffset = processes[nextPid].ip + processes[nextPid].poffset;
+      processes[nextPid + 1].roffset = processes[nextPid].poffset - 10;
       processes[nextPid].ip = 0; 
       nextPid++;
       printf("New Processes %d\n", nextPid);

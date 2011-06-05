@@ -126,6 +126,7 @@ struct process {
     int ip;       //virtual IP this is where the process believes it's at
     int page;     //Actual page number returned from lookup
     int offset;   //Offset from the ip
+    int roffset;  //Offset to the beginning of the registers for the process
     int poffset;  //Offset to the beginning of the process
     int status;   //0 = not finished, 1 = terminated
     int state;    //state - 0 ready, 1 running, 2 waiting on IO, 3 suspended (not implemented)
@@ -154,7 +155,7 @@ int  gmem[MAXGMEM];         // Global var sit here
 int  jsym[60];
 int  mem[MAXPRO][MAXMEM];   // Main mem for each process
 int  machineOn = 1;         // Is the machine still running?
-//int  reg[MAXPRO][REGISTERSIZE];
+int  reg[MAXPRO][REGISTERSIZE];
 int  tempmem[MAXPRO][200];  // For PTB - loading all of the process information here
 
 char *arg1;      // The argument(file's name)

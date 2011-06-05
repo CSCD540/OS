@@ -1,27 +1,18 @@
 echo on
 save ../milk1.out
-save ../sort.out2
-load ../sort.out2
-load ../milk1.out
+save ../sort.out
 load ../milk1.out
 run
 memdump
+showGlobalMem
+piddump
 exit
 
-
-memdump
-showGlobalMem
-
-
-piddump
-memdump
-ptdump
-
-save ../sort.out
 load ../sort.out
-memdump
-ptdump
-piddump
+load ../milk1.out
 
+memdump
+piddump
+ptdump
 
 filedump ../sort.out
