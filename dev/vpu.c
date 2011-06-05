@@ -772,6 +772,9 @@ int new_process(char * filename)
   int len = strlen(arg1);
   int index = 0;
   
+  if(open(filename)<0)
+    return FILE_NOT_FOUND;
+  
   if(MAXPRO == nextPid)
     return -2; //Process table full
   
@@ -792,9 +795,9 @@ int new_process(char * filename)
   processes[nextPid].state = NOT_FINISHED;
   processes[nextPid].iodelay = 0;
   curProcesses = nextPid + 1;
-  printf("New Processes %d\n", nextPid);
+  printf("New Process %d\n", nextPid);
     
-  while(mem[0][lookup_ip(processes[nextPid], 0)] >= 0 && nextPid < MAXPRO)//While we're not at -1 keep going
+  while(nextPid < MAXPRO && mem[0][lookup_ip(processes[nextPid], 0)] >= 0)//While we're not at -1 keep going
   {
     printf("IP: %d mem[0][%d] = %d\n", processes[nextPid].ip, lookup_ip(processes[nextPid], 0), mem[0][lookup_ip(processes[nextPid], 0)]); 
     //Scan to the end of the process
