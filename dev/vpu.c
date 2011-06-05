@@ -228,7 +228,11 @@ void executeit()
     next_instruct[i]=10;
 
   keyhit(54);
-  while(1)
+  
+  if(curProcesses <= 0)
+    printf("No processes to run.\n");
+  
+  while(1 && curProcesses > 0)
   {
     cont:
       terminate = NOT_FINISHED;
@@ -828,7 +832,7 @@ int new_process(char * filename)
       processes[nextPid + 1].roffset = processes[nextPid].poffset - 10;
       processes[nextPid].ip = 0; 
       nextPid++;
-      printf("New Processes %d\n", nextPid);
+      printf("New Process %d\n", nextPid);
       processes[nextPid].filename = (char *) realloc(processes[nextPid].filename, len * sizeof(char));
 
       if (processes[nextPid].filename == NULL)
@@ -842,7 +846,6 @@ int new_process(char * filename)
       processes[nextPid].iodelay = 0;
       curProcesses = nextPid + 1;
       processes[nextPid].ip = 0;
-      print_mem();
     }
   }
 }
