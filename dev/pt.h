@@ -276,7 +276,7 @@ int page_fault(struct process proc, int vpn)
   
   // Open the file for reading
   int fd = open(proc.filename);
-  printf("%d\n", fd);
+
   if(fd < 0)
   {
     // BAD FD, return something useful...
