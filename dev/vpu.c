@@ -799,21 +799,21 @@ int new_process(char * filename)
     
   while(nextPid < MAXPRO && mem[0][lookup_ip(processes[nextPid], 0)] >= 0)//While we're not at -1 keep going
   {
-    printf("IP: %d mem[0][%d] = %d\n", processes[nextPid].ip, lookup_ip(processes[nextPid], 0), mem[0][lookup_ip(processes[nextPid], 0)]); 
+    if(DEBUG)printf("IP: %d mem[0][%d] = %d\n", processes[nextPid].ip, lookup_ip(processes[nextPid], 0), mem[0][lookup_ip(processes[nextPid], 0)]); 
     //Scan to the end of the process
     while(mem[0][lookup_ip(processes[nextPid], 0)] >= 0 && 
           mem[0][lookup_ip(processes[nextPid], 0)] != 268)
       processes[nextPid].ip++;
   
     processes[nextPid].ip++;  //Go past the 268
-    printf("IP: %d mem[0][%d] = %d\n", processes[nextPid].ip, lookup_ip(processes[nextPid], 0), mem[0][lookup_ip(processes[nextPid], 0)]); 
+    if(DEBUG)printf("IP: %d mem[0][%d] = %d\n", processes[nextPid].ip, lookup_ip(processes[nextPid], 0), mem[0][lookup_ip(processes[nextPid], 0)]); 
     //After the process there may be ascii constants or registers, so scan until we find a machine instruction
     while((mem[0][lookup_ip(processes[nextPid], 0)] >= 0) &&
           ( (mem[0][lookup_ip(processes[nextPid], 0)] <= 257) || 
             (mem[0][lookup_ip(processes[nextPid], 0)] >= 302) ) )
       processes[nextPid].ip++;
 
-    printf("IP: %d mem[0][%d] = %d\n", processes[nextPid].ip, lookup_ip(processes[nextPid], 0), mem[0][lookup_ip(processes[nextPid], 0)]); 
+    if(DEBUG)printf("IP: %d mem[0][%d] = %d\n", processes[nextPid].ip, lookup_ip(processes[nextPid], 0), mem[0][lookup_ip(processes[nextPid], 0)]); 
     //print_mem();
     //Only process in the file?
     if(mem[0][lookup_ip(processes[nextPid], 0)] < 0)
@@ -823,7 +823,7 @@ int new_process(char * filename)
     }
     else 
     {
-      printf("IP: %d mem[0][%d] = %d\n", processes[nextPid].ip, lookup_ip(processes[nextPid], 0), mem[0][lookup_ip(processes[nextPid], 0)]); 
+      if(DEBUG)printf("IP: %d mem[0][%d] = %d\n", processes[nextPid].ip, lookup_ip(processes[nextPid], 0), mem[0][lookup_ip(processes[nextPid], 0)]); 
       processes[nextPid + 1].poffset = processes[nextPid].ip + processes[nextPid].poffset;
       processes[nextPid + 1].roffset = processes[nextPid].poffset - 10;
       processes[nextPid].ip = 0; 
