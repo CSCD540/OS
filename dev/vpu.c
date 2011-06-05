@@ -216,7 +216,7 @@ void executeit()
 
   //Clear the stack, registers and reset the stack pointers
   memset(stack, 0, MAXPRO*STACKSIZE*sizeof(int));
-  memset(sp, -1, MAXPRO*sizeof(int));
+  memset(sp, 0, MAXPRO*sizeof(int));
   //memset(reg, 0, 10 * MAXPRO * sizeof(int));
   //memset(proc_complete, 0, MAXPRO*sizeof(int));
   
@@ -244,8 +244,16 @@ void executeit()
           processes[cur_proc].status = READY;
           
         do{//Select a new process to run
-          cur_proc = (cur_proc + 1) % curProcesses;//rand() % curProcesses; //Find one of the programs to run  
+          cur_proc = /*(cur_proc + 1)*/ rand() % curProcesses; //Find one of the programs to run  
+          //printf("cur_proc = %d\n", cur_proc);
         }while(processes[cur_proc].state == TERMINATED);//Only use non-terminated processes
+        
+        if(0 == cur_proc % 3)
+          indent = (char *)indent0;
+        else if(1 == cur_proc % 3)
+          indent = (char *)indent1;
+        else
+          indent = (char *)indent2;
       }
               
       /*if(next_instruct[cur_proc] &&mem[0][next_instruct[cur_proc]] <= -1)//-1 means we've reached the end of the program
@@ -271,15 +279,14 @@ void executeit()
         {
           //Wait for IO to return
           //If we pick a number less than 10 out of 1000 the IO returned and set status to 0 ready
-          printf("Process %d: Waiting on IO\n", cur_proc);
-          processes[cur_proc].iodelay--;
+          printf("%sProcess %d: Waiting on IO for %d cycles\n\n", indent, cur_proc, processes[cur_proc].iodelay--);
           if(processes[cur_proc].iodelay <= 0)
             processes[cur_proc].status = READY;
         }
                 
         if(msg == ENDPROCESS || msg == ENDPROGRAM || terminate == TERMINATED)
         {
-          printf("Process %d complete from state (%d)\n",cur_proc, processes[cur_proc].state);
+          if(DEBUG)printf("%sProcess %d complete from state (%d)\n", indent, cur_proc, processes[cur_proc].state);
           processes[cur_proc].state = TERMINATED; //Terminated
           if(ENDPROGRAM == msg)//End all the programs associated with this process
           {
@@ -287,7 +294,7 @@ void executeit()
             {
               if(strcmp(processes[i].filename, processes[cur_proc].filename) == 0)
               {
-                printf("Program complete: terminated process %d\n", i);
+                if(DEBUG)printf("%sProgram complete: terminated process %d\n", indent, i);
                 processes[i].state = TERMINATED;
               }
             }
@@ -323,6 +330,7 @@ int exe(int stack[][STACKSIZE], int sp[], int next_instruct[], int cur_proc, int
 {
   int i; // delete these after all accesses renamed, except i
   int diff, tmp, tmp1, tmp2;
+  int max_cycles = 200;
 
   next_instruct[cur_proc] = lookup_ip(processes[cur_proc], 0);
   if(next_instruct[cur_proc] < 0) //Can't have a negative IP
@@ -347,15 +355,15 @@ int exe(int stack[][STACKSIZE], int sp[], int next_instruct[], int cur_proc, int
   {
     /** OPEN, READ, CLOSE, WRITE, SEEK ::  OS services **/
     case OPEN :
-        if (DBGCPU) printf("Open file\n");
-        processes[cur_proc].state = WAITING; //Set to waiting on IO
-        processes[cur_proc].iodelay = rand() % 1000;
+        processes[cur_proc].status = WAITING; //Set to waiting on IO
+        processes[cur_proc].iodelay = rand() % max_cycles;
+        if (DBGCPU) printf("Open file: time to load %d cycles\n", processes[cur_proc].iodelay);
         break;
         
     case READ :
         if (DBGCPU) printf("Read file\n");
-        processes[cur_proc].state = WAITING; //Set to waiting on IO
-        processes[cur_proc].iodelay = rand() % 1000;
+        processes[cur_proc].status = WAITING; //Set to waiting on IO
+        processes[cur_proc].iodelay = rand() % max_cycles;
         break;
 
     case CLOSE :
@@ -364,15 +372,15 @@ int exe(int stack[][STACKSIZE], int sp[], int next_instruct[], int cur_proc, int
 
     case WRITE :
         if (DBGCPU) printf("Open file\n");
-        processes[cur_proc].state = WAITING; //Set to waiting on IO
-        processes[cur_proc].iodelay = rand() % 1000;
+        processes[cur_proc].status = WAITING; //Set to waiting on IO
+        processes[cur_proc].iodelay = rand() % max_cycles;
         break;
 
     case SEEK :
           tmp = peek(stack, cur_proc, sp, 0) ;
           if (DBGCPU) printf("SEEK offset=  0,  data=%d\n", tmp);
-          processes[cur_proc].state = WAITING; //Set to waiting on IO
-          processes[cur_proc].iodelay = rand() % 1000;
+          processes[cur_proc].status = WAITING; //Set to waiting on IO
+          processes[cur_proc].iodelay = rand() % max_cycles;
           tmp1 = peek(stack, cur_proc, sp, -1) ;
           if (DBGCPU)
           {
@@ -733,9 +741,9 @@ int pop(int stack[][STACKSIZE], int proc_id, int sp[], int calledfrom)
   {
     printf("Stack Underflow: process %d %d\n", proc_id, sp[proc_id]);
     printf("Called from  %d\n", calledfrom);
-    print_mem();
-    print_gmem();
-    exit(-1);
+    //print_mem();
+    //print_gmem();
+    //exit(-1);
   }
   return val;
 }
@@ -748,7 +756,7 @@ void push(int stack[][STACKSIZE], int proc_id, int sp[], int data, int calledfro
   {
     printf("Stack Overflow: process %d %d %d\n", proc_id, sp[proc_id], data);
     printf("PUSH Called from  %d\n", calledfrom);
-    exit(-1);
+    //exit(-1);
   }
   stack[proc_id][sp[proc_id]] = data;
 }
