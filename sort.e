@@ -6,6 +6,7 @@ process p0
 	{
 		halt;
 	}
+	x = x + 1;
 }
 
 process p1

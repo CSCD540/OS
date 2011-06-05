@@ -125,7 +125,11 @@ int main(int argc, char *argv[])
     {
       proc_loaded = new_process(arg1);
       if(proc_loaded < 0)
+      {
         printf("Error on allocating process\n");
+        if(proc_loaded == -2)
+          printf("Process table full.\n");
+      }
       else
         lookup_ip(processes[proc_loaded], 0);
     }
@@ -223,7 +227,6 @@ void executeit()
     next_instruct[i]=10;
 
   keyhit(54);
-  cur_proc = 0;
   while(1)
   {
     cont:
@@ -482,8 +485,8 @@ int exe(int stack[][STACKSIZE], int sp[], int next_instruct[], int cur_proc, int
           
           //Locations in mem are absoluate addresses from the beginning of the file starting at 1
           
-          //Indexing starts at 0 not 1, also adjust for the poffset            
-          tmp2 = mem[0][i+1] - 1;
+          //Indexing starts at 0 no need to adjust, also adjust for the poffset            
+          tmp2 = mem[0][i+1];// - processes[cur_proc].poffset;
           if(tmp == 0)
           {
             next_instruct[cur_proc] = lookup_addr(tmp2, cur_proc, 0) - 1; // sub one for IP increment at end of funciton
@@ -508,11 +511,11 @@ int exe(int stack[][STACKSIZE], int sp[], int next_instruct[], int cur_proc, int
 
           //Locations in mem are absoluate addresses from the beginning of the file starting at 1
           
-          //Indexing starts at 0 not 1, also adjust for the poffset            
-          tmp = mem[0][i + 1] - processes[cur_proc].poffset - 1;
+          //Indexing starts at 0, also adjust for the poffset            
+          tmp = mem[0][i + 1];// - processes[cur_proc].poffset;
           
           next_instruct[cur_proc] = lookup_addr(tmp - 1, cur_proc, 0); // sub one for IP increment at end of funciton
-          processes[cur_proc].ip = tmp - 1;
+          processes[cur_proc].ip = tmp2 - processes[cur_proc].poffset - 1;
           if(DBGCPU) printf("JMP goto %d: mem[0][%d] = %d \n", tmp - 1, next_instruct[cur_proc] + 1, mem[0][next_instruct[cur_proc]+1]);
           break;
     
@@ -682,7 +685,7 @@ int pop(int stack[][STACKSIZE], int proc_id, int sp[], int calledfrom)
   {
     printf("Stack Underflow: process %d %d\n", proc_id, sp[proc_id]);
     printf("Called from  %d\n", calledfrom);
-    exit(-1);
+    //exit(-1);
   }
   return val;
 }
@@ -711,27 +714,74 @@ int new_process(char * filename)
   int len = strlen(arg1);
   int index = 0;
   
+  if(MAXPRO == nextPid)
+    return -2; //Process table full
   
-  
-  if(0 == curProcesses)
+  if(0 == curProcesses) //Reset processes for next run
     nextPid = curProcesses;
   
-  processes[nextPid].filename = (char *) realloc(processes[nextPid].filename,len * sizeof(char));
+  processes[nextPid].filename = (char *) realloc(processes[nextPid].filename, len * sizeof(char));
+  
   if (processes[nextPid].filename == NULL)
     return -1;
   //Make the first process entry for the file.
   strncpy(processes[nextPid].filename, arg1, len);
   processes[nextPid].pid = nextPid;
   processes[nextPid].ip = 0; //First instruction is at 10 use the poffset to store this
-  processes[nextPid].poffset = 29; //First process in the file
+  processes[nextPid].poffset = 10; //First process in the file
   processes[nextPid].status = READY;
   processes[nextPid].state = NOT_FINISHED;
   processes[nextPid].iodelay = 0;
   curProcesses = nextPid + 1;
+  printf("New Processes %d\n", nextPid);
+    
+  while(mem[0][lookup_ip(processes[nextPid], 0)] >= 0 && nextPid < MAXPRO)//While we're not at -1 keep going
+  {
+    printf("IP: %d mem[0][%d] = %d\n", processes[nextPid].ip, lookup_ip(processes[nextPid], 0), mem[0][lookup_ip(processes[nextPid], 0)]); 
+    //Scan to the end of the process
+    while(mem[0][lookup_ip(processes[nextPid], 0)] >= 0 && 
+          mem[0][lookup_ip(processes[nextPid], 0)] != 268)
+      processes[nextPid].ip++;
   
-  //Scan for more processes in the file.
-  //Looking for
-  return nextPid++;
+    processes[nextPid].ip++;  //Go past the 268
+    printf("IP: %d mem[0][%d] = %d\n", processes[nextPid].ip, lookup_ip(processes[nextPid], 0), mem[0][lookup_ip(processes[nextPid], 0)]); 
+    //After the process there may be ascii constants or registers, so scan until we find a machine instruction
+    while((mem[0][lookup_ip(processes[nextPid], 0)] >= 0) &&
+          ( (mem[0][lookup_ip(processes[nextPid], 0)] <= 257) || 
+            (mem[0][lookup_ip(processes[nextPid], 0)] >= 302) ) )
+      processes[nextPid].ip++;
+
+    printf("IP: %d mem[0][%d] = %d\n", processes[nextPid].ip, lookup_ip(processes[nextPid], 0), mem[0][lookup_ip(processes[nextPid], 0)]); 
+    //print_mem();
+    //Only process in the file?
+    if(mem[0][lookup_ip(processes[nextPid], 0)] < 0)
+    {
+      processes[nextPid].ip = 0;
+      return nextPid++;
+    }
+    else 
+    {
+      printf("IP: %d mem[0][%d] = %d\n", processes[nextPid].ip, lookup_ip(processes[nextPid], 0), mem[0][lookup_ip(processes[nextPid], 0)]); 
+      processes[nextPid + 1].poffset = processes[nextPid].ip + processes[nextPid].poffset;
+      processes[nextPid].ip = 0; 
+      nextPid++;
+      printf("New Processes %d\n", nextPid);
+      processes[nextPid].filename = (char *) realloc(processes[nextPid].filename, len * sizeof(char));
+
+      if (processes[nextPid].filename == NULL)
+        return -1;
+      //Make the process entry for the file.
+      strncpy(processes[nextPid].filename, arg1, len);
+      processes[nextPid].pid = nextPid;
+      processes[nextPid].ip = 0; //First instruction is at 10 use the poffset to store this
+      processes[nextPid].status = READY;
+      processes[nextPid].state = NOT_FINISHED;
+      processes[nextPid].iodelay = 0;
+      curProcesses = nextPid + 1;
+      processes[nextPid].ip = 0;
+      print_mem();
+    }
+  }
 }
 
 void clear_processes()
