@@ -46,9 +46,16 @@ int lookup_addr(int vip, int cur_proc, int rw)
 
   vpn = (vip)>>pageBits;
   offset = (vip) % PAGESIZE;
-  page = (lookup(processes[cur_proc], vpn, rw)) << pageBits; //Left shift it back
+  page = (lookup(processes[cur_proc], vpn, rw)); 
     
-  if(DBGCPU==0) 
+  if(page == ENDF)
+  {
+    printf("ERROR: Page not found.\n");
+    return OUT_OF_RANGE;  //Error
+  }
+  page = page << pageBits;  //Left shift it back
+  
+  if(DEBUG) 
   { 
     if(0 == cur_proc % 3)
       indent = (char *)indent0;
@@ -66,11 +73,6 @@ int lookup_addr(int vip, int cur_proc, int rw)
     //print_mem();
   }
   
-  if(page == ENDF)
-  {
-    printf("ERROR: Page not found.\n");
-    return OUT_OF_RANGE;//Error
-  }
   return (page | offset);
 }
 
@@ -90,7 +92,15 @@ int lookup_ip(struct process proc, int rw)
   
   vpn = (proc.poffset + proc.ip)>>pageBits;
   proc.offset = (proc.poffset + proc.ip) % PAGESIZE;
-  proc.page = (lookup(proc, vpn, rw)) << pageBits; //Left shift it back
+  proc.page = (lookup(proc, vpn, rw)); 
+    
+  if(proc.page == ENDF)
+  {
+    printf("ERROR: Page not found.\n");
+    return OUT_OF_RANGE;  //Error
+  }
+  proc.page = proc.page << pageBits;  //Left shift it back
+
   if(DEBUG) 
   { 
     printf("vip %d\n", proc.ip);
@@ -101,11 +111,6 @@ int lookup_ip(struct process proc, int rw)
     printf("Physical Address %d\n", proc.page | proc.offset);
   }
   
-  if(proc.page == ENDF)
-  {
-    printf("ERROR: Page not found.\n");
-    return OUT_OF_RANGE;//Error
-  }
   return (proc.page | proc.offset);
 }
 
@@ -258,6 +263,7 @@ int page_fault(struct process proc, int vpn)
   
   // Open the file for reading
   int fd = open(proc.filename);
+  printf("%d\n", fd);
   if(fd < 0)
   {
     // BAD FD, return something useful...
