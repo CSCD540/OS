@@ -53,6 +53,11 @@ int lookup_addr(int vip, int cur_proc, int rw)
     printf("ERROR: Page not found.\n");
     return OUT_OF_RANGE;  //Error
   }
+  else if(page < 0)
+  {
+    print_error(page);
+    return OUT_OF_RANGE; // Error
+  }
   page = page << pageBits;  //Left shift it back
   
   if(DEBUG) 
@@ -98,6 +103,11 @@ int lookup_ip(struct process proc, int rw)
   {
     printf("ERROR: Page not found.\n");
     return OUT_OF_RANGE;  //Error
+  }
+  else if(proc.page < 0)
+  {
+    print_error(proc.page);
+    return OUT_OF_RANGE; // Error
   }
   proc.page = proc.page << pageBits;  //Left shift it back
 
@@ -164,6 +174,9 @@ int lookup(struct process proc, int vpn, int rw)
   }
   else // If we did not find it, we page fault
     physPage = page_fault(proc, vpn);
+    
+  if(physPage < 0)
+    return physPage;
   
   // Reset this page to be most recently used
   pageTable[physPage][2] = -1;
@@ -267,7 +280,8 @@ int page_fault(struct process proc, int vpn)
   if(fd < 0)
   {
     // BAD FD, return something useful...
-    ;
+    print_error(fd);
+    return fd;
   }
   
   // Skip to the right spot (aka seek)

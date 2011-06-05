@@ -772,8 +772,10 @@ int new_process(char * filename)
   int len = strlen(arg1);
   int index = 0;
   
-  if(open(filename)<0)
-    return FILE_NOT_FOUND;
+  int fd = open(filename);
+  if(fd<0)
+    return fd;
+  close(fd);
   
   if(MAXPRO == nextPid)
     return -2; //Process table full
