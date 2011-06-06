@@ -33,7 +33,7 @@ char * indent;        //Used for formatting scheduled processes
 #define BLOCKSIZE     4  // number of instructions per block
 
 // Filesystem 
-#define DISKSIZE      ((BLOCKSIZE) * 512)          // Total size of the disk
+#define DISKSIZE      ((BLOCKSIZE) * 110)          // Total size of the disk
 #define BLOCKS        ((DISKSIZE) / (BLOCKSIZE))  // Total number of blocks
 #define MAXFILES      1000                        // How many files can be opened at once
 #define NUMBLOCKS     ((DISKSIZE) / (BLOCKSIZE))  // Total number of blocks on the disk

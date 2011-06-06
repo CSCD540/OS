@@ -11,6 +11,7 @@
 #endif
 
 /* Forward Declarations */
+int delete_file(char * filename);
 struct fileNode * add_file(char *filename, int numBlocks);
 struct fileNode * get_file(char *filename);
 struct blockNode * get_free_block_node();
@@ -45,6 +46,39 @@ struct fileNode * add_file(char *filename, int numBlocks)
   newFileNode = add_file_node(&fileList, filename, numBlocks);
   if(DEBUG) printf("post add file %p\n", newFileNode);
   return newFileNode;
+}
+
+
+/* int delete_file(char * filename)
+ * Description:
+ *    add a new file with the specified filename to the fileList
+ * Input:
+ *    char *filename : the name of the file to add
+ * Output:
+ *    a pointer to the first node in the blockList
+ */
+int delete_file(char * filename)
+{
+  struct fileNode * file;
+  file = find_file(&fileList, filename);
+  if(file == NULL)
+  { return FILE_NOT_FOUND; }
+  
+  // Write -1 to all the instructions
+  int blocksToWrite = file->numBlocks - 1; // Have to convert from 1 based count to 0
+  int dataSize = blocksToWrite * BLOCKSIZE;
+  int data[dataSize];
+  printf("%d\n", dataSize);
+  int i = 0;
+  for(; i < dataSize; i++)
+  { data[i] = -1; }
+  write(&file,  data, dataSize, OVERWRITE, 0);
+  
+  // Move the blocks back to the freeBlockList
+  
+  
+  // Need to free stuff?
+  return SUCCESS;
 }
 
 
@@ -117,11 +151,5 @@ void init_disk(struct block disk[])
   fileList = malloc(sizeof(struct fileNode));
   fileList->blockList = NULL;
   fileList->filename = NULL;
-}
-
-
-int delete_file(char * filename)
-{
-  return FILE_NOT_FOUND;
 }
 #endif //_EFS_H_

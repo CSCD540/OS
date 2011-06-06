@@ -107,16 +107,18 @@ struct fileNode * add_file_node(struct fileNode **fileList, char *filename, int 
     {
       next->nextFile = temp;
       *fileList = next;
-      return next;
+      temp = next;
     }
-      
-    // Advance to the correct node in the list
-    while(temp->nextFile != NULL && strcmp(filename, temp->nextFile->filename) > 0)
-    { temp = temp->nextFile; }
-        
-    next->nextFile = temp->nextFile;
-    temp->nextFile = next;
-    temp = temp->nextFile;
+    else
+    {
+      // Advance to the correct node in the list
+      while(temp->nextFile != NULL && strcmp(filename, temp->nextFile->filename) > 0)
+      { temp = temp->nextFile; }
+          
+      next->nextFile = temp->nextFile;
+      temp->nextFile = next;
+      temp = temp->nextFile;
+    }
   }
   if(DEBUG) printf("add file node %p\n", temp);
   return temp;

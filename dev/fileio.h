@@ -107,8 +107,6 @@ int read(int fd)
  */
 int write(struct fileNode **fileListNode, int data[], int count, int writeMode, int offset)
 {
-  int newFile;
-  newFile = writeMode;
   struct blockNode *blockNode = (*fileListNode)->blockList;
   struct block *curBlock; // Declare a block pointer.
   if(DEBUG) printf("\nstart write : fileListNode->blockList->block %p\n", (*fileListNode)->blockList->block);
@@ -122,7 +120,7 @@ int write(struct fileNode **fileListNode, int data[], int count, int writeMode, 
   }
   else // OVERWRITE or NEWFILE
   {
-    if(offset != 0)
+    if(offset > 0)
     {
       int k = 1;
       for(; k <= offset; k++)
@@ -132,16 +130,18 @@ int write(struct fileNode **fileListNode, int data[], int count, int writeMode, 
     }
     curBlock = blockNode->block;
   }
-      
+  
   int j;
   for(j = 0; j < count; j++)
   {
-    if((i == 0) && (newFile != NEWFILE))
+    if((i == 0) && (j != 0))
     { 
       if(DEBUG) printf("curBlock %p\n", curBlock);
-      if(DEBUG) printf("\nadding new blockNode...\n");
       if(blockNode->nextBlock == NULL)
+      {
+        if(DEBUG) printf("adding new blockNode...\n");
         blockNode->nextBlock = get_free_block_node();
+      }
       blockNode = blockNode->nextBlock;
       curBlock = blockNode->block;
       if(DEBUG) printf("new blockNode %p\n", blockNode);
@@ -154,9 +154,6 @@ int write(struct fileNode **fileListNode, int data[], int count, int writeMode, 
     // If i == BLOCKSIZE, we have written to the last availble instruction location and need to get a new blockNode next time.
     if(i == BLOCKSIZE)
       i = 0;
-    // If this is a new file, set newFile to 0 so that when i == 0 we will get a new blockNode
-    if(newFile == NEWFILE)
-      newFile = 0;
   }
   if(DEBUG) printf("end write : fileListNode->blockList->block %p\n", (*fileListNode)->blockList->block);
   return SUCCESS;
