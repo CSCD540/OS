@@ -77,11 +77,11 @@ void list_directory_contents()
   // print_file_list(fileList);
   struct fileNode *fnode = fileList;
   printf("\n");
-  if(fnode->filename == NULL)
+  if(is_file_list_empty(&fileList))
     return;
   while(fnode != NULL)
   {
-    printf("%s\t", fnode->filename);
+    printf("%-10s\t", fnode->filename);
     if(arg1 != NULL && strcmp(arg1, "-l") == 0)
     { 
       printf("%d blk\t", fnode->numBlocks);
@@ -179,6 +179,7 @@ int save_file(char *filename)
     if(numInstructs % BLOCKSIZE == 0)
       numBlocks++;
   }
+  
   // Enough available disk space?
   if(get_block_count(freeBlockList) < numBlocks)
   {

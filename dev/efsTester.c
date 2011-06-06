@@ -87,6 +87,7 @@ int main(int argc, char *argv[])
   else
     printf("File not found\n");
   
+  delete_file("milk1.out");
   
   printf("\n");
   return 0;

@@ -65,19 +65,26 @@ int delete_file(char * filename)
   { return FILE_NOT_FOUND; }
   
   // Write -1 to all the instructions
-  int blocksToWrite = file->numBlocks - 1; // Have to convert from 1 based count to 0
+  int blocksToWrite = file->numBlocks; // Have to convert from 1 based count to 0
   int dataSize = blocksToWrite * BLOCKSIZE;
   int data[dataSize];
-  printf("%d\n", dataSize);
   int i = 0;
   for(; i < dataSize; i++)
   { data[i] = -1; }
   write(&file,  data, dataSize, OVERWRITE, 0);
   
   // Move the blocks back to the freeBlockList
+  struct blockNode * blockNode = file->blockList;
+  while(blockNode != NULL)
+  {
+    add_block_node(&freeBlockList, blockNode->block);
+    blockNode = blockNode->nextBlock;
+    // Free stuff?
+  }
   
+  // Remove the file from the file list
+  delete_file_node(&fileList, filename);
   
-  // Need to free stuff?
   return SUCCESS;
 }
 

@@ -29,7 +29,7 @@ void print_error(int errno);
 
 /* void add_block_node(struct blockNode **blockList, struct block *block)
  * Description:
- *    Add a new block to the list
+ *    Add a block to the list. Adds in-order based on the block number.
  * Input:
  *    blockNode *blockList : Pointer to the first node in the blockList.
  *    block *block : Pointer to a block on the disk.
@@ -47,25 +47,35 @@ struct blockNode * add_block_node(struct blockNode **blockList, struct block *bl
     if(DEBUG) printf("add_block->new list %p\n", temp->block);
     temp->nextBlock = NULL;
     *blockList = temp;
-     return *blockList;
   }
-  // List is NOT empty. Add last.
+  // List is NOT empty.
   else
   {
     struct blockNode *next;
     temp = *blockList;
-    
-    // Advance to the last node in the list
-    while(temp->nextBlock != NULL)
-    { temp = temp->nextBlock; }
-    
     next = malloc(sizeof(struct blockNode));
     next->block = block;
-    if(DEBUG) printf("add_block->old list %p\n", next->block);
-    next->nextBlock = NULL;
-    temp->nextBlock = next;
-    return next;
+    
+    // Add first?
+    if(block->blockNum < temp->block->blockNum)
+    {
+      next->nextBlock = temp;
+      *blockList = next;
+      temp = next;
+    }
+    else
+    {
+      // Advance to the correct node in the list
+      while((temp->nextBlock != NULL) && (block->blockNum > temp->nextBlock->block->blockNum))
+      { temp = temp->nextBlock; }
+      
+      if(DEBUG) printf("add_block->old list %p\n", next->block);
+      next->nextBlock = temp->nextBlock;
+      temp->nextBlock = next;
+      temp = temp->nextBlock;
+    }
   }
+  return temp;  
 } // end add_block_node()
 
 
@@ -83,7 +93,7 @@ struct fileNode * add_file_node(struct fileNode **fileList, char *filename, int 
 {
   struct fileNode *temp;
   // First file in the list
-  if((*fileList)->filename == NULL)
+  if(is_file_list_empty())
   {
     temp = malloc(sizeof(struct fileNode));
     temp->numBlocks = numBlocks;
@@ -170,6 +180,46 @@ int delete_block_node(struct blockNode **blockList, struct block *block)
 } // end delete_block_node()
 
 
+/* int delete_file_node(struct fileNode **fileList, char * filename)
+ * Description:
+ *    Delete the specified file from the list
+ * Input:
+ *    struct fileNode ** fileList : pointer to the head node of the fileList
+ *    char * filename : Name of the file to be deleted
+ * Output:
+ *    -1 : fileList is empty
+ *     0 : file was found and the node was successfully removed from the list
+ *     1 : file was not found. No changes made to the list
+ */
+int delete_file_node(struct fileNode **fileList, char * filename)
+{
+  struct fileNode *temp, *last;
+  temp = *fileList;
+  // Check for empty list
+  if(is_file_list_empty(fileList))
+  {
+    print_error(LIST_EMPTY);
+    return LIST_EMPTY;
+  }
+    
+  while(temp != NULL)
+  {
+    if(strcmp(filename, temp->filename) == 0)
+    {
+      // First node in the list?
+      if(temp == *fileList)
+        *fileList = temp->nextFile;
+      else
+        last->nextFile = temp->nextFile;
+      return 0;
+    }
+    last = temp;
+    temp = temp->nextFile;
+  }
+  return 1;
+} // end delete_block_node()
+
+
 /* fileNode * find_file(struct fileNode **fileList, char *filename)
  * Description:
  *    Search the fileList for a file with a matching filename
@@ -248,7 +298,7 @@ struct blockNode * get_block_node(struct blockNode **blockList, int blockIndex)
 int get_block_count(struct blockNode *blockList)
 {
   int i;
-  if(blockList == NULL)
+  if(is_block_list_empty())
   { 
     print_error(LIST_EMPTY);
     return 0;
@@ -277,7 +327,7 @@ int get_block_count(struct blockNode *blockList)
  */
 int is_file_list_empty(struct fileNode **fileList)
 {
-  if((*fileList)->filename == NULL)
+  if((*fileList == NULL) || (*fileList)->filename == NULL)
     return 1;
   else
     return 0;

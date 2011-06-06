@@ -20,7 +20,7 @@ flex -d easm.l
 gcc -g lex.yy.c easm.tab.c -lfl -lm -o ../easm
 
 #Create the Eagle Virtual Machine in the parent directory.
-gcc -o ../vpu vpu.c
+gcc -g -o ../vpu vpu.c
 
 if [ "$1" = "noClean" ]
 then
