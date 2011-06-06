@@ -178,6 +178,10 @@ void print_error(int errno)
       printf("Value out of range.\n");
       break;
       
+    case FD_LIMIT_EXCEED:
+      printf("Too many files open.\n");
+      break;
+      
     default:
       printf("An unspecified has error occurred. %d\n", errno);
   }

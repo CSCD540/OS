@@ -228,7 +228,11 @@ void executeit()
     next_instruct[i]=10;
 
   keyhit(54);
-  while(1)
+  
+  if(curProcesses <= 0)
+    printf("No processes to run.\n");
+  
+  while(1 && curProcesses > 0)
   {
     cont:
       terminate = NOT_FINISHED;
@@ -773,6 +777,11 @@ int new_process(char * filename)
   int len = strlen(arg1);
   int index = 0;
   
+  int fd = open(filename);
+  if(fd<0)
+    return fd;
+  close(fd);
+  
   if(MAXPRO == nextPid)
     return -2; //Process table full
   
@@ -793,25 +802,25 @@ int new_process(char * filename)
   processes[nextPid].state = NOT_FINISHED;
   processes[nextPid].iodelay = 0;
   curProcesses = nextPid + 1;
-  printf("New Processes %d\n", nextPid);
+  printf("New Process %d\n", nextPid);
     
-  while(mem[0][lookup_ip(processes[nextPid], 0)] >= 0 && nextPid < MAXPRO)//While we're not at -1 keep going
+  while(nextPid < MAXPRO && mem[0][lookup_ip(processes[nextPid], 0)] >= 0)//While we're not at -1 keep going
   {
-    printf("IP: %d mem[0][%d] = %d\n", processes[nextPid].ip, lookup_ip(processes[nextPid], 0), mem[0][lookup_ip(processes[nextPid], 0)]); 
+    if(DEBUG)printf("IP: %d mem[0][%d] = %d\n", processes[nextPid].ip, lookup_ip(processes[nextPid], 0), mem[0][lookup_ip(processes[nextPid], 0)]); 
     //Scan to the end of the process
     while(mem[0][lookup_ip(processes[nextPid], 0)] >= 0 && 
           mem[0][lookup_ip(processes[nextPid], 0)] != 268)
       processes[nextPid].ip++;
   
     processes[nextPid].ip++;  //Go past the 268
-    printf("IP: %d mem[0][%d] = %d\n", processes[nextPid].ip, lookup_ip(processes[nextPid], 0), mem[0][lookup_ip(processes[nextPid], 0)]); 
+    if(DEBUG)printf("IP: %d mem[0][%d] = %d\n", processes[nextPid].ip, lookup_ip(processes[nextPid], 0), mem[0][lookup_ip(processes[nextPid], 0)]); 
     //After the process there may be ascii constants or registers, so scan until we find a machine instruction
     while((mem[0][lookup_ip(processes[nextPid], 0)] >= 0) &&
           ( (mem[0][lookup_ip(processes[nextPid], 0)] <= 257) || 
             (mem[0][lookup_ip(processes[nextPid], 0)] >= 302) ) )
       processes[nextPid].ip++;
 
-    printf("IP: %d mem[0][%d] = %d\n", processes[nextPid].ip, lookup_ip(processes[nextPid], 0), mem[0][lookup_ip(processes[nextPid], 0)]); 
+    if(DEBUG)printf("IP: %d mem[0][%d] = %d\n", processes[nextPid].ip, lookup_ip(processes[nextPid], 0), mem[0][lookup_ip(processes[nextPid], 0)]); 
     //print_mem();
     //Only process in the file?
     if(mem[0][lookup_ip(processes[nextPid], 0)] < 0)
@@ -821,12 +830,12 @@ int new_process(char * filename)
     }
     else 
     {
-      printf("IP: %d mem[0][%d] = %d\n", processes[nextPid].ip, lookup_ip(processes[nextPid], 0), mem[0][lookup_ip(processes[nextPid], 0)]); 
+      if(DEBUG)printf("IP: %d mem[0][%d] = %d\n", processes[nextPid].ip, lookup_ip(processes[nextPid], 0), mem[0][lookup_ip(processes[nextPid], 0)]); 
       processes[nextPid + 1].poffset = processes[nextPid].ip + processes[nextPid].poffset;
       processes[nextPid + 1].roffset = processes[nextPid].poffset - 10;
       processes[nextPid].ip = 0; 
       nextPid++;
-      printf("New Processes %d\n", nextPid);
+      printf("New Process %d\n", nextPid);
       processes[nextPid].filename = (char *) realloc(processes[nextPid].filename, len * sizeof(char));
 
       if (processes[nextPid].filename == NULL)
@@ -840,7 +849,6 @@ int new_process(char * filename)
       processes[nextPid].iodelay = 0;
       curProcesses = nextPid + 1;
       processes[nextPid].ip = 0;
-      print_mem();
     }
   }
 }
