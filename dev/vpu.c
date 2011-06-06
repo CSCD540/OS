@@ -787,12 +787,12 @@ int new_process(char * filename)
   if(0 == curProcesses) //Reset processes for next run
     nextPid = curProcesses;
   
-  processes[nextPid].filename = (char *) realloc(processes[nextPid].filename, len * sizeof(char));
+  processes[nextPid].filename = (char *) realloc(processes[nextPid].filename, len * sizeof(char) + 1);
   
   if (processes[nextPid].filename == NULL)
     return -1;
   //Make the first process entry for the file.
-  strncpy(processes[nextPid].filename, arg1, len);
+  strncpy(processes[nextPid].filename, arg1, len + 1);
   processes[nextPid].pid = nextPid;
   processes[nextPid].ip = 0; //First instruction is at 10 use the poffset to store this
   processes[nextPid].poffset = 10; //First process in the file
@@ -803,7 +803,9 @@ int new_process(char * filename)
   curProcesses = nextPid + 1;
   printf("New Process %d\n", nextPid);
     
-  while(nextPid < MAXPRO && mem[0][lookup_ip(processes[nextPid], 0)] >= 0)//While we're not at -1 keep going
+  while(nextPid < MAXPRO && 
+        lookup_ip(processes[nextPid], 0) >= 0 && 
+        mem[0][lookup_ip(processes[nextPid], 0)] >= 0)//While we're not at -1 keep going
   {
     if(DEBUG)printf("IP: %d mem[0][%d] = %d\n", processes[nextPid].ip, lookup_ip(processes[nextPid], 0), mem[0][lookup_ip(processes[nextPid], 0)]); 
     //Scan to the end of the process
@@ -831,16 +833,16 @@ int new_process(char * filename)
     {
       if(DEBUG)printf("IP: %d mem[0][%d] = %d\n", processes[nextPid].ip, lookup_ip(processes[nextPid], 0), mem[0][lookup_ip(processes[nextPid], 0)]); 
       processes[nextPid + 1].poffset = processes[nextPid].ip + processes[nextPid].poffset;
-      processes[nextPid + 1].roffset = processes[nextPid].poffset - 10;
       processes[nextPid].ip = 0; 
       nextPid++;
+      processes[nextPid].roffset = processes[nextPid].poffset - 10;
       printf("New Process %d\n", nextPid);
-      processes[nextPid].filename = (char *) realloc(processes[nextPid].filename, len * sizeof(char));
+      processes[nextPid].filename = (char *) realloc(processes[nextPid].filename, len * sizeof(char) + 1);
 
       if (processes[nextPid].filename == NULL)
         return -1;
       //Make the process entry for the file.
-      strncpy(processes[nextPid].filename, arg1, len);
+      strncpy(processes[nextPid].filename, arg1, len + 1);
       processes[nextPid].pid = nextPid;
       processes[nextPid].ip = 0; //First instruction is at 10 use the poffset to store this
       processes[nextPid].status = READY;
@@ -849,6 +851,12 @@ int new_process(char * filename)
       curProcesses = nextPid + 1;
       processes[nextPid].ip = 0;
     }
+  }
+  if(lookup_ip(processes[nextPid], 0) >= 0)
+  {
+    curProcesses--;
+    nextPid--;
+    return -1;
   }
 }
 

@@ -2,14 +2,15 @@ echo on
 save ../milk1.out
 save ../sort.out
 load ../milk1.out
+load ../sort.out
+run
+load ../sort.out
 run
 memdump
 showGlobalMem
 piddump
 exit
 
-load ../sort.out
-load ../milk1.out
 
 memdump
 piddump
