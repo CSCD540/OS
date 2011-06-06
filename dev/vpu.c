@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
     else if(strcmp(cmd, "diskdump")==0)
     {
       print_disk(disk);
-    }
+    } 
     else if(strcmp(cmd, "echo")==0)
     {
       if(arg1 != NULL)
@@ -760,6 +760,7 @@ void push(int stack[][STACKSIZE], int proc_id, int sp[], int data, int calledfro
   }
   stack[proc_id][sp[proc_id]] = data;
 }
+
 
 /* int newProcess(char * filename)
  * Description: This function first scans mem to build the PID table then runs the programs in mem

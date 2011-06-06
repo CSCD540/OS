@@ -60,7 +60,7 @@ char * indent;        //Used for formatting scheduled processes
 #define FD_LIMIT_EXCEED  -7   // Maximum number of file descriptors has been reached
 #define ENDF             -8   // At the end of the process or file
 #define OUT_OF_RANGE     -9   // Argument was out of range
-#define DUPLICATE_FILE    10   // Another file with that file name was found in the pwd
+#define DUPLICATE_FILE   10   // Another file with that file name was found in the pwd
 
 // Memory
 #define PAGESIZE   ((BLOCKSIZE) * 4)        // size of each page in words 2-bytes

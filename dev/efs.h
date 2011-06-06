@@ -119,4 +119,9 @@ void init_disk(struct block disk[])
   fileList->filename = NULL;
 }
 
+
+int delete_file(char * filename)
+{
+  return FILE_NOT_FOUND;
+}
 #endif //_EFS_H_

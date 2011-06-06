@@ -133,7 +133,11 @@ int load_program(char *filename)
  */
 void remove_file(char *filename)
 {
-  printf("Delete file \"%s\" from the filesystem.\n", filename);
+  int status = delete_file(filename);
+  if(status == SUCCESS)
+    printf("File \"%s\" deleted.\n", filename);
+  else
+    print_error(status);
 }
 
 
@@ -225,7 +229,6 @@ void show_help()
   printf(" showGlobalMem\n   display the current contents of the global memory\n\n");
   printf(" showLRU\n   display the current least recently used page\n\n");
   printf(" showPage\n   display out a physical memory page\n\n");
-  printf(" showRegisterData\n   display the current regester data\n\n");
 }
 
 
