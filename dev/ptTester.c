@@ -43,23 +43,23 @@ main(int argc, char *argv[])
   
   accessPage(0, 0);
   accessPage(0, 3);
-  write2Page(0, 3);
+  write2Page(0, 0);
   accessPage(0, 2);
   accessPage(0, 4);
   accessPage(0, 7);
   //accessPage(0, 3);
-  accessPage(0, 2);
+  accessPage(0, 1);
   accessPage(0, 5);
   accessPage(0, 6);
   accessPage(0, 3);
   
   
-  print_disk(disk);
+  //print_disk(disk);
 }
 
 void write2Page(int pid, int vpn)
 {
-  printf("\r\nLooking up virtual page number %d for process %d\r\n", vpn, pid);
+  printf("\r\nLooking up virtual page number %d for process %d (writing)\r\n", vpn, pid);
   
   print_pt();
   
@@ -75,7 +75,7 @@ void write2Page(int pid, int vpn)
 
 void accessPage(int pid, int vpn)
 {
-  printf("\r\nLooking up virtual page number %d for process %d\r\n", vpn, pid);
+  printf("\r\nLooking up virtual page number %d for process %d (accessing)\r\n", vpn, pid);
   
   print_pt();
   

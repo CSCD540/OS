@@ -264,7 +264,7 @@ void print_mem_pages()
   printf("\r\n------------------\r\n|%c[%d;%dm   MAIN MEMORY  %c[%dm|\r\n|----------------|\r\n", 27, 1, 42, 27, 0);
   
   int i,j;
-  for(i = 0; i < MAXPRO; i++)
+  for(i = 0; i < 1; i++)
   {
 //    printf("| Mem column: %2d |\r\n", i);
     for(j = 0; j < MAXMEM; j++)
