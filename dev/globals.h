@@ -6,7 +6,7 @@
 //-----------------------------------------------------------------------------
 
 #define DEBUG         0 // Run debugging
-#define PT_DBG_LVL    0 // The page table debugging level
+#define PT_DBG_LVL    10 // The page table debugging level
 #define DBGCPU        1 // Turn CPU debugging on(1)/off(0)
 #define STEPCPU       0 // Make user hit key to advance program counter
 const char * indent0 = "";
@@ -33,7 +33,7 @@ char * indent;        //Used for formatting scheduled processes
 #define BLOCKSIZE     4  // number of instructions per block
 
 // Filesystem 
-#define DISKSIZE      ((BLOCKSIZE) * 110)          // Total size of the disk
+#define DISKSIZE      ((BLOCKSIZE) * 512)         // Total size of the disk
 #define BLOCKS        ((DISKSIZE) / (BLOCKSIZE))  // Total number of blocks
 #define MAXFILES      1000                        // How many files can be opened at once
 #define NUMBLOCKS     ((DISKSIZE) / (BLOCKSIZE))  // Total number of blocks on the disk

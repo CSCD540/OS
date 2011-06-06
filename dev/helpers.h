@@ -157,7 +157,11 @@ void print_error(int errno)
 {
   printf("\nERROR: ");
   switch(errno)
-  {  
+  { 
+    case SUCCESS:
+      printf("Just kidding. SUCCESS!.\n");
+      break;
+      
     case DISK_FULL:
       printf("Not enough room on the disk.\n");
       break;

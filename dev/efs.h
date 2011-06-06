@@ -22,13 +22,13 @@ struct fileNode *fileList = NULL;
 struct blockNode *freeBlockList = NULL;
 
 
-/* struct blockNode * add_file(char *filename)
+/* struct fileNode * add_file(char *filename)
  * Description:
  *    add a new file with the specified filename to the fileList
  * Input:
  *    char *filename : the name of the file to add
  * Output:
- *    a pointer to the first node in the blockList
+ *    a pointer to the first node in the fileList
  */
 struct fileNode * add_file(char *filename, int numBlocks)
 {
@@ -51,11 +51,11 @@ struct fileNode * add_file(char *filename, int numBlocks)
 
 /* int delete_file(char * filename)
  * Description:
- *    add a new file with the specified filename to the fileList
+ *    Delete a file with the specified filename from the fileList
  * Input:
- *    char *filename : the name of the file to add
+ *    char *filename : the name of the file to delete
  * Output:
- *    a pointer to the first node in the blockList
+ *    a pointer to the first node in the fileList
  */
 int delete_file(char * filename)
 {
@@ -103,7 +103,8 @@ struct fileNode * get_file(char *filename)
   struct fileNode * file;
   file = find_file(&fileList, filename);
   return file;
-}
+}  // Write the file system
+  
 
 
 /* struct block * get_free_block_node()
@@ -158,5 +159,109 @@ void init_disk(struct block disk[])
   fileList = malloc(sizeof(struct fileNode));
   fileList->blockList = NULL;
   fileList->filename = NULL;
+}
+
+
+/* int export_filesystem()
+ * Description:
+ *    Writes all the contents of the file system to a file. Writes all the contents of the disk,
+ *    all the current file names, the number of blocks associated with those files, and the
+ *    block numbers on the disk where the data resides.
+ * Input:
+ *    None
+ * Output:
+ *    A file named "efs.vhd" containing all the current filesystem information.
+ */
+int export_filesystem()
+{
+  if(is_file_list_empty(&fileList))
+  { return LIST_EMPTY; }
+  char * filename = "efs.vhd"; // Name of the backup file to write to
+  FILE * file;
+  // Does the file already exist? If so, annihilate it.
+  if(file = fopen(filename, "r"))
+  {
+    fclose(file);
+    remove(filename);
+  }
+  // Open a file for writing.
+  file = fopen(filename, "w");
+  fprintf(file, "%d\n", DISKSIZE);
+  fprintf(file, "%d\n", BLOCKSIZE);
+  fprintf(file, "%d\n", NUMBLOCKS);
+  
+  // Write the contents of the disk
+  int i = 0;
+  for( ; i < NUMBLOCKS; i++)
+  {
+    int j = 0;
+    for( ; j < BLOCKSIZE; j++)
+    { fprintf(file, "%d\n", disk[i].instructions[j]); }
+  }
+  
+  // Write the file system
+  struct fileNode * fileNode = fileList;
+  while(fileNode != NULL)
+  {
+    // Write file specific information
+    fprintf(file, "%s\n", fileNode->filename);
+    fprintf(file, "%d\n", fileNode->numBlocks);
+    
+    // Write which block numbers are associated with this file
+    struct blockNode * blockNode = fileNode->blockList;
+    while(blockNode != NULL)
+    {
+      fprintf(file, "%d\n", blockNode->block->blockNum);
+      blockNode = blockNode->nextBlock;
+    }
+    fileNode = fileNode->nextFile;
+  }
+  
+  fclose(file);
+  return SUCCESS;
+}
+
+
+int import_filesystem()
+{
+  char * filename = "efs.vhd"; // Name of the backup file to write to
+  FILE * file;
+  // Does the file exist?
+  if(!(file = fopen(filename, "r")))
+  { return FILE_NOT_FOUND; }
+  
+  // Check for consistancy
+  int disksize, blocksize, numblocks;
+  fscanf(file, "%d", &disksize);
+  fscanf(file, "%d", &blocksize);
+  fscanf(file, "%d", &numblocks);
+  if(disksize != DISKSIZE || blocksize != BLOCKSIZE || numblocks != NUMBLOCKS)
+  { printf("Inconsistency with filesystem data specification. File system not restored!\n"); }
+  
+  // Write the contents of the file to the disk
+  int i = 0;
+  for( ; i < NUMBLOCKS; i++)
+  {
+    int j = 0;
+    for( ; j < BLOCKSIZE; j++)
+    { fscanf(file, "%d", &disk[i].instructions[j]); }
+  }
+  
+  char str [100];
+  while(!feof(file))
+  {
+    fscanf(file, "%s", str);
+    printf("filename %s\n", str);
+    int blockCount;
+    fscanf(file, "%d", &blockCount);
+    for(i = 0; i < blockCount; i++)
+    {
+      int bnum;
+      fscanf(file, "%d", &bnum);
+      printf("bnum %d\n", bnum);
+    }
+  }
+  
+  return SUCCESS;
 }
 #endif //_EFS_H_

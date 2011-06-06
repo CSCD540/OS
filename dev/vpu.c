@@ -27,6 +27,8 @@ int echoCmd = 0; // Echo the command on the shell back to the user?
 int main(int argc, char *argv[])
 {
   init_disk(disk);
+  // int temp = import_filesystem();
+  // if(DEBUG) print_error(temp);
   init_mem();
   init_gmem();
   init_pt();
@@ -102,6 +104,7 @@ int main(int argc, char *argv[])
     }
     else if(strcmp(cmd, "exit")==0)
     {
+      export_filesystem();
       show_exit();
     }
     else if(strcmp(cmd, "fdisk")==0)
