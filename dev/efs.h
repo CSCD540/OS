@@ -167,6 +167,23 @@ void init_disk(struct block disk[])
  *    Writes all the contents of the file system to a file. Writes all the contents of the disk,
  *    all the current file names, the number of blocks associated with those files, and the
  *    block numbers on the disk where the data resides.
+ *    Output file format is as follows:
+ *
+ *    DISKSIZE
+ *    BLOCKSIZE
+ *    NUMBLOCKS
+ *    for all disk:
+ *      space delimited instructions, newline at the end of block.
+ *        e.g.
+ *        -1 -1 -1 -1
+ *        -1 -1 -1 -1
+ *        etc...
+ *    for all files:
+ *      filename
+ *      numBlocks
+ *      space delimited list of block numbers.
+ *        e.g.
+ *        23 24 25 26 27 40 45 46 47 48 50 etc...
  * Input:
  *    None
  * Output:
@@ -174,8 +191,6 @@ void init_disk(struct block disk[])
  */
 int export_filesystem()
 {
-  if(is_file_list_empty(&fileList))
-  { return LIST_EMPTY; }
   char * filename = "efs.vhd"; // Name of the backup file to write to
   FILE * file;
   // Does the file already exist? If so, annihilate it.
@@ -184,6 +199,8 @@ int export_filesystem()
     fclose(file);
     remove(filename);
   }
+  if(is_file_list_empty(&fileList))
+  { return LIST_EMPTY; }
   // Open a file for writing.
   file = fopen(filename, "w");
   fprintf(file, "%d\n", DISKSIZE);
@@ -192,29 +209,33 @@ int export_filesystem()
   
   // Write the contents of the disk
   int i = 0;
-  for( ; i < NUMBLOCKS; i++)
+  for( ; i < NUMBLOCKS; i++, fprintf(file, "\n"))
   {
     int j = 0;
     for( ; j < BLOCKSIZE; j++)
-    { fprintf(file, "%d\n", disk[i].instructions[j]); }
+    { fprintf(file, "%d ", disk[i].instructions[j]); }
   }
   
-  // Write the file system
+  // Write out the file system
   struct fileNode * fileNode = fileList;
   while(fileNode != NULL)
   {
-    // Write file specific information
+    // Write out file specific information
     fprintf(file, "%s\n", fileNode->filename);
     fprintf(file, "%d\n", fileNode->numBlocks);
     
-    // Write which block numbers are associated with this file
+    // Write out which block numbers are associated with this file
     struct blockNode * blockNode = fileNode->blockList;
     while(blockNode != NULL)
     {
-      fprintf(file, "%d\n", blockNode->block->blockNum);
+      fprintf(file, "%d", blockNode->block->blockNum);
       blockNode = blockNode->nextBlock;
+      if(blockNode != NULL)
+      { fprintf(file, " "); }
     }
     fileNode = fileNode->nextFile;
+    if(fileNode != NULL)
+    { fprintf(file, "\n"); }
   }
   
   fclose(file);
@@ -251,17 +272,21 @@ int import_filesystem()
   while(!feof(file))
   {
     fscanf(file, "%s", str);
-    printf("filename %s\n", str);
+    if(DEBUG) printf("%s\n", str);
     int blockCount;
     fscanf(file, "%d", &blockCount);
+    struct fileNode * fileNode = add_file(str, blockCount);
     for(i = 0; i < blockCount; i++)
     {
       int bnum;
       fscanf(file, "%d", &bnum);
-      printf("bnum %d\n", bnum);
+      add_block_node(&(fileNode->blockList), &disk[bnum]);
+      delete_block_node(&freeBlockList, &disk[bnum]);
+      if(DEBUG) printf("bnum %d\n", bnum);
     }
   }
   
+  fclose(file);
   return SUCCESS;
 }
 #endif //_EFS_H_

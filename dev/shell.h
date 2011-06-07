@@ -180,6 +180,9 @@ int save_file(char *filename)
       numBlocks++;
   }
   
+  if(numInstructs != 0 && numInstructs % BLOCKSIZE == 0)
+    numBlocks--;
+  
   // Enough available disk space?
   if(get_block_count(freeBlockList) < numBlocks)
   {

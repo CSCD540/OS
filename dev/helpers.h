@@ -159,7 +159,7 @@ void print_error(int errno)
   switch(errno)
   { 
     case SUCCESS:
-      printf("Just kidding. SUCCESS!.\n");
+      printf("Just kidding. SUCCESS!\n");
       break;
       
     case DISK_FULL:

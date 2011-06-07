@@ -40,7 +40,7 @@ struct blockNode * add_block_node(struct blockNode **blockList, struct block *bl
   if(DEBUG) printf("add_block_node:in-block: %p\n", block);
   struct blockNode *temp;
   // List is empty. Add first.
-  if((*blockList)->block == NULL)
+  if(is_block_list_empty(blockList))
   {
     temp = malloc(sizeof(struct blockNode));
     temp->block = block;
@@ -93,7 +93,7 @@ struct fileNode * add_file_node(struct fileNode **fileList, char *filename, int 
 {
   struct fileNode *temp;
   // First file in the list
-  if(is_file_list_empty())
+  if(is_file_list_empty(fileList))
   {
     temp = malloc(sizeof(struct fileNode));
     temp->numBlocks = numBlocks;
@@ -161,11 +161,6 @@ int delete_block_node(struct blockNode **blockList, struct block *block)
   {
     if(temp->block == block)
     {
-      // Initialize the block
-      int i;
-      for(i = 0; i < BLOCKSIZE; i++)
-        block->instructions[i] = -1;
-      
       // First node in the list?
       if(temp == *blockList)
         *blockList = temp->nextBlock;
@@ -345,7 +340,7 @@ int is_file_list_empty(struct fileNode **fileList)
  */
 int is_block_list_empty(struct blockNode **blockList)
 {
-  if(*blockList == NULL)
+  if(*blockList == NULL || (*blockList)->block == NULL)
     return 1;
   else
     return 0;
