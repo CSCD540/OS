@@ -1,0 +1,39 @@
+Testing harness - load a bunch of programs and 
+	Try and create fragmentation test program and measure disk performance. (with big and small )
+	Must exercise io delay
+	
+	
+
+loader - create pid entry
+scheduler - ready/ suspended/ running processes  (randomly pick process to run, 1 instruction)
+process table -
+	pid - get pid number
+	context switch ()
+	filename
+	registers - for register (nice to have) 
+	
+	program counter - virtual address (0 is top of process) pass in the virtual page number
+		offset is the instruction in the page
+		virtual page number is the address shifted by the 
+		physical page is returned by lookup() and in the offset
+	state - running, ready, waiting, suspended
+	
+	look up register r0 then read and write the memory.
+	
+Josh
+
+io delay - Josh
+
+shell commands
+
+help - list of commands available
+run - execute the processes that we've loaded
+load - load a process
+ls - 
+rm - 
+cp - 
+man - Josh
+file_dump - Josh
+fs - 
+df - add free blocks * size of block
+lru 

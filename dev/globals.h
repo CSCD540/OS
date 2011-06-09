@@ -6,7 +6,7 @@
 //-----------------------------------------------------------------------------
 
 #define DEBUG         0 // Run debugging
-#define PT_DBG_LVL    10 // The page table debugging level
+#define PT_DBG_LVL    2 // The page table debugging level
 #define DBGCPU        1 // Turn CPU debugging on(1)/off(0)
 #define STEPCPU       0 // Make user hit key to advance program counter
 const char * indent0 = "";
